@@ -1,11 +1,14 @@
 namespace TestTransform {
     
-    use Ast.Type_;
-    use Ast.Def;
-    use Ast.Def.Def;
+    use Ast.Call.Call;
+    use Ast.Call;
     use Ast.Context;
-    use Ast.Impl;
+    use Ast.Def.Def;
+    use Ast.Def;
     use Ast.Impl.Impl;
+    use Ast.Impl;
+    use Ast.Import;
+    use Ast.Type_;
 
     use Transform.visitClass;
     use Transform.visitMethod;
@@ -27,7 +30,9 @@ namespace TestTransform {
         import java.lang.Class.getMethod(String, Array[Class]): & Pure;
         let string = forName("java.lang.String");
         let method = getMethod(string, "concat", [string] as & Pure);
-        let impl = Impl(Context.Instance, "java.lang.String", "concat", Type_.String_ :: Nil, "x0" :: "x1" :: Nil);
+        let imp = Import.Method(Context.Instance, "java.lang.String.concat", Type_.String_ :: Nil);
+        let call = Call("concat", "x0" :: "x1" :: Nil);
+        let impl = Impl(imp, call);
         visitMethod(method) == Def("concat", ("x0", Type_.String_) :: ("x1", Type_.String_) :: Nil, Type_.String_, impl)
     }
 }

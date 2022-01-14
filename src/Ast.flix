@@ -3,7 +3,21 @@ namespace Ast {
     pub opaque type Def with Eq = (String, List[(String, Type_)], Type_, Impl)
 
     // Impl(context, class, method, types, args)
-    pub opaque type Impl with Eq = (Context, String, String, List[Type_], List[String])
+    pub opaque type Impl with Eq = (Import, Call)
+
+    pub enum Import with Eq {
+        // Method(context, name, params)
+        case Method(Context, String, List[Type_])
+
+        // GetField(context, field, alias)
+        case GetField(Context, String, String)
+
+        // SetField(context, field, alias)
+        case SetField(Context, String, String)
+    }
+
+    // Call(name, params)
+    pub opaque type Call with Eq = (String, List[String])
 
     // Namespace(name, defs)
     pub opaque type Namespace with Eq = (String, List[Def])
@@ -50,17 +64,41 @@ namespace Ast {
     }
 
     instance ToString[Impl] {
-        pub def toString(x: Impl): String = let
-            Impl(context, clazz, method, tpes, args) = x;
-            let tpeString = tpes |> List.map(ToString.toString) |> String.intercalate(", ");
-            let argString = args |> String.intercalate(", ");
-            let mod = match context {
-                case Static => "static " // extra space for formatting
-                case Instance => ""
-            };
-            "import ${mod}${clazz}.${method}(${tpeString});\n" +
-            "${method}(${argString})\n"
+        pub def toString(x: Impl): String =
+            let Impl(imp, call) = x;
+            "${imp}${call}"
     }
+
+    instance ToString[Import] {
+        pub def toString(x: Import): String = match x {
+            case Method(context, name, params) =>
+                let mod = match context {
+                    case Static => "static " // extra space for formatting
+                    case Instance => ""
+                };
+                let paramString = params |> List.map(ToString.toString) |> String.intercalate(", ");
+                "import ${context}${name}(${paramString});\n"
+            case GetField(_, _, _) => ???
+            case SetField(_, _, _) => ???
+        }
+    }
+
+    instance ToString[Call] {
+        pub def toString(x: Call): String =
+            let Call(name, params) = x;
+            let paramString = params |> String.intercalate(", ");
+            "${name}(${paramString})"
+    }
+    
+
+    instance ToString[Context] {
+        pub def toString(x: Context): String = match x {
+            case Static => "static " // kind of hacky to put this in an instance
+            case Instance => ""
+        }
+    }
+    
+    
 
     instance ToString[Type_] {
         pub def toString(x: Type_): String = match x {

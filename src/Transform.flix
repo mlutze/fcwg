@@ -1,10 +1,13 @@
 namespace Transform {
 
+    use Ast.Call.Call;
+    use Ast.Call;
     use Ast.Context;
-    use Ast.Def;
     use Ast.Def.Def;
-    use Ast.Impl;
+    use Ast.Def;
     use Ast.Impl.Impl;
+    use Ast.Impl;
+    use Ast.Import;
     use Ast.Namespace.Namespace;
     use Ast.Namespace;
     use Ast.Type_;
@@ -37,7 +40,9 @@ namespace Transform {
         };
         let paramNames = List.range(0, List.length(outerParamTypes)) |> List.map(i -> "x${i}");
         let params = List.zip(paramNames, outerParamTypes);
-        let impl = Impl(context, clazzName, name, importParamTypes, paramNames);
+        let imp = Import.Method(context, clazzName + "." + name, importParamTypes);
+        let call = Call(name, paramNames);
+        let impl = Impl(imp, call);
         Def(name, params, return, impl)
     }
 
