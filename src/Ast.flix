@@ -1,14 +1,14 @@
 namespace Ast {
     // Def(name, params, type, impl)
-    pub opaque type Def = (String, List[(String, Type_)], Type_, Impl)
+    pub opaque type Def with Eq = (String, List[(String, Type_)], Type_, Impl)
 
     // Impl(context, class, method, types, args)
-    pub opaque type Impl = (Context, String, String, List[Type_], List[String])
+    pub opaque type Impl with Eq = (Context, String, String, List[Type_], List[String])
 
     // Namespace(name, defs)
-    pub opaque type Namespace = (String, List[Def])
+    pub opaque type Namespace with Eq = (String, List[Def])
 
-    pub enum Type_ {
+    pub enum Type_ with Eq {
         case Int8_
         case Int16_
         case Int32_
@@ -23,13 +23,12 @@ namespace Ast {
         case Ref(String)
     }
 
-    pub enum Context {
+    pub enum Context with Eq {
         case Static
         case Instance
     }
 
     instance ToString[Namespace] {
-    
         pub def toString(x: Namespace): String =
             let Namespace(name, defs) = x;
             let contents = defs
@@ -39,10 +38,7 @@ namespace Ast {
             "namespace ${name} {\n" +
             "${contents}" +
             "}"
-    
     }
-    
-
 
     instance ToString[Def] {
         pub def toString(d: Def): String =
@@ -82,6 +78,4 @@ namespace Ast {
             case Ref(name) => "##${name}"
         }
     }
-    
-    
 }

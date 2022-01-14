@@ -19,7 +19,7 @@ namespace Transform {
         Namespace(getSimpleName(c), defs)
     }
 
-    def visitMethod(m: Method): Ast.Def = {
+    pub def visitMethod(m: Method): Ast.Def = {
         import java.lang.reflect.Method.getName(): & Pure;
         import java.lang.reflect.Method.getParameterTypes(): & Pure;
         import java.lang.reflect.Method.getReturnType(): & Pure;
@@ -30,18 +30,18 @@ namespace Transform {
         let clazz = getDeclaringClass(m);
         let clazzName = getCanonicalName(clazz);
         let context = if (isStatic(m)) Context.Static else Context.Instance;
-        let paramTypes = if (isStatic(m)) {
-            { getParameterTypes(m) |> Array.toList |> List.map(visitType) } as & Pure
-        } else {
-            visitType(clazz) :: { getParameterTypes(m) |> Array.toList |> List.map(visitType) } as & Pure
+        let importParamTypes = { getParameterTypes(m) |> Array.toList |> List.map(visitType) } as & Pure;
+        let outerParamTypes = match context {
+            case Context.Static => importParamTypes
+            case Context.Instance => visitType(clazz) :: importParamTypes
         };
-        let paramNames = List.range(0, List.length(paramTypes)) |> List.map(i -> "x${i}");
-        let params = List.zip(paramNames, paramTypes);
-        let impl = Impl(context, clazzName, name, paramTypes, paramNames);
+        let paramNames = List.range(0, List.length(outerParamTypes)) |> List.map(i -> "x${i}");
+        let params = List.zip(paramNames, outerParamTypes);
+        let impl = Impl(context, clazzName, name, importParamTypes, paramNames);
         Def(name, params, return, impl)
     }
 
-    def visitType(t: Class): Ast.Type_ = {
+    pub def visitType(t: Class): Ast.Type_ = {
         import java.lang.Class.getCanonicalName(): & Pure;
         match getCanonicalName(t) {
             case "byte" => Type_.Int8_
