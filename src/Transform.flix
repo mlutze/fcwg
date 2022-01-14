@@ -1,0 +1,68 @@
+namespace Transform {
+
+    use Ast.Context;
+    use Ast.Def;
+    use Ast.Def.Def;
+    use Ast.Impl;
+    use Ast.Impl.Impl;
+    use Ast.Namespace.Namespace;
+    use Ast.Namespace;
+    use Ast.Type_;
+
+    type alias Class = ##java.lang.Class
+    type alias Method = ##java.lang.reflect.Method
+
+    pub def visitClass(c: Class): Namespace = {
+        import java.lang.Class.getMethods(): & Pure;
+        import java.lang.Class.getSimpleName(): & Pure;
+        let defs = { getMethods(c) |> Array.toList |> List.map(visitMethod) } as & Pure;
+        Namespace(getSimpleName(c), defs)
+    }
+
+    def visitMethod(m: Method): Ast.Def = {
+        import java.lang.reflect.Method.getName(): & Pure;
+        import java.lang.reflect.Method.getParameterTypes(): & Pure;
+        import java.lang.reflect.Method.getReturnType(): & Pure;
+        import java.lang.reflect.Method.getDeclaringClass(): & Pure;
+        import java.lang.Class.getCanonicalName(): & Pure;
+        let name = getName(m);
+        let return = getReturnType(m) |> visitType;
+        let clazz = getDeclaringClass(m);
+        let clazzName = getCanonicalName(clazz);
+        let context = if (isStatic(m)) Context.Static else Context.Instance;
+        let paramTypes = if (isStatic(m)) {
+            { getParameterTypes(m) |> Array.toList |> List.map(visitType) } as & Pure
+        } else {
+            visitType(clazz) :: { getParameterTypes(m) |> Array.toList |> List.map(visitType) } as & Pure
+        };
+        let paramNames = List.range(0, List.length(paramTypes)) |> List.map(i -> "x${i}");
+        let params = List.zip(paramNames, paramTypes);
+        let impl = Impl(context, clazzName, name, paramTypes, paramNames);
+        Def(name, params, return, impl)
+    }
+
+    def visitType(t: Class): Ast.Type_ = {
+        import java.lang.Class.getCanonicalName(): & Pure;
+        match getCanonicalName(t) {
+            case "byte" => Type_.Int8_
+            case "short" => Type_.Int16_
+            case "int" => Type_.Int32_
+            case "long" => Type_.Int64_
+            case "float" => Type_.Float32_
+            case "double" => Type_.Float64_
+            case "boolean" => Type_.Bool_
+            case "char" => Type_.Char_
+            case "java.lang.String" => Type_.String_
+            case "java.math.BigInteger" => Type_.BigInt_
+            case "void" => Type_.Unit_
+            case name => Type_.Ref(name)
+        }
+        // TODO handle arrays, other generics
+    }
+
+    def isStatic(m: Method): Bool = {
+        import java.lang.reflect.Method.getModifiers(): & Pure;
+        import static java.lang.reflect.Modifier.isStatic(Int): & Pure;
+        getModifiers(m) |> isStatic
+    }
+}
