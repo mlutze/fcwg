@@ -35,6 +35,7 @@ namespace Ast {
         case BigInt_
         case Unit_
         case Ref(String)
+        case Array_(Type_)
     }
 
     pub enum Context with Eq {
@@ -114,6 +115,7 @@ namespace Ast {
             case BigInt_ => "BigInt"
             case Unit_ => "Unit"
             case Ref(name) => "##${name}"
+            case Array_(ct) => "Array[${ct}]"
         }
     }
 }

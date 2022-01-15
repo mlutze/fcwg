@@ -48,21 +48,27 @@ namespace Transform {
 
     pub def visitType(t: Class): Ast.Type_ = {
         import java.lang.Class.getCanonicalName(): & Pure;
-        match getCanonicalName(t) {
-            case "byte" => Type_.Int8_
-            case "short" => Type_.Int16_
-            case "int" => Type_.Int32_
-            case "long" => Type_.Int64_
-            case "float" => Type_.Float32_
-            case "double" => Type_.Float64_
-            case "boolean" => Type_.Bool_
-            case "char" => Type_.Char_
-            case "java.lang.String" => Type_.String_
-            case "java.math.BigInteger" => Type_.BigInt_
-            case "void" => Type_.Unit_
-            case name => Type_.Ref(name)
+        import java.lang.Class.isArray(): & Pure;
+        import java.lang.Class.getComponentType(): & Pure;
+        if (isArray(t)) {
+            let ct = getComponentType(t);
+            Type_.Array_(visitType(ct))
+        } else {
+            match getCanonicalName(t) {
+                case "byte" => Type_.Int8_
+                case "short" => Type_.Int16_
+                case "int" => Type_.Int32_
+                case "long" => Type_.Int64_
+                case "float" => Type_.Float32_
+                case "double" => Type_.Float64_
+                case "boolean" => Type_.Bool_
+                case "char" => Type_.Char_
+                case "java.lang.String" => Type_.String_
+                case "java.math.BigInteger" => Type_.BigInt_
+                case "void" => Type_.Unit_
+                case name => Type_.Ref(name)
+            }
         }
-        // TODO handle arrays, other generics
     }
 
     def isStatic(m: Method): Bool = {
