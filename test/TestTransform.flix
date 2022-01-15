@@ -25,6 +25,14 @@ namespace TestTransform {
     }
 
     @test
+    def testVisitType02(): Bool = {
+        import static java.lang.Class.forName(String): & Pure;
+        import java.lang.Class.arrayType(): & Pure;
+        let tpe = forName("java.lang.StringBuilder") |> arrayType;
+        visitType(tpe) == Type_.Array_(Type_.Ref("java.lang.StringBuilder"))
+    }
+
+    @test
     def testVisitMethod01(): Bool = {
         import static java.lang.Class.forName(String): & Pure;
         import java.lang.Class.getMethod(String, Array[Class]): & Pure;
