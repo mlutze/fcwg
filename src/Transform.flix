@@ -16,9 +16,15 @@ namespace Transform {
     type alias Method = ##java.lang.reflect.Method
 
     pub def visitClass(c: Class): Namespace = {
-        import java.lang.Class.getMethods(): & Pure;
+        import java.lang.Class.getDeclaredMethods(): & Pure;
         import java.lang.Class.getSimpleName(): & Pure;
-        let defs = { getMethods(c) |> Array.toList |> List.map(visitMethod) } as & Pure;
+        let defs = {
+            getDeclaredMethods(c) 
+            |> Array.toList 
+            |> List.filter(isPublic) 
+            |> List.filter(isBlackMagic >> Bool.not)
+            |> List.map(visitMethod)
+        } as & Pure;
         Namespace(getSimpleName(c), defs)
     }
 
@@ -75,5 +81,18 @@ namespace Transform {
         import java.lang.reflect.Method.getModifiers(): & Pure;
         import static java.lang.reflect.Modifier.isStatic(Int): & Pure;
         getModifiers(m) |> isStatic
+    }
+
+    def isPublic(m: Method): Bool = {
+        import java.lang.reflect.Method.getModifiers(): & Pure;
+        import static java.lang.reflect.Modifier.isPublic(Int): & Pure;
+        getModifiers(m) |> isPublic
+    }
+
+    /// A method with an undocumented modifier.
+    /// Causes issues as it may have signature overlap.
+    def isBlackMagic(m: Method): Bool = {
+        import java.lang.reflect.Method.getModifiers(): & Pure;
+        getModifiers(m) &&& 4096 != 0
     }
 }

@@ -8,6 +8,8 @@ namespace TestTransform {
     use Ast.Impl.Impl;
     use Ast.Impl;
     use Ast.Import;
+    use Ast.Namespace.Namespace;
+    use Ast.Namespace;
     use Ast.Type_;
 
     use Transform.visitClass;
@@ -42,5 +44,13 @@ namespace TestTransform {
         let call = Call("concat", "x0" :: "x1" :: Nil);
         let impl = Impl(imp, call);
         visitMethod(method) == Def("concat", ("x0", Type_.String_) :: ("x1", Type_.String_) :: Nil, Type_.String_, impl)
+    }
+
+    @test
+    def testVisitClassIgnoreInherited(): Bool = {
+        import static java.lang.Class.forName(String): & Pure;
+        let clazz = forName("java.lang.String");
+        let Namespace(_, defs) = visitClass(clazz);
+        List.count(match Def(name, _, _, _) -> name == "wait", defs) == 0
     }
 }
