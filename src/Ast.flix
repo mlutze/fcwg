@@ -73,14 +73,12 @@ namespace Ast {
     instance ToString[Import] {
         pub def toString(x: Import): String = match x {
             case Method(context, name, params) =>
-                let mod = match context {
-                    case Static => "static " // extra space for formatting
-                    case Instance => ""
-                };
                 let paramString = params |> List.map(ToString.toString) |> String.intercalate(", ");
                 "import ${context}${name}(${paramString});\n"
-            case GetField(_, _, _) => ???
-            case SetField(_, _, _) => ???
+            case GetField(context, name, func) =>
+                "import ${context} get ${name} as ${func};\n"
+            case SetField(context, name, func) =>
+                "import ${context} set ${name} as ${func};\n"
         }
     }
 

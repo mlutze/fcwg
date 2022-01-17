@@ -13,6 +13,7 @@ namespace TestTransform {
     use Ast.Type_;
 
     use Transform.visitClass;
+    use Transform.visitField;
     use Transform.visitMethod;
     use Transform.visitType;
 
@@ -44,6 +45,18 @@ namespace TestTransform {
         let call = Call("concat", "x0" :: "x1" :: Nil);
         let impl = Impl(imp, call);
         visitMethod(method) == Def("concat", ("x0", Type_.String_) :: ("x1", Type_.String_) :: Nil, Type_.String_, impl)
+    }
+
+    @test
+    def testVisitField01(): Bool = {
+        import static java.lang.Class.forName(String): & Pure;
+        import java.lang.Class.getField(String): & Pure;
+        let string = forName("java.lang.String");
+        let field = getField(string, "CASE_INSENSITIVE_ORDER");
+        let imp = Import.GetField(Context.Static, "java.lang.String.CASE_INSENSITIVE_ORDER", "getCASE_INSENSITIVE_ORDER");
+        let call = Call("getCASE_INSENSITIVE_ORDER", Nil);
+        let impl = Impl(imp, call);
+        visitField(field) == Def("getCASE_INSENSITIVE_ORDER", Nil, Type_.Ref("java.util.Comparator"), impl) :: Nil
     }
 
     @test

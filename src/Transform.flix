@@ -13,19 +13,27 @@ namespace Transform {
     use Ast.Type_;
 
     type alias Class = ##java.lang.Class
+    type alias Field = ##java.lang.reflect.Field
     type alias Method = ##java.lang.reflect.Method
 
     pub def visitClass(c: Class): Namespace = {
         import java.lang.Class.getDeclaredMethods(): & Pure;
         import java.lang.Class.getSimpleName(): & Pure;
-        let defs = {
+        import java.lang.Class.getDeclaredFields(): & Pure;
+        let defs1 = {
             getDeclaredMethods(c) 
             |> Array.toList 
             |> List.filter(isPublic) 
             |> List.filter(isBlackMagic >> Bool.not)
             |> List.map(visitMethod)
         } as & Pure;
-        Namespace(getSimpleName(c), defs)
+        let defs2 = {
+            getDeclaredFields(c)
+            |> Array.toList
+            |> List.filter(isPublicField)
+            |> List.flatMap(visitField)
+        } as & Pure;
+        Namespace(getSimpleName(c), defs1 ::: defs2)
     }
 
     pub def visitMethod(m: Method): Ast.Def = {
@@ -50,6 +58,60 @@ namespace Transform {
         let call = Call(name, paramNames);
         let impl = Impl(imp, call);
         Def(name, params, return, impl)
+    }
+
+    pub def visitField(f: Field): List[Ast.Def] = {
+        if (isFinalField(f)) {
+            mkGetter(f) :: Nil
+        } else {
+            mkGetter(f) :: mkSetter(f) :: Nil
+        }
+    }
+
+    def mkGetter(f: Field): Ast.Def = {
+        import java.lang.reflect.Field.getDeclaringClass(): & Pure;
+        import java.lang.reflect.Field.getName(): & Pure;
+        import java.lang.reflect.Field.getType(): & Pure;
+        import java.lang.Class.getCanonicalName(): & Pure;
+        let context = if (isStaticField(f)) Context.Static else Context.Instance;
+        let name = getName(f);
+        let clazz = getDeclaringClass(f);
+        let clazzName = getCanonicalName(clazz);
+        let fieldType = visitType(getType(f));
+        let paramTypes = match context {
+            case Context.Static => Nil
+            case Context.Instance => visitType(clazz) :: Nil
+        };
+        let paramNames = List.range(0, List.length(paramTypes)) |> List.map(i -> "x${i}");
+        let params = List.zip(paramNames, paramTypes);
+        let funcName = getterName(name);
+        let imp = Import.GetField(context, clazzName + "." + name, funcName);
+        let call = Call(funcName, paramNames);
+        let impl = Impl(imp, call);
+        Def(funcName, params, fieldType, impl)
+    }
+
+    def mkSetter(f: Field): Ast.Def = {
+        import java.lang.reflect.Field.getDeclaringClass(): & Pure;
+        import java.lang.reflect.Field.getName(): & Pure;
+        import java.lang.reflect.Field.getType(): & Pure;
+        import java.lang.Class.getCanonicalName(): & Pure;
+        let context = if (isStaticField(f)) Context.Static else Context.Instance;
+        let name = getName(f);
+        let clazz = getDeclaringClass(f);
+        let clazzName = getCanonicalName(clazz);
+        let fieldType = visitType(getType(f));
+        let paramTypes = match context {
+            case Context.Static => fieldType :: Nil
+            case Context.Instance => visitType(clazz) :: fieldType :: Nil
+        };
+        let paramNames = List.range(0, List.length(paramTypes)) |> List.map(i -> "x${i}");
+        let params = List.zip(paramNames, paramTypes);
+        let funcName = setterName(name);
+        let imp = Import.SetField(context, clazzName + "." + name, funcName);
+        let call = Call(funcName, paramNames);
+        let impl = Impl(imp, call);
+        Def(funcName, params, fieldType, impl)
     }
 
     pub def visitType(t: Class): Ast.Type_ = {
@@ -77,6 +139,18 @@ namespace Transform {
         }
     }
 
+    def isStaticField(f: Field): Bool = {
+        import java.lang.reflect.Field.getModifiers(): & Pure;
+        import static java.lang.reflect.Modifier.isStatic(Int): & Pure;
+        getModifiers(f) |> isStatic
+    }
+
+    def isFinalField(f: Field): Bool = {
+        import java.lang.reflect.Field.getModifiers(): & Pure;
+        import static java.lang.reflect.Modifier.isFinal(Int): & Pure;
+        getModifiers(f) |> isFinal
+    }
+
     def isStatic(m: Method): Bool = {
         import java.lang.reflect.Method.getModifiers(): & Pure;
         import static java.lang.reflect.Modifier.isStatic(Int): & Pure;
@@ -89,10 +163,30 @@ namespace Transform {
         getModifiers(m) |> isPublic
     }
 
+    def isPublicField(f: Field): Bool = {
+        import java.lang.reflect.Field.getModifiers(): & Pure;
+        import static java.lang.reflect.Modifier.isPublic(Int): & Pure;
+        getModifiers(f) |> isPublic
+    }
+
     /// A method with an undocumented modifier.
     /// Causes issues as it may have signature overlap.
     def isBlackMagic(m: Method): Bool = {
         import java.lang.reflect.Method.getModifiers(): & Pure;
         getModifiers(m) &&& 4096 != 0
+    }
+
+    def getterName(fieldName: String): String = {
+        // safe because field names are never empty
+        let head = String.charAt(0, fieldName);
+        let tail = String.sliceRight(1, fieldName);
+        "get" + "${Char.toUpperCase(head)}" + tail
+    }
+
+    def setterName(fieldName: String): String = {
+        // safe because field names are never empty
+        let head = String.charAt(0, fieldName);
+        let tail = String.sliceRight(1, fieldName);
+        "set" + "${Char.toUpperCase(head)}" + tail
     }
 }
