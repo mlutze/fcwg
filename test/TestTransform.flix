@@ -1,5 +1,6 @@
 namespace TestTransform {
     
+    use Ast.Body;
     use Ast.Call.Call;
     use Ast.Call;
     use Ast.Context;
@@ -21,14 +22,14 @@ namespace TestTransform {
     type alias Method = ##java.lang.reflect.Method
 
     @test
-    def testVisitType01(): Bool = {
+    def testVisitType(): Bool = {
         import static java.lang.Class.forName(String): & Pure;
         let tpe = forName("java.lang.String");
         visitType(tpe) == Type_.String_
     }
 
     @test
-    def testVisitType02(): Bool = {
+    def testVisitTypeArray(): Bool = {
         import static java.lang.Class.forName(String): & Pure;
         import java.lang.Class.arrayType(): & Pure;
         let tpe = forName("java.lang.StringBuilder") |> arrayType;
@@ -36,26 +37,42 @@ namespace TestTransform {
     }
 
     @test
-    def testVisitMethod01(): Bool = {
+    def testVisitMethod(): Bool = {
         import static java.lang.Class.forName(String): & Pure;
         import java.lang.Class.getMethod(String, Array[Class]): & Pure;
         let string = forName("java.lang.String");
         let method = getMethod(string, "concat", [string] as & Pure);
         let imp = Import.Method(Context.Instance, "java.lang.String.concat", Type_.String_ :: Nil);
         let call = Call("concat", "x0" :: "x1" :: Nil);
-        let impl = Impl(imp, call);
+        let body = Body.NoTry(call);
+        let impl = Impl(imp, body);
         visitMethod(method) == Def("concat", ("x0", Type_.String_) :: ("x1", Type_.String_) :: Nil, Type_.String_, impl)
     }
 
     @test
-    def testVisitField01(): Bool = {
+    def testVisitMethodException(): Bool = {
+        import static java.lang.Class.forName(String): & Pure;
+        import java.lang.Class.getMethod(String, Array[Class]): & Pure;
+        let clazz = forName("java.lang.Class");
+        let string = forName("java.lang.String");
+        let method = getMethod(clazz, "forName", [string] as & Pure);
+        let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil);
+        let call = Call("forName", "x0" :: Nil);
+        let body = Body.TryCatch(call);
+        let impl = Impl(imp, body);
+        visitMethod(method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Result_(Type_.Ref("java.lang.Class"), Type_.Ref("java.lang.Exception")), impl)
+    }
+
+    @test
+    def testVisitField(): Bool = {
         import static java.lang.Class.forName(String): & Pure;
         import java.lang.Class.getField(String): & Pure;
         let string = forName("java.lang.String");
         let field = getField(string, "CASE_INSENSITIVE_ORDER");
         let imp = Import.GetField(Context.Static, "java.lang.String.CASE_INSENSITIVE_ORDER", "getCASE_INSENSITIVE_ORDER");
         let call = Call("getCASE_INSENSITIVE_ORDER", Nil);
-        let impl = Impl(imp, call);
+        let body = Body.NoTry(call);
+        let impl = Impl(imp, body);
         visitField(field) == Def("getCASE_INSENSITIVE_ORDER", Nil, Type_.Ref("java.util.Comparator"), impl) :: Nil
     }
 

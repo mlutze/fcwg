@@ -2,8 +2,7 @@ namespace Ast {
     // Def(name, params, type, impl)
     pub opaque type Def with Eq = (String, List[(String, Type_)], Type_, Impl)
 
-    // Impl(context, class, method, types, args)
-    pub opaque type Impl with Eq = (Import, Call)
+    pub opaque type Impl with Eq = (Import, Body)
 
     pub enum Import with Eq {
         // Method(context, name, params)
@@ -14,6 +13,11 @@ namespace Ast {
 
         // SetField(context, field, alias)
         case SetField(Context, String, String)
+    }
+
+    pub enum Body with Eq {
+        case TryCatch(Call)
+        case NoTry(Call)
     }
 
     // Call(name, params)
@@ -36,6 +40,7 @@ namespace Ast {
         case Unit_
         case Ref(String)
         case Array_(Type_)
+        case Result_(Type_, Type_)
     }
 
     pub enum Context with Eq {
@@ -68,6 +73,19 @@ namespace Ast {
         pub def toString(x: Impl): String =
             let Impl(imp, call) = x;
             "${imp}${call}"
+    }
+
+    instance ToString[Body] {
+        pub def toString(x: Body): String = match x {
+            case NoTry(call) => "${call}"
+            case TryCatch(call) =>
+                "try {\n" +
+                "    Ok(${call})\n" +
+                "} catch {\n" +
+                "    case e: ##java.lang.Exception => Err(e)\n" +
+                "}"
+
+        }
     }
 
     instance ToString[Import] {
@@ -114,6 +132,7 @@ namespace Ast {
             case Unit_ => "Unit"
             case Ref(name) => "##${name}"
             case Array_(ct) => "Array[${ct}]"
+            case Result_(t, e) => "Result[${t}, ${e}]"
         }
     }
 }

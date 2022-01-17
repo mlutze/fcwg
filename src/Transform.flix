@@ -1,5 +1,6 @@
 namespace Transform {
 
+    use Ast.Body;
     use Ast.Call.Call;
     use Ast.Call;
     use Ast.Context;
@@ -42,6 +43,7 @@ namespace Transform {
         import java.lang.reflect.Method.getReturnType(): & Pure;
         import java.lang.reflect.Method.getDeclaringClass(): & Pure;
         import java.lang.Class.getCanonicalName(): & Pure;
+        import java.lang.reflect.Method.getExceptionTypes(): & Pure;
         let name = getName(m);
         let return = getReturnType(m) |> visitType;
         let clazz = getDeclaringClass(m);
@@ -52,12 +54,19 @@ namespace Transform {
             case Context.Static => importParamTypes
             case Context.Instance => visitType(clazz) :: importParamTypes
         };
+        let canFail = getExceptionTypes(m) |> Array.isEmpty |> Bool.not;
+        let outerReturnType = if (canFail) {
+            Type_.Result_(return, Type_.Ref("java.lang.Exception"))
+        } else {
+            return
+        };
         let paramNames = List.range(0, List.length(outerParamTypes)) |> List.map(i -> "x${i}");
         let params = List.zip(paramNames, outerParamTypes);
         let imp = Import.Method(context, clazzName + "." + name, importParamTypes);
         let call = Call(name, paramNames);
-        let impl = Impl(imp, call);
-        Def(name, params, return, impl)
+        let body = if (canFail) Body.TryCatch(call) else Body.NoTry(call);
+        let impl = Impl(imp, body);
+        Def(name, params, outerReturnType, impl)
     }
 
     pub def visitField(f: Field): List[Ast.Def] = {
@@ -87,7 +96,8 @@ namespace Transform {
         let funcName = getterName(name);
         let imp = Import.GetField(context, clazzName + "." + name, funcName);
         let call = Call(funcName, paramNames);
-        let impl = Impl(imp, call);
+        let body = Body.NoTry(call);
+        let impl = Impl(imp, body);
         Def(funcName, params, fieldType, impl)
     }
 
@@ -110,7 +120,8 @@ namespace Transform {
         let funcName = setterName(name);
         let imp = Import.SetField(context, clazzName + "." + name, funcName);
         let call = Call(funcName, paramNames);
-        let impl = Impl(imp, call);
+        let body = Body.NoTry(call);
+        let impl = Impl(imp, body);
         Def(funcName, params, fieldType, impl)
     }
 
