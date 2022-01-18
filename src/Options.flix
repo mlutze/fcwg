@@ -16,32 +16,32 @@ namespace Options {
         case Version
     }
 
-    pub enum OptionLevel {
+    pub enum OptionLevel with Eq, Order {
         case OptionNone
         case OptionRef
         case OptionAll
     }
 
-    pub enum PureLevel {
+    pub enum PureLevel with Eq, Order {
         case PureNone
         case PureFinal
         case PureButSetters
         case PureAll
     }
 
-    pub enum ResultLevel {
+    pub enum ResultLevel with Eq, Order {
         case ResultNone
         case ResultChecked
         case ResultAll
     }
 
-    pub enum SuperLevel {
+    pub enum SuperLevel with Eq, Order {
         case SuperNone
         case SuperButObject
         case SuperAll
     }
 
-    pub type alias Options = {
+    pub opaque type Options = {
         generic :: Bool,
         namespace_ :: Option[String],
         optionLevel :: OptionLevel,
@@ -50,7 +50,19 @@ namespace Options {
         superLevel :: SuperLevel
     }
 
-    pub enum Command {
+    instance Eq[Options] {
+        pub def eq(x0: Options, y0: Options): Bool =
+            let Options(x) = x0;
+            let Options(y) = y0;
+            x.generic == y.generic and
+                x.namespace_ == y.namespace_ and
+                x.optionLevel == y.optionLevel and
+                x.pureLevel == y.pureLevel and
+                x.resultLevel == y.resultLevel and
+                x.superLevel == y.superLevel
+    }
+
+    pub enum Command with Eq {
         case GetHelp
         case GetVersion
         case GoInteractive(String, Options)
@@ -70,14 +82,14 @@ namespace Options {
         {optionIds = 'v' :: Nil, optionNames = "version" :: Nil, argDescriptor = NoArg(Version), explanation = "Prints the version string and exits."} ::
         Nil
     
-    def defaultOptions(): Options = {
+    def defaultOptions(): Options = Options({
         generic = false,
         namespace_ = None,
         optionLevel = OptionNone,
         pureLevel = PureNone,
         resultLevel = ResultNone,
         superLevel = SuperNone
-    }
+    })
     
     def namespace_(x: String): Option[Flag] = Some(Namespace(x)) // MATT validate namespace
 
@@ -109,42 +121,44 @@ namespace Options {
         }
     }
 
-    def addOpt(opt: Flag, opts: Options): Options = match opt {
-        case Generic => { generic = true | opts }
-        case Help => unreachable!()
-        case Interactive => unreachable!()
-        case Namespace(name) => { namespace_ = Some(name) | opts }
-        case Option =>
-            let o = match opts.optionLevel {
-                case OptionNone => OptionRef
-                case OptionRef => OptionAll
-                case OptionAll => OptionAll
-            };
-            { optionLevel = o | opts }
-        case Pure_ =>
-            let p = match opts.pureLevel {
-                case PureNone => PureFinal
-                case PureFinal => PureButSetters
-                case PureButSetters => PureAll
-                case PureAll => PureAll
-            };
-            { pureLevel = p | opts }
-        case Result =>
-            let r = match opts.resultLevel {
-                case ResultNone => ResultChecked
-                case ResultChecked => ResultAll
-                case ResultAll => ResultAll
-            };
-            { resultLevel = r | opts }
-        case Super =>
-            let s = match opts.superLevel {
-                case SuperNone => SuperButObject
-                case SuperButObject => SuperAll
-                case SuperAll => SuperAll
-            };
-            { superLevel = s | opts }
-        case Version => unreachable!()
-
-    }
+    def addOpt(opt: Flag, opts0: Options): Options = 
+        let Options(opts) = opts0;
+        let newOpts = match opt {
+            case Generic => { generic = true | opts }
+            case Help => unreachable!()
+            case Interactive => unreachable!()
+            case Namespace(name) => { namespace_ = Some(name) | opts }
+            case Option =>
+                let o = match opts.optionLevel {
+                    case OptionNone => OptionRef
+                    case OptionRef => OptionAll
+                    case OptionAll => OptionAll
+                };
+                { optionLevel = o | opts }
+            case Pure_ =>
+                let p = match opts.pureLevel {
+                    case PureNone => PureFinal
+                    case PureFinal => PureButSetters
+                    case PureButSetters => PureAll
+                    case PureAll => PureAll
+                };
+                { pureLevel = p | opts }
+            case Result =>
+                let r = match opts.resultLevel {
+                    case ResultNone => ResultChecked
+                    case ResultChecked => ResultAll
+                    case ResultAll => ResultAll
+                };
+                { resultLevel = r | opts }
+            case Super =>
+                let s = match opts.superLevel {
+                    case SuperNone => SuperButObject
+                    case SuperButObject => SuperAll
+                    case SuperAll => SuperAll
+                };
+                { superLevel = s | opts }
+            case Version => unreachable!()
+        };
+    Options(newOpts)
 
 }
