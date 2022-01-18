@@ -1,3 +1,4 @@
+use Options.Command;
 use Options.parse;
 use Transform.visitClass;
 
@@ -5,13 +6,14 @@ use Transform.visitClass;
 def main(args: Array[String]): Int32 & Impure =
     import static java.lang.Class.forName(String): & Pure;
     match parse(args) {
-        case Go(clazz, opts) =>
+        case Success(Command.Go(clazz, _)) =>
             let ns = visitClass(forName(clazz));
             println(ns);
             0
-        case _ =>
+        case Success(_) =>
             println("Unsupported operation.");
             1
+        case Failure(_) =>
+            println("Failure parsing command line arguments.");
+            2
     }
-}
-
