@@ -20,31 +20,52 @@ namespace Transform {
     use Options.Options;
     use Options.PureLevel;
     use Options.ResultLevel;
+    use Options.SuperLevel;
 
     type alias Class = ##java.lang.Class
     type alias Field = ##java.lang.reflect.Field
     type alias Method = ##java.lang.reflect.Method
 
     pub def visitClass(o: Options, c: Class): Namespace = {
-        import java.lang.Class.getDeclaredMethods(): & Pure;
         import java.lang.Class.getSimpleName(): & Pure;
-        import java.lang.Class.getDeclaredFields(): & Pure;
         let defs1 = {
-            getDeclaredMethods(c) 
-            |> Array.toList 
-            |> List.filter(isPublic) 
+            getMethodsFor(o, c) 
             |> List.filter(isBlackMagic >> Bool.not)
             |> List.map(visitMethod(o))
-        } as & Pure;
+        };
         let defs2 = {
-            getDeclaredFields(c)
-            |> Array.toList
-            |> List.filter(isPublicField)
+            getFieldsFor(o, c)
             |> List.flatMap(visitField(o))
-        } as & Pure;
+        };
         let Options(opts) = o;
         let name = opts.namespace_ |> Option.getWithDefault(getSimpleName(c));
         Namespace(name, defs1 ::: defs2)
+    }
+
+    def getMethodsFor(o: Options, c: Class): List[Method] = {
+        import java.lang.Class.getMethods(): & Pure;
+        import java.lang.Class.getName(): & Pure;
+        import java.lang.reflect.Method.getDeclaringClass(): & Pure;
+        let Options(opts) = o;
+        let clazzName = getName(c);
+        match opts.superLevel {
+            case SuperLevel.SuperNone => getMethods(c) |> Array.toList |> List.filter(m -> getName(getDeclaringClass(m)) == clazzName)
+            case SuperLevel.SuperButObject => getMethods(c) |> Array.toList |> List.filter(m -> getName(getDeclaringClass(m)) != "java.lang.Object")
+            case SuperLevel.SuperAll => getMethods(c) |> Array.toList
+        } as & Pure
+    }
+
+    def getFieldsFor(o: Options, c: Class): List[Field] = {
+        import java.lang.Class.getFields(): & Pure;
+        import java.lang.Class.getName(): & Pure;
+        import java.lang.reflect.Field.getDeclaringClass(): & Pure;
+        let Options(opts) = o;
+        let clazzName = getName(c);
+        match opts.superLevel {
+            case SuperLevel.SuperNone => getFields(c) |> Array.toList |> List.filter(m -> getName(getDeclaringClass(m)) == clazzName)
+            case SuperLevel.SuperButObject => getFields(c) |> Array.toList |> List.filter(m -> getName(getDeclaringClass(m)) != "java.lang.Object")
+            case SuperLevel.SuperAll => getFields(c) |> Array.toList
+        } as & Pure
     }
 
     pub def visitMethod(o: Options, m: Method): Ast.Def = {
@@ -207,18 +228,6 @@ namespace Transform {
         import java.lang.reflect.Method.getModifiers(): & Pure;
         import static java.lang.reflect.Modifier.isStatic(Int): & Pure;
         getModifiers(m) |> isStatic
-    }
-
-    def isPublic(m: Method): Bool = {
-        import java.lang.reflect.Method.getModifiers(): & Pure;
-        import static java.lang.reflect.Modifier.isPublic(Int): & Pure;
-        getModifiers(m) |> isPublic
-    }
-
-    def isPublicField(f: Field): Bool = {
-        import java.lang.reflect.Field.getModifiers(): & Pure;
-        import static java.lang.reflect.Modifier.isPublic(Int): & Pure;
-        getModifiers(f) |> isPublic
     }
 
     /// A method with an undocumented modifier.
