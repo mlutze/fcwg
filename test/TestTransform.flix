@@ -57,6 +57,20 @@ namespace TestTransform {
     }
 
     @test
+    def testVisitMethodExceptionNoResult(): Bool = {
+        import static java.lang.Class.forName(String): & Pure;
+        import java.lang.Class.getMethod(String, Array[Class]): & Pure;
+        let clazz = forName("java.lang.Class");
+        let string = forName("java.lang.String");
+        let method = getMethod(clazz, "forName", [string] as & Pure);
+        let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Effect.Impure_);
+        let call = Call("forName", "x0" :: Nil);
+        let body = Body.NoTry(call);
+        let impl = Impl(imp, body);
+        visitMethod(defaultOptions(), method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Ref("java.lang.Class"), Effect.Impure_, impl)
+    }
+
+    @test
     def testVisitMethodException(): Bool = {
         import static java.lang.Class.forName(String): & Pure;
         import java.lang.Class.getMethod(String, Array[Class]): & Pure;

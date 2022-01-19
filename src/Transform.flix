@@ -67,16 +67,21 @@ namespace Transform {
             case Context.Instance => visitType(clazz) :: importParamTypes
         };
         let canFail = getExceptionTypes(m) |> Array.isEmpty |> Bool.not;
-        let outerReturnType = match (o, canFail) {
-            case (Options(opts), true) if opts.resultLevel >= ResultLevel.ResultChecked => Type_.Result_(return, Type_.Ref("java.lang.Exception"))
-            case (Options(opts), _) if opts.resultLevel >= ResultLevel.ResultAll => Type_.Result_(return, Type_.Ref("java.lang.Exception"))
-            case _ => return
+        let catchException = match (o, canFail) {
+            case (Options(opts), true) if opts.resultLevel >= ResultLevel.ResultChecked => true
+            case (Options(opts), _) if opts.resultLevel >= ResultLevel.ResultAll => true
+            case _ => false
+        };
+        let outerReturnType = if (catchException) {
+            Type_.Result_(return, Type_.Ref("java.lang.Exception"))
+        } else {
+            return
         };
         let paramNames = List.range(0, List.length(outerParamTypes)) |> List.map(i -> "x${i}");
         let params = List.zip(paramNames, outerParamTypes);
         let imp = Import.Method(context, clazzName + "." + name, importParamTypes, eff);
         let call = Call(name, paramNames);
-        let body = if (canFail) Body.TryCatch(call) else Body.NoTry(call);
+        let body = if (catchException) Body.TryCatch(call) else Body.NoTry(call);
         let impl = Impl(imp, body);
         Def(name, params, outerReturnType, eff, impl)
     }
