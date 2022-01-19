@@ -107,6 +107,7 @@ namespace Transform {
         import java.lang.reflect.Field.getName(): & Pure;
         import java.lang.reflect.Field.getType(): & Pure;
         import java.lang.Class.getCanonicalName(): & Pure;
+        import java.lang.Class.isPrimitive(): & Pure;
         let context = if (isStaticField(f)) Context.Static else Context.Instance;
         let eff = match (o, isFinalField(f)) {
             case (Options(opts), true) if opts.pureLevel >= PureLevel.PureFinal => Effect.Pure_
@@ -126,7 +127,12 @@ namespace Transform {
         let funcName = getterName(name);
         let imp = Import.GetField(context, clazzName + "." + name, eff, funcName);
         let call = Call(funcName, paramNames);
-        let body = Body.NoTry(call);
+        let wrap = match (o, isPrimitive(getType(f))) {
+            case (Options(opts), false) if opts.optionLevel >= OptionLevel.OptionRef => Wrap.WrapOption(call)
+            case (Options(opts), _) if opts.optionLevel >= OptionLevel.OptionAll => Wrap.WrapOption(call)
+            case _ => Wrap.NoWrap(call)
+        };
+        let body = Body.NoTry(wrap);
         let impl = Impl(imp, body);
         Def(funcName, params, fieldType, eff, impl)
     }
@@ -154,7 +160,8 @@ namespace Transform {
         let funcName = setterName(name);
         let imp = Import.SetField(context, clazzName + "." + name, eff, funcName);
         let call = Call(funcName, paramNames);
-        let body = Body.NoTry(call);
+        let wrap = Wrap.NoWrap(call);
+        let body = Body.NoTry(wrap);
         let impl = Impl(imp, body);
         Def(funcName, params, fieldType, eff, impl)
     }

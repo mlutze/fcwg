@@ -13,6 +13,7 @@ namespace TestTransform {
     use Ast.Namespace.Namespace;
     use Ast.Namespace;
     use Ast.Type_;
+    use Ast.Wrap;
 
     use Options.Options.Options;
     use Options.Options;
@@ -51,7 +52,8 @@ namespace TestTransform {
         let method = getMethod(string, "concat", [string] as & Pure);
         let imp = Import.Method(Context.Instance, "java.lang.String.concat", Type_.String_ :: Nil, Effect.Impure_);
         let call = Call("concat", "x0" :: "x1" :: Nil);
-        let body = Body.NoTry(call);
+        let wrap = Wrap.NoWrap(call);
+        let body = Body.NoTry(wrap);
         let impl = Impl(imp, body);
         visitMethod(defaultOptions(), method) == Def("concat", ("x0", Type_.String_) :: ("x1", Type_.String_) :: Nil, Type_.String_, Effect.Impure_, impl)
     }
@@ -65,7 +67,8 @@ namespace TestTransform {
         let method = getMethod(clazz, "forName", [string] as & Pure);
         let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Effect.Impure_);
         let call = Call("forName", "x0" :: Nil);
-        let body = Body.NoTry(call);
+        let wrap = Wrap.NoWrap(call);
+        let body = Body.NoTry(wrap);
         let impl = Impl(imp, body);
         visitMethod(defaultOptions(), method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Ref("java.lang.Class"), Effect.Impure_, impl)
     }
@@ -79,7 +82,8 @@ namespace TestTransform {
         let method = getMethod(clazz, "forName", [string] as & Pure);
         let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Effect.Impure_);
         let call = Call("forName", "x0" :: Nil);
-        let body = Body.TryCatch(call);
+        let wrap = Wrap.NoWrap(call);
+        let body = Body.TryCatch(wrap);
         let impl = Impl(imp, body);
         let Options(opts) = defaultOptions();
         let o = Options({ resultLevel = ResultLevel.ResultChecked | opts });
@@ -94,7 +98,8 @@ namespace TestTransform {
         let field = getField(string, "CASE_INSENSITIVE_ORDER");
         let imp = Import.GetField(Context.Static, "java.lang.String.CASE_INSENSITIVE_ORDER", Effect.Impure_, "getCASE_INSENSITIVE_ORDER");
         let call = Call("getCASE_INSENSITIVE_ORDER", Nil);
-        let body = Body.NoTry(call);
+        let wrap = Wrap.NoWrap(call);
+        let body = Body.NoTry(wrap);
         let impl = Impl(imp, body);
         visitField(defaultOptions(), field) == Def("getCASE_INSENSITIVE_ORDER", Nil, Type_.Ref("java.util.Comparator"), Effect.Impure_, impl) :: Nil
     }
@@ -107,7 +112,8 @@ namespace TestTransform {
         let field = getField(string, "CASE_INSENSITIVE_ORDER");
         let imp = Import.GetField(Context.Static, "java.lang.String.CASE_INSENSITIVE_ORDER", Effect.Pure_, "getCASE_INSENSITIVE_ORDER");
         let call = Call("getCASE_INSENSITIVE_ORDER", Nil);
-        let body = Body.NoTry(call);
+        let wrap = Wrap.NoWrap(call);
+        let body = Body.NoTry(wrap);
         let impl = Impl(imp, body);
         let Options(opts) = defaultOptions();
         let o = Options({ pureLevel = PureLevel.PureFinal | opts });
