@@ -6,6 +6,7 @@ namespace TestTransform {
     use Ast.Context;
     use Ast.Def.Def;
     use Ast.Def;
+    use Ast.Effect;
     use Ast.Impl.Impl;
     use Ast.Impl;
     use Ast.Import;
@@ -42,11 +43,11 @@ namespace TestTransform {
         import java.lang.Class.getMethod(String, Array[Class]): & Pure;
         let string = forName("java.lang.String");
         let method = getMethod(string, "concat", [string] as & Pure);
-        let imp = Import.Method(Context.Instance, "java.lang.String.concat", Type_.String_ :: Nil);
+        let imp = Import.Method(Context.Instance, "java.lang.String.concat", Type_.String_ :: Nil, Effect.Impure_);
         let call = Call("concat", "x0" :: "x1" :: Nil);
         let body = Body.NoTry(call);
         let impl = Impl(imp, body);
-        visitMethod(method) == Def("concat", ("x0", Type_.String_) :: ("x1", Type_.String_) :: Nil, Type_.String_, impl)
+        visitMethod(method) == Def("concat", ("x0", Type_.String_) :: ("x1", Type_.String_) :: Nil, Type_.String_, Effect.Impure_, impl)
     }
 
     @test
@@ -56,11 +57,11 @@ namespace TestTransform {
         let clazz = forName("java.lang.Class");
         let string = forName("java.lang.String");
         let method = getMethod(clazz, "forName", [string] as & Pure);
-        let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil);
+        let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Effect.Impure_);
         let call = Call("forName", "x0" :: Nil);
         let body = Body.TryCatch(call);
         let impl = Impl(imp, body);
-        visitMethod(method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Result_(Type_.Ref("java.lang.Class"), Type_.Ref("java.lang.Exception")), impl)
+        visitMethod(method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Result_(Type_.Ref("java.lang.Class"), Type_.Ref("java.lang.Exception")), Effect.Impure_, impl)
     }
 
     @test
@@ -69,11 +70,11 @@ namespace TestTransform {
         import java.lang.Class.getField(String): & Pure;
         let string = forName("java.lang.String");
         let field = getField(string, "CASE_INSENSITIVE_ORDER");
-        let imp = Import.GetField(Context.Static, "java.lang.String.CASE_INSENSITIVE_ORDER", "getCASE_INSENSITIVE_ORDER");
+        let imp = Import.GetField(Context.Static, "java.lang.String.CASE_INSENSITIVE_ORDER", Effect.Impure_, "getCASE_INSENSITIVE_ORDER");
         let call = Call("getCASE_INSENSITIVE_ORDER", Nil);
         let body = Body.NoTry(call);
         let impl = Impl(imp, body);
-        visitField(field) == Def("getCASE_INSENSITIVE_ORDER", Nil, Type_.Ref("java.util.Comparator"), impl) :: Nil
+        visitField(field) == Def("getCASE_INSENSITIVE_ORDER", Nil, Type_.Ref("java.util.Comparator"), Effect.Impure_, impl) :: Nil
     }
 
     @test
@@ -81,6 +82,6 @@ namespace TestTransform {
         import static java.lang.Class.forName(String): & Pure;
         let clazz = forName("java.lang.String");
         let Namespace(_, defs) = visitClass(clazz);
-        List.count(match Def(name, _, _, _) -> name == "wait", defs) == 0
+        List.count(match Def(name, _, _, _, _) -> name == "wait", defs) == 0
     }
 }

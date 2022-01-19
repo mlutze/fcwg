@@ -6,6 +6,7 @@ namespace Transform {
     use Ast.Context;
     use Ast.Def.Def;
     use Ast.Def;
+    use Ast.Effect;
     use Ast.Impl.Impl;
     use Ast.Impl;
     use Ast.Import;
@@ -62,11 +63,11 @@ namespace Transform {
         };
         let paramNames = List.range(0, List.length(outerParamTypes)) |> List.map(i -> "x${i}");
         let params = List.zip(paramNames, outerParamTypes);
-        let imp = Import.Method(context, clazzName + "." + name, importParamTypes);
+        let imp = Import.Method(context, clazzName + "." + name, importParamTypes, Effect.Impure_);
         let call = Call(name, paramNames);
         let body = if (canFail) Body.TryCatch(call) else Body.NoTry(call);
         let impl = Impl(imp, body);
-        Def(name, params, outerReturnType, impl)
+        Def(name, params, outerReturnType, Effect.Impure_, impl)
     }
 
     pub def visitField(f: Field): List[Ast.Def] = {
@@ -94,11 +95,11 @@ namespace Transform {
         let paramNames = List.range(0, List.length(paramTypes)) |> List.map(i -> "x${i}");
         let params = List.zip(paramNames, paramTypes);
         let funcName = getterName(name);
-        let imp = Import.GetField(context, clazzName + "." + name, funcName);
+        let imp = Import.GetField(context, clazzName + "." + name, Effect.Impure_, funcName);
         let call = Call(funcName, paramNames);
         let body = Body.NoTry(call);
         let impl = Impl(imp, body);
-        Def(funcName, params, fieldType, impl)
+        Def(funcName, params, fieldType, Effect.Impure_, impl)
     }
 
     def mkSetter(f: Field): Ast.Def = {
@@ -118,11 +119,11 @@ namespace Transform {
         let paramNames = List.range(0, List.length(paramTypes)) |> List.map(i -> "x${i}");
         let params = List.zip(paramNames, paramTypes);
         let funcName = setterName(name);
-        let imp = Import.SetField(context, clazzName + "." + name, funcName);
+        let imp = Import.SetField(context, clazzName + "." + name, Effect.Impure_, funcName);
         let call = Call(funcName, paramNames);
         let body = Body.NoTry(call);
         let impl = Impl(imp, body);
-        Def(funcName, params, fieldType, impl)
+        Def(funcName, params, fieldType, Effect.Impure_, impl)
     }
 
     pub def visitType(t: Class): Ast.Type_ = {

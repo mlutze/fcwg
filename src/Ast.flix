@@ -1,18 +1,18 @@
 namespace Ast {
     // Def(name, params, type, impl)
-    pub opaque type Def with Eq = (String, List[(String, Type_)], Type_, Impl)
+    pub opaque type Def with Eq = (String, List[(String, Type_)], Type_, Effect, Impl)
 
     pub opaque type Impl with Eq = (Import, Body)
 
     pub enum Import with Eq {
         // Method(context, name, params)
-        case Method(Context, String, List[Type_])
+        case Method(Context, String, List[Type_], Effect)
 
         // GetField(context, field, alias)
-        case GetField(Context, String, String)
+        case GetField(Context, String, Effect, String)
 
         // SetField(context, field, alias)
-        case SetField(Context, String, String)
+        case SetField(Context, String, Effect, String)
     }
 
     pub enum Body with Eq {
@@ -48,6 +48,11 @@ namespace Ast {
         case Instance
     }
 
+    pub enum Effect with Eq {
+        case Pure_
+        case Impure_
+    }
+
     instance ToString[Namespace] {
         pub def toString(x: Namespace): String =
             let Namespace(name, defs) = x;
@@ -62,12 +67,20 @@ namespace Ast {
 
     instance ToString[Def] {
         pub def toString(d: Def): String =
-            let Def(name, params, tpe, impl) = d;
+            let Def(name, params, tpe, eff, impl) = d;
             let paramString = params |> List.map(match (n, t) -> "${n}: ${t}") |> String.intercalate(", ");
-            "pub def ${name}(${paramString}): ${tpe} & Impure = {\n" +
+            "pub def ${name}(${paramString}): ${tpe} & ${eff}= {\n" +
             "${impl}" |> String.indent(4) +
             "}\n"
     }
+
+    instance ToString[Effect] {
+        pub def toString(x: Effect): String = match x {
+            case Pure_ => "Pure"
+            case Impure_ => "Impure"
+        }
+    }
+    
 
     instance ToString[Impl] {
         pub def toString(x: Impl): String =
@@ -90,13 +103,13 @@ namespace Ast {
 
     instance ToString[Import] {
         pub def toString(x: Import): String = match x {
-            case Method(context, name, params) =>
+            case Method(context, name, params, eff) =>
                 let paramString = params |> List.map(ToString.toString) |> String.intercalate(", ");
-                "import ${context}${name}(${paramString});\n"
-            case GetField(context, name, func) =>
-                "import ${context} get ${name} as ${func};\n"
-            case SetField(context, name, func) =>
-                "import ${context} set ${name} as ${func};\n"
+                "import ${context}${name}(${paramString}): & ${eff};\n"
+            case GetField(context, name, eff, func) =>
+                "import ${context} get ${name}: & ${eff} as ${func};\n"
+            case SetField(context, name, eff, func) =>
+                "import ${context} set ${name}: & ${eff} as ${func};\n"
         }
     }
 
