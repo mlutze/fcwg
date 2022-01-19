@@ -1,5 +1,6 @@
 use Options.Command;
 use Options.parse;
+use Options.usage;
 use Transform.visitClass;
 use Version.version;
 
@@ -14,10 +15,14 @@ def main(args: Array[String]): Int32 & Impure =
         case Success(Command.GetVersion) =>
             println(version());
             0
+        case Success(Command.GetHelp) =>
+            print(usage());
+            0
         case Success(_) =>
-            println("Unsupported operation.");
+            System/StdErr.println("Unsupported operation.");
             1
-        case Failure(_) =>
-            println("Failure parsing command line arguments.");
+        case Failure(errs) =>
+            errs |> Nel.foreach(System/StdErr.print);
+            System/StdErr.print(usage());
             2
     }

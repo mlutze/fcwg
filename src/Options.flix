@@ -1,8 +1,9 @@
 namespace Options {
-    use GetOpt.OptionDescr;
     use GetOpt.ArgDescr.{NoArg, ReqArg};
-    use GetOpt.getOpt;
     use GetOpt.ArgOrder.Permute;
+    use GetOpt.OptionDescr;
+    use GetOpt.getOpt;
+    use GetOpt.usageInfo;
 
     enum Flag {
         case Generic
@@ -161,4 +162,8 @@ namespace Options {
         };
     Options(newOpts)
 
+    pub def usage(): String = {
+        let header = "Usage: fcwg [OPTIONS] <class file>";
+        usageInfo(header, options())
+    }
 }
