@@ -14,11 +14,13 @@ namespace Transform {
     use Ast.Namespace;
     use Ast.Type_;
 
+    use Options.Options;
+
     type alias Class = ##java.lang.Class
     type alias Field = ##java.lang.reflect.Field
     type alias Method = ##java.lang.reflect.Method
 
-    pub def visitClass(c: Class): Namespace = {
+    pub def visitClass(o: Options, c: Class): Namespace = {
         import java.lang.Class.getDeclaredMethods(): & Pure;
         import java.lang.Class.getSimpleName(): & Pure;
         import java.lang.Class.getDeclaredFields(): & Pure;
@@ -27,18 +29,18 @@ namespace Transform {
             |> Array.toList 
             |> List.filter(isPublic) 
             |> List.filter(isBlackMagic >> Bool.not)
-            |> List.map(visitMethod)
+            |> List.map(visitMethod(o))
         } as & Pure;
         let defs2 = {
             getDeclaredFields(c)
             |> Array.toList
             |> List.filter(isPublicField)
-            |> List.flatMap(visitField)
+            |> List.flatMap(visitField(o))
         } as & Pure;
         Namespace(getSimpleName(c), defs1 ::: defs2)
     }
 
-    pub def visitMethod(m: Method): Ast.Def = {
+    pub def visitMethod(_: Options, m: Method): Ast.Def = {
         import java.lang.reflect.Method.getName(): & Pure;
         import java.lang.reflect.Method.getParameterTypes(): & Pure;
         import java.lang.reflect.Method.getReturnType(): & Pure;
@@ -70,7 +72,7 @@ namespace Transform {
         Def(name, params, outerReturnType, Effect.Impure_, impl)
     }
 
-    pub def visitField(f: Field): List[Ast.Def] = {
+    pub def visitField(_: Options, f: Field): List[Ast.Def] = {
         if (isFinalField(f)) {
             mkGetter(f) :: Nil
         } else {

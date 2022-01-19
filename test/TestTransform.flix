@@ -14,6 +14,8 @@ namespace TestTransform {
     use Ast.Namespace;
     use Ast.Type_;
 
+    use Options.defaultOptions;
+
     use Transform.visitClass;
     use Transform.visitField;
     use Transform.visitMethod;
@@ -47,7 +49,7 @@ namespace TestTransform {
         let call = Call("concat", "x0" :: "x1" :: Nil);
         let body = Body.NoTry(call);
         let impl = Impl(imp, body);
-        visitMethod(method) == Def("concat", ("x0", Type_.String_) :: ("x1", Type_.String_) :: Nil, Type_.String_, Effect.Impure_, impl)
+        visitMethod(defaultOptions(), method) == Def("concat", ("x0", Type_.String_) :: ("x1", Type_.String_) :: Nil, Type_.String_, Effect.Impure_, impl)
     }
 
     @test
@@ -61,7 +63,7 @@ namespace TestTransform {
         let call = Call("forName", "x0" :: Nil);
         let body = Body.TryCatch(call);
         let impl = Impl(imp, body);
-        visitMethod(method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Result_(Type_.Ref("java.lang.Class"), Type_.Ref("java.lang.Exception")), Effect.Impure_, impl)
+        visitMethod(defaultOptions(), method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Result_(Type_.Ref("java.lang.Class"), Type_.Ref("java.lang.Exception")), Effect.Impure_, impl)
     }
 
     @test
@@ -74,14 +76,14 @@ namespace TestTransform {
         let call = Call("getCASE_INSENSITIVE_ORDER", Nil);
         let body = Body.NoTry(call);
         let impl = Impl(imp, body);
-        visitField(field) == Def("getCASE_INSENSITIVE_ORDER", Nil, Type_.Ref("java.util.Comparator"), Effect.Impure_, impl) :: Nil
+        visitField(defaultOptions(), field) == Def("getCASE_INSENSITIVE_ORDER", Nil, Type_.Ref("java.util.Comparator"), Effect.Impure_, impl) :: Nil
     }
 
     @test
     def testVisitClassIgnoreInherited(): Bool = {
         import static java.lang.Class.forName(String): & Pure;
         let clazz = forName("java.lang.String");
-        let Namespace(_, defs) = visitClass(clazz);
+        let Namespace(_, defs) = visitClass(defaultOptions(), clazz);
         List.count(match Def(name, _, _, _, _) -> name == "wait", defs) == 0
     }
 }

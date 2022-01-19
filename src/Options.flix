@@ -83,7 +83,7 @@ namespace Options {
         {optionIds = 'v' :: Nil, optionNames = "version" :: Nil, argDescriptor = NoArg(Version), explanation = "Prints the version string and exits."} ::
         Nil
     
-    def defaultOptions(): Options = Options({
+    pub def defaultOptions(): Options = Options({
         generic = false,
         namespace_ = None,
         optionLevel = OptionNone,

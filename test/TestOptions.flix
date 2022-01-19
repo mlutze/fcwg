@@ -6,16 +6,8 @@ namespace TestOptions {
     use Options.PureLevel;
     use Options.ResultLevel;
     use Options.SuperLevel;
+    use Options.defaultOptions;
     use Options.parse;
-
-    def defaultOptions(): Options = Options({
-        generic = false,
-        namespace_ = None,
-        optionLevel = OptionLevel.OptionNone,
-        pureLevel = PureLevel.PureNone,
-        resultLevel = ResultLevel.ResultNone,
-        superLevel = SuperLevel.SuperNone
-    })
 
     @test
     def testParse01(): Bool & Impure = {

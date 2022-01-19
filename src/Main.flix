@@ -8,8 +8,8 @@ use Version.version;
 def main(args: Array[String]): Int32 & Impure =
     import static java.lang.Class.forName(String): & Pure;
     match parse(args) {
-        case Success(Command.Go(clazz, _)) =>
-            let ns = visitClass(forName(clazz));
+        case Success(Command.Go(clazz, options)) =>
+            let ns = visitClass(options, forName(clazz));
             println(ns);
             0
         case Success(Command.GetVersion) =>
