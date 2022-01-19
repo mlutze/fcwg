@@ -42,7 +42,7 @@ namespace Transform {
         Namespace(getSimpleName(c), defs1 ::: defs2)
     }
 
-    pub def visitMethod(_: Options, m: Method): Ast.Def = {
+    pub def visitMethod(o: Options, m: Method): Ast.Def = {
         import java.lang.reflect.Method.getName(): & Pure;
         import java.lang.reflect.Method.getParameterTypes(): & Pure;
         import java.lang.reflect.Method.getReturnType(): & Pure;
@@ -50,6 +50,10 @@ namespace Transform {
         import java.lang.Class.getCanonicalName(): & Pure;
         import java.lang.reflect.Method.getExceptionTypes(): & Pure;
         let name = getName(m);
+        let eff = match o {
+            case Options(opts) if opts.pureLevel >= PureLevel.PureButSetters => Effect.Pure_
+            case _ => Effect.Impure_
+        };
         let return = getReturnType(m) |> visitType;
         let clazz = getDeclaringClass(m);
         let clazzName = getCanonicalName(clazz);
@@ -67,11 +71,11 @@ namespace Transform {
         };
         let paramNames = List.range(0, List.length(outerParamTypes)) |> List.map(i -> "x${i}");
         let params = List.zip(paramNames, outerParamTypes);
-        let imp = Import.Method(context, clazzName + "." + name, importParamTypes, Effect.Impure_);
+        let imp = Import.Method(context, clazzName + "." + name, importParamTypes, eff);
         let call = Call(name, paramNames);
         let body = if (canFail) Body.TryCatch(call) else Body.NoTry(call);
         let impl = Impl(imp, body);
-        Def(name, params, outerReturnType, Effect.Impure_, impl)
+        Def(name, params, outerReturnType, eff, impl)
     }
 
     pub def visitField(o: Options, f: Field): List[Ast.Def] = {
@@ -111,12 +115,16 @@ namespace Transform {
         Def(funcName, params, fieldType, eff, impl)
     }
 
-    def mkSetter(_: Options, f: Field): Ast.Def = {
+    def mkSetter(o: Options, f: Field): Ast.Def = {
         import java.lang.reflect.Field.getDeclaringClass(): & Pure;
         import java.lang.reflect.Field.getName(): & Pure;
         import java.lang.reflect.Field.getType(): & Pure;
         import java.lang.Class.getCanonicalName(): & Pure;
         let context = if (isStaticField(f)) Context.Static else Context.Instance;
+        let eff = match o {
+            case Options(opts) if opts.pureLevel >= PureLevel.PureAll => Effect.Pure_
+            case _ => Effect.Impure_
+        };
         let name = getName(f);
         let clazz = getDeclaringClass(f);
         let clazzName = getCanonicalName(clazz);
@@ -128,11 +136,11 @@ namespace Transform {
         let paramNames = List.range(0, List.length(paramTypes)) |> List.map(i -> "x${i}");
         let params = List.zip(paramNames, paramTypes);
         let funcName = setterName(name);
-        let imp = Import.SetField(context, clazzName + "." + name, Effect.Impure_, funcName);
+        let imp = Import.SetField(context, clazzName + "." + name, eff, funcName);
         let call = Call(funcName, paramNames);
         let body = Body.NoTry(call);
         let impl = Impl(imp, body);
-        Def(funcName, params, fieldType, Effect.Impure_, impl)
+        Def(funcName, params, fieldType, eff, impl)
     }
 
     pub def visitType(t: Class): Ast.Type_ = {
