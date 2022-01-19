@@ -17,6 +17,7 @@ namespace TestTransform {
     use Options.Options.Options;
     use Options.Options;
     use Options.PureLevel;
+    use Options.ResultLevel;
     use Options.defaultOptions;
 
     use Transform.visitClass;
@@ -66,7 +67,9 @@ namespace TestTransform {
         let call = Call("forName", "x0" :: Nil);
         let body = Body.TryCatch(call);
         let impl = Impl(imp, body);
-        visitMethod(defaultOptions(), method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Result_(Type_.Ref("java.lang.Class"), Type_.Ref("java.lang.Exception")), Effect.Impure_, impl)
+        let Options(opts) = defaultOptions();
+        let o = Options({ resultLevel = ResultLevel.ResultChecked | opts });
+        visitMethod(o, method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Result_(Type_.Ref("java.lang.Class"), Type_.Ref("java.lang.Exception")), Effect.Impure_, impl)
     }
 
     @test

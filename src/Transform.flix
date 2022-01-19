@@ -17,6 +17,7 @@ namespace Transform {
     use Options.Options;
     use Options.Options.Options;
     use Options.PureLevel;
+    use Options.ResultLevel;
 
     type alias Class = ##java.lang.Class
     type alias Field = ##java.lang.reflect.Field
@@ -66,10 +67,10 @@ namespace Transform {
             case Context.Instance => visitType(clazz) :: importParamTypes
         };
         let canFail = getExceptionTypes(m) |> Array.isEmpty |> Bool.not;
-        let outerReturnType = if (canFail) {
-            Type_.Result_(return, Type_.Ref("java.lang.Exception"))
-        } else {
-            return
+        let outerReturnType = match (o, canFail) {
+            case (Options(opts), true) if opts.resultLevel >= ResultLevel.ResultChecked => Type_.Result_(return, Type_.Ref("java.lang.Exception"))
+            case (Options(opts), _) if opts.resultLevel >= ResultLevel.ResultAll => Type_.Result_(return, Type_.Ref("java.lang.Exception"))
+            case _ => return
         };
         let paramNames = List.range(0, List.length(outerParamTypes)) |> List.map(i -> "x${i}");
         let params = List.zip(paramNames, outerParamTypes);
