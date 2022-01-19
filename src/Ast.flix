@@ -16,8 +16,13 @@ namespace Ast {
     }
 
     pub enum Body with Eq {
-        case TryCatch(Call)
-        case NoTry(Call)
+        case TryCatch(Wrap)
+        case NoTry(Wrap)
+    }
+
+    pub enum Wrap with Eq {
+        case WrapOption(Call)
+        case NoWrap(Call)
     }
 
     // Call(name, params)
@@ -112,6 +117,16 @@ namespace Ast {
                 "import ${context} set ${name}: & ${eff} as ${func};\n"
         }
     }
+
+    instance ToString[Wrap] {
+    
+        pub def toString(x: Wrap): String = match x {
+            case NoWrap(call) => "${call}"
+            case WrapOption(call) => "Object.toOption(${call})"
+        }
+    
+    }
+    
 
     instance ToString[Call] {
         pub def toString(x: Call): String =

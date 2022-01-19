@@ -13,9 +13,11 @@ namespace Transform {
     use Ast.Namespace.Namespace;
     use Ast.Namespace;
     use Ast.Type_;
+    use Ast.Wrap;
 
-    use Options.Options;
+    use Options.OptionLevel;
     use Options.Options.Options;
+    use Options.Options;
     use Options.PureLevel;
     use Options.ResultLevel;
 
@@ -51,6 +53,7 @@ namespace Transform {
         import java.lang.reflect.Method.getReturnType(): & Pure;
         import java.lang.reflect.Method.getDeclaringClass(): & Pure;
         import java.lang.Class.getCanonicalName(): & Pure;
+        import java.lang.Class.isPrimitive(): & Pure;
         import java.lang.reflect.Method.getExceptionTypes(): & Pure;
         let name = getName(m);
         let eff = match o {
@@ -81,7 +84,12 @@ namespace Transform {
         let params = List.zip(paramNames, outerParamTypes);
         let imp = Import.Method(context, clazzName + "." + name, importParamTypes, eff);
         let call = Call(name, paramNames);
-        let body = if (catchException) Body.TryCatch(call) else Body.NoTry(call);
+        let wrap = match (o, isPrimitive(getReturnType(m))) {
+            case (Options(opts), false) if opts.optionLevel >= OptionLevel.OptionRef => Wrap.WrapOption(call)
+            case (Options(opts), _) if opts.optionLevel >= OptionLevel.OptionAll => Wrap.WrapOption(call)
+            case _ => Wrap.NoWrap(call)
+        };
+        let body = if (catchException) Body.TryCatch(wrap) else Body.NoTry(wrap);
         let impl = Impl(imp, body);
         Def(name, params, outerReturnType, eff, impl)
     }
