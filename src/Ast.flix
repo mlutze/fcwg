@@ -69,7 +69,7 @@ namespace Ast {
         pub def toString(d: Def): String =
             let Def(name, params, tpe, eff, impl) = d;
             let paramString = params |> List.map(match (n, t) -> "${n}: ${t}") |> String.intercalate(", ");
-            "pub def ${name}(${paramString}): ${tpe} & ${eff}= {\n" +
+            "pub def ${name}(${paramString}): ${tpe} & ${eff} = {\n" +
             "${impl}" |> String.indent(4) +
             "}\n"
     }
