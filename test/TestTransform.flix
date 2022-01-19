@@ -98,6 +98,16 @@ namespace TestTransform {
     }
 
     @test
+    def testVisitClassSetNamespace(): Bool = {
+        import static java.lang.Class.forName(String): & Pure;
+        let clazz = forName("java.lang.String");
+        let Options(opts) = defaultOptions();
+        let o = Options({ namespace_ = Some("MyString") | opts });
+        let Namespace(name, _) = visitClass(o, clazz);
+        name == "MyString"
+    }
+
+    @test
     def testVisitClassIgnoreInherited(): Bool = {
         import static java.lang.Class.forName(String): & Pure;
         let clazz = forName("java.lang.String");

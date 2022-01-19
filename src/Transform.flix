@@ -39,7 +39,9 @@ namespace Transform {
             |> List.filter(isPublicField)
             |> List.flatMap(visitField(o))
         } as & Pure;
-        Namespace(getSimpleName(c), defs1 ::: defs2)
+        let Options(opts) = o;
+        let name = opts.namespace_ |> Option.getWithDefault(getSimpleName(c));
+        Namespace(name, defs1 ::: defs2)
     }
 
     pub def visitMethod(o: Options, m: Method): Ast.Def = {
