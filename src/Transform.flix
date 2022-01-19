@@ -15,6 +15,8 @@ namespace Transform {
     use Ast.Type_;
 
     use Options.Options;
+    use Options.Options.Options;
+    use Options.PureLevel;
 
     type alias Class = ##java.lang.Class
     type alias Field = ##java.lang.reflect.Field
@@ -72,20 +74,25 @@ namespace Transform {
         Def(name, params, outerReturnType, Effect.Impure_, impl)
     }
 
-    pub def visitField(_: Options, f: Field): List[Ast.Def] = {
+    pub def visitField(o: Options, f: Field): List[Ast.Def] = {
         if (isFinalField(f)) {
-            mkGetter(f) :: Nil
+            mkGetter(o, f) :: Nil
         } else {
-            mkGetter(f) :: mkSetter(f) :: Nil
+            mkGetter(o, f) :: mkSetter(o, f) :: Nil
         }
     }
 
-    def mkGetter(f: Field): Ast.Def = {
+    def mkGetter(o: Options, f: Field): Ast.Def = {
         import java.lang.reflect.Field.getDeclaringClass(): & Pure;
         import java.lang.reflect.Field.getName(): & Pure;
         import java.lang.reflect.Field.getType(): & Pure;
         import java.lang.Class.getCanonicalName(): & Pure;
         let context = if (isStaticField(f)) Context.Static else Context.Instance;
+        let eff = match (o, isFinalField(f)) {
+            case (Options(opts), true) if opts.pureLevel >= PureLevel.PureFinal => Effect.Pure_
+            case (Options(opts), _) if opts.pureLevel >= PureLevel.PureButSetters => Effect.Pure_
+            case _ => Effect.Impure_
+        };
         let name = getName(f);
         let clazz = getDeclaringClass(f);
         let clazzName = getCanonicalName(clazz);
@@ -97,14 +104,14 @@ namespace Transform {
         let paramNames = List.range(0, List.length(paramTypes)) |> List.map(i -> "x${i}");
         let params = List.zip(paramNames, paramTypes);
         let funcName = getterName(name);
-        let imp = Import.GetField(context, clazzName + "." + name, Effect.Impure_, funcName);
+        let imp = Import.GetField(context, clazzName + "." + name, eff, funcName);
         let call = Call(funcName, paramNames);
         let body = Body.NoTry(call);
         let impl = Impl(imp, body);
-        Def(funcName, params, fieldType, Effect.Impure_, impl)
+        Def(funcName, params, fieldType, eff, impl)
     }
 
-    def mkSetter(f: Field): Ast.Def = {
+    def mkSetter(_: Options, f: Field): Ast.Def = {
         import java.lang.reflect.Field.getDeclaringClass(): & Pure;
         import java.lang.reflect.Field.getName(): & Pure;
         import java.lang.reflect.Field.getType(): & Pure;
