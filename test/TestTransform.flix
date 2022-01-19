@@ -14,6 +14,9 @@ namespace TestTransform {
     use Ast.Namespace;
     use Ast.Type_;
 
+    use Options.Options.Options;
+    use Options.Options;
+    use Options.PureLevel;
     use Options.defaultOptions;
 
     use Transform.visitClass;
@@ -77,6 +80,21 @@ namespace TestTransform {
         let body = Body.NoTry(call);
         let impl = Impl(imp, body);
         visitField(defaultOptions(), field) == Def("getCASE_INSENSITIVE_ORDER", Nil, Type_.Ref("java.util.Comparator"), Effect.Impure_, impl) :: Nil
+    }
+
+    @test
+    def testVisitFieldPure(): Bool = {
+        import static java.lang.Class.forName(String): & Pure;
+        import java.lang.Class.getField(String): & Pure;
+        let string = forName("java.lang.String");
+        let field = getField(string, "CASE_INSENSITIVE_ORDER");
+        let imp = Import.GetField(Context.Static, "java.lang.String.CASE_INSENSITIVE_ORDER", Effect.Pure_, "getCASE_INSENSITIVE_ORDER");
+        let call = Call("getCASE_INSENSITIVE_ORDER", Nil);
+        let body = Body.NoTry(call);
+        let impl = Impl(imp, body);
+        let Options(opts) = defaultOptions();
+        let o = Options({ pureLevel = PureLevel.PureFinal | opts });
+        visitField(o, field) == Def("getCASE_INSENSITIVE_ORDER", Nil, Type_.Ref("java.util.Comparator"), Effect.Pure_, impl) :: Nil
     }
 
     @test
