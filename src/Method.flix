@@ -87,8 +87,8 @@ namespace Method {
     }
     
     
-    pub def setAccessible(x0: ##java.lang.reflect.Method, x1: Bool): Unit & Pure = {
-        import java.lang.reflect.Method.setAccessible(Bool): & Pure;
+    pub def setAccessible(x0: ##java.lang.reflect.Method, x1: Bool): Unit & Impure = {
+        import java.lang.reflect.Method.setAccessible(Bool): & Impure;
         setAccessible(x0, x1)
     }
     

@@ -1,18 +1,18 @@
 namespace Exception {
-    pub def printStackTrace(x0: ##java.lang.Throwable): Unit & Pure = {
-        import java.lang.Throwable.printStackTrace(): & Pure;
+    pub def printStackTrace(x0: ##java.lang.Throwable): Unit & Impure = {
+        import java.lang.Throwable.printStackTrace(): & Impure;
         printStackTrace(x0)
     }
     
     
-    /// pub def printStackTrace(x0: ##java.lang.Throwable, x1: ##java.io.PrintStream): Unit & Pure = {
-    ///     import java.lang.Throwable.printStackTrace(##java.io.PrintStream): & Pure;
+    /// pub def printStackTrace(x0: ##java.lang.Throwable, x1: ##java.io.PrintStream): Unit & Impure = {
+    ///     import java.lang.Throwable.printStackTrace(##java.io.PrintStream): & Impure;
     ///     printStackTrace(x0, x1)
     /// }
     
     
-    /// pub def printStackTrace(x0: ##java.lang.Throwable, x1: ##java.io.PrintWriter): Unit & Pure = {
-    ///     import java.lang.Throwable.printStackTrace(##java.io.PrintWriter): & Pure;
+    /// pub def printStackTrace(x0: ##java.lang.Throwable, x1: ##java.io.PrintWriter): Unit & Impure = {
+    ///     import java.lang.Throwable.printStackTrace(##java.io.PrintWriter): & Impure;
     ///     printStackTrace(x0, x1)
     /// }
     
@@ -65,14 +65,14 @@ namespace Exception {
     }
     
     
-    pub def setStackTrace(x0: ##java.lang.Throwable, x1: Array[##java.lang.StackTraceElement]): Unit & Pure = {
-        import java.lang.Throwable.setStackTrace(Array[##java.lang.StackTraceElement]): & Pure;
+    pub def setStackTrace(x0: ##java.lang.Throwable, x1: Array[##java.lang.StackTraceElement]): Unit & Impure = {
+        import java.lang.Throwable.setStackTrace(Array[##java.lang.StackTraceElement]): & Impure;
         setStackTrace(x0, x1)
     }
     
     
-    pub def addSuppressed(x0: ##java.lang.Throwable, x1: ##java.lang.Throwable): Unit & Pure = {
-        import java.lang.Throwable.addSuppressed(##java.lang.Throwable): & Pure;
+    pub def addSuppressed(x0: ##java.lang.Throwable, x1: ##java.lang.Throwable): Unit & Impure = {
+        import java.lang.Throwable.addSuppressed(##java.lang.Throwable): & Impure;
         addSuppressed(x0, x1)
     }
 }

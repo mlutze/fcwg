@@ -155,8 +155,8 @@ namespace Field {
     }
     
     
-    pub def set(x0: ##java.lang.reflect.Field, x1: ##java.lang.Object, x2: ##java.lang.Object): Result[Unit, ##java.lang.Exception] & Pure = {
-        import java.lang.reflect.Field.set(##java.lang.Object, ##java.lang.Object): & Pure;
+    pub def set(x0: ##java.lang.reflect.Field, x1: ##java.lang.Object, x2: ##java.lang.Object): Result[Unit, ##java.lang.Exception] & Impure = {
+        import java.lang.reflect.Field.set(##java.lang.Object, ##java.lang.Object): & Impure;
         try {
             Ok(set(x0, x1, x2))
         } catch {
@@ -165,8 +165,8 @@ namespace Field {
     }
     
     
-    pub def setAccessible(x0: ##java.lang.reflect.Field, x1: Bool): Unit & Pure = {
-        import java.lang.reflect.Field.setAccessible(Bool): & Pure;
+    pub def setAccessible(x0: ##java.lang.reflect.Field, x1: Bool): Unit & Impure = {
+        import java.lang.reflect.Field.setAccessible(Bool): & Impure;
         setAccessible(x0, x1)
     }
     
@@ -183,8 +183,8 @@ namespace Field {
     }
     
     
-    pub def setBoolean(x0: ##java.lang.reflect.Field, x1: ##java.lang.Object, x2: Bool): Result[Unit, ##java.lang.Exception] & Pure = {
-        import java.lang.reflect.Field.setBoolean(##java.lang.Object, Bool): & Pure;
+    pub def setBoolean(x0: ##java.lang.reflect.Field, x1: ##java.lang.Object, x2: Bool): Result[Unit, ##java.lang.Exception] & Impure = {
+        import java.lang.reflect.Field.setBoolean(##java.lang.Object, Bool): & Impure;
         try {
             Ok(setBoolean(x0, x1, x2))
         } catch {
@@ -193,8 +193,8 @@ namespace Field {
     }
     
     
-    pub def setByte(x0: ##java.lang.reflect.Field, x1: ##java.lang.Object, x2: Int8): Result[Unit, ##java.lang.Exception] & Pure = {
-        import java.lang.reflect.Field.setByte(##java.lang.Object, Int8): & Pure;
+    pub def setByte(x0: ##java.lang.reflect.Field, x1: ##java.lang.Object, x2: Int8): Result[Unit, ##java.lang.Exception] & Impure = {
+        import java.lang.reflect.Field.setByte(##java.lang.Object, Int8): & Impure;
         try {
             Ok(setByte(x0, x1, x2))
         } catch {
@@ -203,8 +203,8 @@ namespace Field {
     }
     
     
-    pub def setChar(x0: ##java.lang.reflect.Field, x1: ##java.lang.Object, x2: Char): Result[Unit, ##java.lang.Exception] & Pure = {
-        import java.lang.reflect.Field.setChar(##java.lang.Object, Char): & Pure;
+    pub def setChar(x0: ##java.lang.reflect.Field, x1: ##java.lang.Object, x2: Char): Result[Unit, ##java.lang.Exception] & Impure = {
+        import java.lang.reflect.Field.setChar(##java.lang.Object, Char): & Impure;
         try {
             Ok(setChar(x0, x1, x2))
         } catch {
@@ -213,8 +213,8 @@ namespace Field {
     }
     
     
-    pub def setShort(x0: ##java.lang.reflect.Field, x1: ##java.lang.Object, x2: Int16): Result[Unit, ##java.lang.Exception] & Pure = {
-        import java.lang.reflect.Field.setShort(##java.lang.Object, Int16): & Pure;
+    pub def setShort(x0: ##java.lang.reflect.Field, x1: ##java.lang.Object, x2: Int16): Result[Unit, ##java.lang.Exception] & Impure = {
+        import java.lang.reflect.Field.setShort(##java.lang.Object, Int16): & Impure;
         try {
             Ok(setShort(x0, x1, x2))
         } catch {
@@ -223,8 +223,8 @@ namespace Field {
     }
     
     
-    pub def setInt(x0: ##java.lang.reflect.Field, x1: ##java.lang.Object, x2: Int32): Result[Unit, ##java.lang.Exception] & Pure = {
-        import java.lang.reflect.Field.setInt(##java.lang.Object, Int32): & Pure;
+    pub def setInt(x0: ##java.lang.reflect.Field, x1: ##java.lang.Object, x2: Int32): Result[Unit, ##java.lang.Exception] & Impure = {
+        import java.lang.reflect.Field.setInt(##java.lang.Object, Int32): & Impure;
         try {
             Ok(setInt(x0, x1, x2))
         } catch {
@@ -233,8 +233,8 @@ namespace Field {
     }
     
     
-    pub def setLong(x0: ##java.lang.reflect.Field, x1: ##java.lang.Object, x2: Int64): Result[Unit, ##java.lang.Exception] & Pure = {
-        import java.lang.reflect.Field.setLong(##java.lang.Object, Int64): & Pure;
+    pub def setLong(x0: ##java.lang.reflect.Field, x1: ##java.lang.Object, x2: Int64): Result[Unit, ##java.lang.Exception] & Impure = {
+        import java.lang.reflect.Field.setLong(##java.lang.Object, Int64): & Impure;
         try {
             Ok(setLong(x0, x1, x2))
         } catch {
@@ -243,8 +243,8 @@ namespace Field {
     }
     
     
-    pub def setFloat(x0: ##java.lang.reflect.Field, x1: ##java.lang.Object, x2: Float32): Result[Unit, ##java.lang.Exception] & Pure = {
-        import java.lang.reflect.Field.setFloat(##java.lang.Object, Float32): & Pure;
+    pub def setFloat(x0: ##java.lang.reflect.Field, x1: ##java.lang.Object, x2: Float32): Result[Unit, ##java.lang.Exception] & Impure = {
+        import java.lang.reflect.Field.setFloat(##java.lang.Object, Float32): & Impure;
         try {
             Ok(setFloat(x0, x1, x2))
         } catch {
@@ -253,8 +253,8 @@ namespace Field {
     }
     
     
-    pub def setDouble(x0: ##java.lang.reflect.Field, x1: ##java.lang.Object, x2: Float64): Result[Unit, ##java.lang.Exception] & Pure = {
-        import java.lang.reflect.Field.setDouble(##java.lang.Object, Float64): & Pure;
+    pub def setDouble(x0: ##java.lang.reflect.Field, x1: ##java.lang.Object, x2: Float64): Result[Unit, ##java.lang.Exception] & Impure = {
+        import java.lang.reflect.Field.setDouble(##java.lang.Object, Float64): & Impure;
         try {
             Ok(setDouble(x0, x1, x2))
         } catch {
