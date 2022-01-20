@@ -1,5 +1,6 @@
 namespace TestTransform {
     
+    use Ast.Arg;
     use Ast.Body;
     use Ast.Call.Call;
     use Ast.Call;
@@ -30,6 +31,8 @@ namespace TestTransform {
     type alias Class = ##java.lang.Class
     type alias Method = ##java.lang.reflect.Method
 
+    def mkArgs(args: List[String]): List[Arg] = List.map(Arg.NoCast, args)
+
     @test
     def testVisitType(): Bool = {
         import static java.lang.Class.forName(String): & Pure;
@@ -52,11 +55,11 @@ namespace TestTransform {
         let string = forName("java.lang.String");
         let method = getMethod(string, "concat", [string] as & Pure);
         let imp = Import.Method(Context.Instance, "java.lang.String.concat", Type_.String_ :: Nil, Effect.Impure_);
-        let call = Call("concat", "x0" :: "x1" :: Nil);
+        let call = Call("concat", mkArgs("x0" :: "x1" :: Nil));
         let wrap = Wrap.NoWrap(call);
         let body = Body.NoTry(wrap);
         let impl = Impl(imp, body);
-        visitMethod(defaultOptions(), method) == Def("concat", ("x0", Type_.String_) :: ("x1", Type_.String_) :: Nil, Type_.String_, Effect.Impure_, impl)
+        visitMethod(defaultOptions(), string, method) == Def("concat", ("x0", Type_.String_) :: ("x1", Type_.String_) :: Nil, Type_.String_, Effect.Impure_, impl)
     }
 
     @test
@@ -67,11 +70,11 @@ namespace TestTransform {
         let string = forName("java.lang.String");
         let method = getMethod(clazz, "forName", [string] as & Pure);
         let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Effect.Impure_);
-        let call = Call("forName", "x0" :: Nil);
+        let call = Call("forName", mkArgs("x0" :: Nil));
         let wrap = Wrap.NoWrap(call);
         let body = Body.NoTry(wrap);
         let impl = Impl(imp, body);
-        visitMethod(defaultOptions(), method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Ref("java.lang.Class"), Effect.Impure_, impl)
+        visitMethod(defaultOptions(), string, method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Ref("java.lang.Class"), Effect.Impure_, impl)
     }
 
     @test
@@ -82,13 +85,13 @@ namespace TestTransform {
         let string = forName("java.lang.String");
         let method = getMethod(clazz, "forName", [string] as & Pure);
         let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Effect.Impure_);
-        let call = Call("forName", "x0" :: Nil);
+        let call = Call("forName", mkArgs("x0" :: Nil));
         let wrap = Wrap.NoWrap(call);
         let body = Body.TryCatch(wrap);
         let impl = Impl(imp, body);
         let Options(opts) = defaultOptions();
         let o = Options({ resultLevel = ResultLevel.ResultChecked | opts });
-        visitMethod(o, method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Result_(Type_.Ref("java.lang.Class"), Type_.Ref("java.lang.Exception")), Effect.Impure_, impl)
+        visitMethod(o, clazz, method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Result_(Type_.Ref("java.lang.Class"), Type_.Ref("java.lang.Exception")), Effect.Impure_, impl)
     }
 
     @test
@@ -98,13 +101,13 @@ namespace TestTransform {
         let throwable = forName("java.lang.Throwable");
         let method = getMethod(throwable, "printStackTrace", [] as & Pure);
         let imp = Import.Method(Context.Instance, "java.lang.Throwable.printStackTrace", Nil, Effect.Impure_);
-        let call = Call("printStackTrace", "x0" :: Nil);
+        let call = Call("printStackTrace", mkArgs("x0" :: Nil));
         let wrap = Wrap.NoWrap(call);
         let body = Body.NoTry(wrap);
         let impl = Impl(imp, body);
         let Options(default) = defaultOptions();
         let o = Options({ pureLevel = PureLevel.PureButUnit | default });
-        visitMethod(o, method) == Def("printStackTrace", ("x0", Type_.Ref("java.lang.Throwable")) :: Nil, Type_.Unit_, Effect.Impure_, impl)
+        visitMethod(o, throwable, method) == Def("printStackTrace", ("x0", Type_.Ref("java.lang.Throwable")) :: Nil, Type_.Unit_, Effect.Impure_, impl)
     }
 
     @test
@@ -118,7 +121,7 @@ namespace TestTransform {
         let wrap = Wrap.NoWrap(call);
         let body = Body.NoTry(wrap);
         let impl = Impl(imp, body);
-        visitField(defaultOptions(), field) == Def("getCASE_INSENSITIVE_ORDER", Nil, Type_.Ref("java.util.Comparator"), Effect.Impure_, impl) :: Nil
+        visitField(defaultOptions(), string, field) == Def("getCASE_INSENSITIVE_ORDER", Nil, Type_.Ref("java.util.Comparator"), Effect.Impure_, impl) :: Nil
     }
 
     @test
@@ -134,7 +137,7 @@ namespace TestTransform {
         let impl = Impl(imp, body);
         let Options(opts) = defaultOptions();
         let o = Options({ pureLevel = PureLevel.PureFinal | opts });
-        visitField(o, field) == Def("getCASE_INSENSITIVE_ORDER", Nil, Type_.Ref("java.util.Comparator"), Effect.Pure_, impl) :: Nil
+        visitField(o, string, field) == Def("getCASE_INSENSITIVE_ORDER", Nil, Type_.Ref("java.util.Comparator"), Effect.Pure_, impl) :: Nil
     }
 
     @test
@@ -163,5 +166,24 @@ namespace TestTransform {
         let opts = Options({ superLevel = SuperLevel.SuperButObject | default });
         let Namespace(_, defs) = visitClass(opts, clazz);
         List.count(match Def(name, _, _, _, _) -> name == "getMessage", defs) > 0
+    }
+
+    @test
+    def testVisitMethodCastInherited(): Bool = {
+        import static java.lang.Class.forName(String): & Pure;
+        import java.lang.Class.getMethod(String, Array[Class]): & Pure;
+        let throwable = forName("java.lang.Throwable");
+        let exception = forName("java.lang.Exception");
+        let method = getMethod(throwable, "getMessage", [] as & Pure);
+        let imp = Import.Method(Context.Instance, "java.lang.Throwable.getMessage", Nil, Effect.Impure_);
+        let call = Call("getMessage", Arg.Cast("x0", Type_.Ref("java.lang.Throwable")) :: Nil);
+        let wrap = Wrap.NoWrap(call);
+        let body = Body.NoTry(wrap);
+        let impl = Impl(imp, body);
+
+        let Options(default) = defaultOptions();
+        let opts = Options({ superLevel = SuperLevel.SuperButObject | default });
+
+        visitMethod(opts, exception, method) == Def("getMessage", ("x0", Type_.Ref("java.lang.Exception")) :: Nil, Type_.String_, Effect.Impure_, impl) 
     }
 }

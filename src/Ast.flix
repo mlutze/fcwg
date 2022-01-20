@@ -25,8 +25,13 @@ namespace Ast {
         case NoWrap(Call)
     }
 
+    pub enum Arg with Eq {
+        case Cast(String, Type_)
+        case NoCast(String)
+    }
+
     // Call(name, params)
-    pub opaque type Call with Eq = (String, List[String])
+    pub opaque type Call with Eq = (String, List[Arg])
 
     // Namespace(name, defs)
     pub opaque type Namespace with Eq = (String, List[Def])
@@ -119,19 +124,24 @@ namespace Ast {
     }
 
     instance ToString[Wrap] {
-    
         pub def toString(x: Wrap): String = match x {
             case NoWrap(call) => "${call}"
             case WrapOption(call) => "Object.toOption(${call})"
         }
-    
+    }
+
+    instance ToString[Arg] {
+        pub def toString(x: Arg): String = match x {
+            case Cast(name, tpe) => "${name} as ${tpe}"
+            case NoCast(name) => "${name}"
+        }
     }
     
 
     instance ToString[Call] {
         pub def toString(x: Call): String =
             let Call(name, params) = x;
-            let paramString = params |> String.intercalate(", ");
+            let paramString = params |> List.map(ToString.toString) |> String.intercalate(", ");
             "${name}(${paramString})"
     }
     
