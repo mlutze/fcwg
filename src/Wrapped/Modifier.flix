@@ -1,40 +1,4 @@
 namespace Wrapped/Modifier {
-    pub def isSynchronized(x0: Int32): Bool & Pure = {
-        import static java.lang.reflect.Modifier.isSynchronized(Int32): & Pure;
-        isSynchronized(x0)
-    }
-    
-    
-    pub def isTransient(x0: Int32): Bool & Pure = {
-        import static java.lang.reflect.Modifier.isTransient(Int32): & Pure;
-        isTransient(x0)
-    }
-    
-    
-    pub def isStrict(x0: Int32): Bool & Pure = {
-        import static java.lang.reflect.Modifier.isStrict(Int32): & Pure;
-        isStrict(x0)
-    }
-    
-    
-    pub def interfaceModifiers(): Int32 & Pure = {
-        import static java.lang.reflect.Modifier.interfaceModifiers(): & Pure;
-        interfaceModifiers()
-    }
-    
-    
-    pub def fieldModifiers(): Int32 & Pure = {
-        import static java.lang.reflect.Modifier.fieldModifiers(): & Pure;
-        fieldModifiers()
-    }
-    
-    
-    pub def parameterModifiers(): Int32 & Pure = {
-        import static java.lang.reflect.Modifier.parameterModifiers(): & Pure;
-        parameterModifiers()
-    }
-    
-    
     pub def toString(x0: Int32): String & Pure = {
         import static java.lang.reflect.Modifier.toString(Int32): & Pure;
         toString(x0)
@@ -110,6 +74,42 @@ namespace Wrapped/Modifier {
     pub def isNative(x0: Int32): Bool & Pure = {
         import static java.lang.reflect.Modifier.isNative(Int32): & Pure;
         isNative(x0)
+    }
+    
+    
+    pub def isSynchronized(x0: Int32): Bool & Pure = {
+        import static java.lang.reflect.Modifier.isSynchronized(Int32): & Pure;
+        isSynchronized(x0)
+    }
+    
+    
+    pub def isTransient(x0: Int32): Bool & Pure = {
+        import static java.lang.reflect.Modifier.isTransient(Int32): & Pure;
+        isTransient(x0)
+    }
+    
+    
+    pub def isStrict(x0: Int32): Bool & Pure = {
+        import static java.lang.reflect.Modifier.isStrict(Int32): & Pure;
+        isStrict(x0)
+    }
+    
+    
+    pub def interfaceModifiers(): Int32 & Pure = {
+        import static java.lang.reflect.Modifier.interfaceModifiers(): & Pure;
+        interfaceModifiers()
+    }
+    
+    
+    pub def fieldModifiers(): Int32 & Pure = {
+        import static java.lang.reflect.Modifier.fieldModifiers(): & Pure;
+        fieldModifiers()
+    }
+    
+    
+    pub def parameterModifiers(): Int32 & Pure = {
+        import static java.lang.reflect.Modifier.parameterModifiers(): & Pure;
+        parameterModifiers()
     }
     
     

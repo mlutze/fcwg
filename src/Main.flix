@@ -17,7 +17,7 @@ def main(args: Array[String]): Int32 & Impure =
                     println(ns);
                     0
                 case Err(err) =>
-                    System/StdErr.println(getMessage(err as ##java.lang.Throwable)); // MATT fix this; don't require cast
+                    System/StdErr.println(getMessage(err)); // MATT fix this; don't require cast
                     1
             }
         case Success(Command.GetVersion) =>
