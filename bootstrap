@@ -3,6 +3,7 @@ set -e
 
 java -jar flix.jar build-jar
 java -jar fcwg.jar -ppr java.lang.Class > src/Class.flix
+java -jar fcwg.jar -pprs java.lang.Exception > src/Exception.flix
 java -jar fcwg.jar -ppr java.lang.reflect.Field > src/Field.flix
 java -jar fcwg.jar -ppr java.lang.reflect.Modifier > src/Modifier.flix
 java -jar fcwg.jar -ppr java.lang.reflect.Method > src/Method.flix

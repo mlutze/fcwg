@@ -38,4 +38,13 @@ namespace TestOptions {
         let cmd = Command.Go("java.lang.String", opts);
         parse(args) == Success(cmd)
     }
+
+    @test
+    def testParse05(): Bool & Impure = {
+        let args = ["-pprs", "java.lang.Exception"];
+        let Options(default) = defaultOptions();
+        let opts = Options({ pureLevel = PureLevel.PureButSetters, superLevel = SuperLevel.SuperButObject, resultLevel = ResultLevel.ResultChecked | default });
+        let cmd = Command.Go("java.lang.Exception", opts);
+        parse(args) == Success(cmd)
+    }
 }

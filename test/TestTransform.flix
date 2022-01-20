@@ -19,6 +19,7 @@ namespace TestTransform {
     use Options.Options;
     use Options.PureLevel;
     use Options.ResultLevel;
+    use Options.SuperLevel;
     use Options.defaultOptions;
 
     use Transform.visitClass;
@@ -136,5 +137,15 @@ namespace TestTransform {
         let clazz = forName("java.lang.String");
         let Namespace(_, defs) = visitClass(defaultOptions(), clazz);
         List.count(match Def(name, _, _, _, _) -> name == "wait", defs) == 0
+    }
+
+    @test
+    def testVisitClassIncludeInherited(): Bool = {
+        import static java.lang.Class.forName(String): & Pure;
+        let clazz = forName("java.lang.Exception");
+        let Options(default) = defaultOptions();
+        let opts = Options({ superLevel = SuperLevel.SuperButObject | default });
+        let Namespace(_, defs) = visitClass(opts, clazz);
+        List.count(match Def(name, _, _, _, _) -> name == "getMessage", defs) > 0
     }
 }
