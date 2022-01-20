@@ -4,14 +4,22 @@ use Options.usage;
 use Transform.visitClass;
 use Version.version;
 
+use Wrapped/Class.forName;
+use Wrapped/Exception.getMessage;
+
 // The main entry point.
 def main(args: Array[String]): Int32 & Impure =
-    import static java.lang.Class.forName(String): & Pure;
     match parse(args) {
-        case Success(Command.Go(clazz, options)) =>
-            let ns = visitClass(options, forName(clazz));
-            println(ns);
-            0
+        case Success(Command.Go(name, options)) =>
+            match forName(name) {
+                case Ok(clazz) =>
+                    let ns = visitClass(options, clazz);
+                    println(ns);
+                    0
+                case Err(err) =>
+                    System/StdErr.println(getMessage(err as ##java.lang.Throwable)); // MATT fix this; don't require cast
+                    1
+            }
         case Success(Command.GetVersion) =>
             println(version());
             0
