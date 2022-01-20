@@ -1,4 +1,4 @@
-namespace Modifier {
+namespace Wrapped/Modifier {
     pub def isSynchronized(x0: Int32): Bool & Pure = {
         import static java.lang.reflect.Modifier.isSynchronized(Int32): & Pure;
         isSynchronized(x0)

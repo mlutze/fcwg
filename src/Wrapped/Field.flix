@@ -1,4 +1,4 @@
-namespace Field {
+namespace Wrapped/Field {
     pub def getName(x0: ##java.lang.reflect.Field): String & Pure = {
         import java.lang.reflect.Field.getName(): & Pure;
         getName(x0)

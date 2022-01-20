@@ -1,4 +1,4 @@
-namespace Exception {
+namespace Wrapped/Exception {
     pub def printStackTrace(x0: ##java.lang.Throwable): Unit & Impure = {
         import java.lang.Throwable.printStackTrace(): & Impure;
         printStackTrace(x0)

@@ -1,4 +1,4 @@
-namespace Method {
+namespace Wrapped/Method {
     pub def invoke(x0: ##java.lang.reflect.Method, x1: ##java.lang.Object, x2: Array[##java.lang.Object]): Result[##java.lang.Object, ##java.lang.Exception] & Pure = {
         import java.lang.reflect.Method.invoke(##java.lang.Object, Array[##java.lang.Object]): & Pure;
         try {

@@ -1,4 +1,4 @@
-namespace Class {
+namespace Wrapped/Class {
     pub def getName(x0: ##java.lang.Class): String & Pure = {
         import java.lang.Class.getName(): & Pure;
         getName(x0)
