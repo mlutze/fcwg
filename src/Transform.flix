@@ -77,11 +77,11 @@ namespace Transform {
         import java.lang.Class.isPrimitive(): & Pure;
         import java.lang.reflect.Method.getExceptionTypes(): & Pure;
         let name = getName(m);
-        let eff = match o {
-            case Options(opts) if opts.pureLevel >= PureLevel.PureButSetters => Effect.Pure_
+        let return = getReturnType(m) |> visitType;
+        let eff = match o  {
+            case Options(opts) if opts.pureLevel >= PureLevel.PureButUnit and return != Type_.Unit_ => Effect.Pure_
             case _ => Effect.Impure_
         };
-        let return = getReturnType(m) |> visitType;
         let clazz = getDeclaringClass(m);
         let clazzName = getCanonicalName(clazz);
         let context = if (isStatic(m)) Context.Static else Context.Instance;
@@ -132,7 +132,7 @@ namespace Transform {
         let context = if (isStaticField(f)) Context.Static else Context.Instance;
         let eff = match (o, isFinalField(f)) {
             case (Options(opts), true) if opts.pureLevel >= PureLevel.PureFinal => Effect.Pure_
-            case (Options(opts), _) if opts.pureLevel >= PureLevel.PureButSetters => Effect.Pure_
+            case (Options(opts), _) if opts.pureLevel >= PureLevel.PureButUnit => Effect.Pure_
             case _ => Effect.Impure_
         };
         let name = getName(f);

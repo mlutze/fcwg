@@ -92,6 +92,22 @@ namespace TestTransform {
     }
 
     @test
+    def testVisitMethodUnit(): Bool = {
+        import static java.lang.Class.forName(String): & Pure;
+        import java.lang.Class.getMethod(String, Array[Class]): & Pure;
+        let throwable = forName("java.lang.Throwable");
+        let method = getMethod(throwable, "printStackTrace", [] as & Pure);
+        let imp = Import.Method(Context.Instance, "java.lang.Throwable.printStackTrace", Nil, Effect.Impure_);
+        let call = Call("printStackTrace", "x0" :: Nil);
+        let wrap = Wrap.NoWrap(call);
+        let body = Body.NoTry(wrap);
+        let impl = Impl(imp, body);
+        let Options(default) = defaultOptions();
+        let o = Options({ pureLevel = PureLevel.PureButUnit | default });
+        visitMethod(o, method) == Def("printStackTrace", ("x0", Type_.Ref("java.lang.Throwable")) :: Nil, Type_.Unit_, Effect.Impure_, impl)
+    }
+
+    @test
     def testVisitField(): Bool = {
         import static java.lang.Class.forName(String): & Pure;
         import java.lang.Class.getField(String): & Pure;

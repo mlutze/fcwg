@@ -26,7 +26,7 @@ namespace Options {
     pub enum PureLevel with Eq, Order {
         case PureNone
         case PureFinal
-        case PureButSetters
+        case PureButUnit
         case PureAll
     }
 
@@ -77,7 +77,7 @@ namespace Options {
         {optionIds = 'i' :: Nil, optionNames = "interactive" :: Nil, argDescriptor = NoArg(Interactive), explanation = "Launches interactive mode." } ::
         {optionIds = 'n' :: Nil, optionNames = "namespace" :: Nil, argDescriptor = ReqArg(namespace_, "<namespace>"), explanation = "Sets the namespace. Uses the class's namespace by default."} ::
         {optionIds = 'o' :: Nil, optionNames = "option" :: Nil, argDescriptor = NoArg(Option), explanation = "Once: Returns Option for functions returning reference types. Twice: Returns Option for all functions."} ::
-        {optionIds = 'p' :: Nil, optionNames = "pure" :: Nil, argDescriptor = NoArg(Pure_), explanation = "Once: Casts getters for final fields to Pure. Twice: Casts all functions but setters. Thrice: Casts all functions."} ::
+        {optionIds = 'p' :: Nil, optionNames = "pure" :: Nil, argDescriptor = NoArg(Pure_), explanation = "Once: Casts getters for final fields to Pure. Twice: Casts all functions but those returning Unit. Thrice: Casts all functions."} ::
         {optionIds = 'r' :: Nil, optionNames = "result" :: Nil, argDescriptor = NoArg(Result), explanation = "Once: Returns Result for methods with checked exceptions. Twice: Returns Result for all methods."} ::
         {optionIds = 's' :: Nil, optionNames = "super" :: Nil, argDescriptor = NoArg(Super), explanation = "Once: Includes super class declarations, excluding Object. Twice: Includes Object."} ::
         {optionIds = 'v' :: Nil, optionNames = "version" :: Nil, argDescriptor = NoArg(Version), explanation = "Prints the version string and exits."} ::
@@ -139,8 +139,8 @@ namespace Options {
             case Pure_ =>
                 let p = match opts.pureLevel {
                     case PureNone => PureFinal
-                    case PureFinal => PureButSetters
-                    case PureButSetters => PureAll
+                    case PureFinal => PureButUnit
+                    case PureButUnit => PureAll
                     case PureAll => PureAll
                 };
                 { pureLevel = p | opts }
