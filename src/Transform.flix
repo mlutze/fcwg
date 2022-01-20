@@ -23,37 +23,41 @@ namespace Transform {
     use Options.ResultLevel;
     use Options.SuperLevel;
 
+    use Wrapped/Class.getSimpleName;
+    use Wrapped/Class.getMethods;
+
     type alias Class = ##java.lang.Class
     type alias Field = ##java.lang.reflect.Field
     type alias Method = ##java.lang.reflect.Method
+    type alias Exception = ##java.lang.Exception
 
-    pub def visitClass(o: Options, c: Class): Namespace = {
-        import java.lang.Class.getSimpleName(): & Pure;
-        let defs1 = {
-            getMethodsFor(o, c) 
+    pub def visitClass(o: Options, c: Class): Result[Namespace, Exception] = {
+        use Result.flatMap;
+        let* methods = getMethodsFor(o, c);
+        let defs1 = methods
             |> List.filter(isBlackMagic >> Bool.not)
-            |> List.map(visitMethod(o, c))
-        };
+            |> List.map(visitMethod(o, c));
         let defs2 = {
             getFieldsFor(o, c)
             |> List.flatMap(visitField(o, c))
         };
         let Options(opts) = o;
         let name = opts.namespace_ |> Option.getWithDefault(getSimpleName(c));
-        Namespace(name, defs1 ::: defs2)
+        Namespace(name, defs1 ::: defs2) |> Ok
     }
 
-    def getMethodsFor(o: Options, c: Class): List[Method] = {
-        import java.lang.Class.getMethods(): & Pure;
+    def getMethodsFor(o: Options, c: Class): Result[List[Method], Exception] = {
+        use Result.flatMap;
         import java.lang.Class.getName(): & Pure;
         import java.lang.reflect.Method.getDeclaringClass(): & Pure;
         let Options(opts) = o;
         let clazzName = getName(c);
+        let* methods = getMethods(c);
         match opts.superLevel {
-            case SuperLevel.SuperNone => getMethods(c) |> Array.toList |> List.filter(m -> getName(getDeclaringClass(m)) == clazzName)
-            case SuperLevel.SuperButObject => getMethods(c) |> Array.toList |> List.filter(m -> getName(getDeclaringClass(m)) != "java.lang.Object")
-            case SuperLevel.SuperAll => getMethods(c) |> Array.toList
-        } as & Pure
+            case SuperLevel.SuperNone => methods |> Array.toList |> List.filter(m -> getName(getDeclaringClass(m)) == clazzName)
+            case SuperLevel.SuperButObject => methods |> Array.toList |> List.filter(m -> getName(getDeclaringClass(m)) != "java.lang.Object")
+            case SuperLevel.SuperAll => methods |> Array.toList
+        } as & Pure |> Ok
     }
 
     def getFieldsFor(o: Options, c: Class): List[Field] = {

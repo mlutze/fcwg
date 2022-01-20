@@ -23,6 +23,8 @@ namespace TestTransform {
     use Options.SuperLevel;
     use Options.defaultOptions;
 
+    use Result.flatMap;
+
     use Transform.visitClass;
     use Transform.visitField;
     use Transform.visitMethod;
@@ -146,16 +148,20 @@ namespace TestTransform {
         let clazz = forName("java.lang.String");
         let Options(opts) = defaultOptions();
         let o = Options({ namespace_ = Some("MyString") | opts });
-        let Namespace(name, _) = visitClass(o, clazz);
-        name == "MyString"
+        {
+            let* Namespace(name, _) = visitClass(o, clazz);
+            Ok(name == "MyString")
+        } |> Result.getWithDefault(false)
     }
 
     @test
     def testVisitClassIgnoreInherited(): Bool = {
         import static java.lang.Class.forName(String): & Pure;
         let clazz = forName("java.lang.String");
-        let Namespace(_, defs) = visitClass(defaultOptions(), clazz);
-        List.count(match Def(name, _, _, _, _) -> name == "wait", defs) == 0
+        {
+            let* Namespace(_, defs) = visitClass(defaultOptions(), clazz);
+            Ok(List.count(match Def(name, _, _, _, _) -> name == "wait", defs) == 0)
+        } |> Result.getWithDefault(false)
     }
 
     @test
@@ -164,8 +170,10 @@ namespace TestTransform {
         let clazz = forName("java.lang.Exception");
         let Options(default) = defaultOptions();
         let opts = Options({ superLevel = SuperLevel.SuperButObject | default });
-        let Namespace(_, defs) = visitClass(opts, clazz);
-        List.count(match Def(name, _, _, _, _) -> name == "getMessage", defs) > 0
+        {
+            let* Namespace(_, defs) = visitClass(opts, clazz);
+            Ok(List.count(match Def(name, _, _, _, _) -> name == "getMessage", defs) > 0)
+        } |> Result.getWithDefault(false)
     }
 
     @test

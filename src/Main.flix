@@ -9,15 +9,18 @@ use Wrapped/Exception.getMessage;
 
 // The main entry point.
 def main(args: Array[String]): Int32 & Impure =
+    use Result.flatMap;
     match parse(args) {
         case Success(Command.Go(name, options)) =>
-            match forName(name) {
-                case Ok(clazz) =>
-                    let ns = visitClass(options, clazz);
+            match {
+                let* clazz = forName(name);
+                visitClass(options, clazz)
+            } {
+                case Ok(ns) =>
                     println(ns);
                     0
                 case Err(err) =>
-                    System/StdErr.println(getMessage(err)); // MATT fix this; don't require cast
+                    System/StdErr.println(getMessage(err));
                     1
             }
         case Success(Command.GetVersion) =>
