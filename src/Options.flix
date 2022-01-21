@@ -99,6 +99,7 @@ namespace Options {
         case Failure(e) => Failure(e)
     }
 
+    /// Parses the command line arguments
     pub def parse(args: Array[String]): Validation[Command, String] & Impure = {
         let* opts = getOpt(Permute, options(), args);
         let command = opts.options |> List.foldLeft(
@@ -122,6 +123,7 @@ namespace Options {
         }
     }
 
+    /// Add the given flag to the options, assuming the flag represents some option.
     def addOpt(opt: Flag, opts0: Options): Options = 
         let Options(opts) = opts0;
         let newOpts = match opt {
@@ -162,6 +164,7 @@ namespace Options {
         };
     Options(newOpts)
 
+    /// Returns the usage string to be printed to the console.
     pub def usage(): String = {
         let header = "Usage: fcwg [OPTIONS] <class file>";
         usageInfo(header, options())

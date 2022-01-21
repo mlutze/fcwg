@@ -52,6 +52,7 @@ namespace Transform {
     type alias Method = ##java.lang.reflect.Method
     type alias Exception = ##java.lang.Exception
 
+    /// Transforms the Java class into a Flix namespace.
     pub def visitClass(o: Options, c: Class): Result[Namespace, Exception] = {
         use Result.flatMap;
         let* methods = getMethodsFor(o, c);
@@ -67,6 +68,7 @@ namespace Transform {
         Namespace(name, defs) |> Ok
     }
 
+    /// Gets the methods relevant to the class.
     def getMethodsFor(o: Options, c: Class): Result[List[Method], Exception] = {
         use Result.flatMap;
         let Options(opts) = o;
@@ -79,6 +81,7 @@ namespace Transform {
         } as & Pure |> Ok
     }
 
+    /// Gets the fields relevant to the class.
     def getFieldsFor(o: Options, c: Class): Result[List[Field], Exception] = {
         use Result.flatMap;
         let Options(opts) = o;
@@ -92,6 +95,7 @@ namespace Transform {
     }
 
     // MATT split into static/instance
+    /// Transforms the Java method into a Flix function.
     pub def visitMethod(o: Options, c: Class, m: Method): Ast.Def = {
         let name = getMethodName(m);
         let return = getReturnType(m) |> visitType;
@@ -140,6 +144,7 @@ namespace Transform {
         Def(name, params, outerReturnType, eff, impl)
     }
 
+    /// Transforms the Java field into a Flix getter and setter.
     pub def visitField(o: Options, c: Class, f: Field): List[Ast.Def] = {
         if (isFinalField(f)) {
             mkGetter(o, c, f) :: Nil
@@ -148,6 +153,7 @@ namespace Transform {
         }
     }
 
+    /// Creates a getter for the given field.
     def mkGetter(o: Options, c: Class, f: Field): Ast.Def = {
         let context = if (isStaticField(f)) Context.Static else Context.Instance;
         let eff = match (o, isFinalField(f)) {
@@ -186,6 +192,7 @@ namespace Transform {
         Def(funcName, params, fieldType, eff, impl)
     }
 
+    /// Creates a setter for the given field.
     def mkSetter(o: Options, c: Class, f: Field): Ast.Def = {
         let context = if (isStaticField(f)) Context.Static else Context.Instance;
         let eff = match o {
@@ -219,6 +226,7 @@ namespace Transform {
         Def(funcName, params, fieldType, eff, impl)
     }
 
+    /// Converts the Java class into a Flix type.
     pub def visitType(t: Class): Ast.Type_ = {
         if (isArray(t)) {
             let ct = getComponentType(t);
@@ -259,6 +267,7 @@ namespace Transform {
         getMethodModifiers(m) &&& 4096 != 0
     }
 
+    /// Creates a valid Flix getter name from the field name.
     def getterName(fieldName: String): String = {
         // safe because field names are never empty
         let head = String.charAt(0, fieldName);
@@ -266,6 +275,7 @@ namespace Transform {
         "get" + "${Char.toUpperCase(head)}" + tail
     }
 
+    /// Creates a valid Flix setter name from the field name.
     def setterName(fieldName: String): String = {
         // safe because field names are never empty
         let head = String.charAt(0, fieldName);

@@ -1,17 +1,17 @@
 namespace Ast {
-    // Def(name, params, type, impl)
+    ///  Def(name, params, return type, effect, impl)
     pub opaque type Def with Eq, Order = (String, List[(String, Type_)], Type_, Effect, Impl)
 
     pub opaque type Impl with Eq, Order = (Import, Body)
 
     pub enum Import with Eq, Order {
-        // Method(context, name, params)
+        // Method(context, name, params, effect)
         case Method(Context, String, List[Type_], Effect)
 
-        // GetField(context, field, alias)
+        // GetField(context, field, effect, alias)
         case GetField(Context, String, Effect, String)
 
-        // SetField(context, field, alias)
+        // SetField(context, field, effect, alias)
         case SetField(Context, String, Effect, String)
     }
 
