@@ -32,13 +32,20 @@ namespace Transform {
     use Wrapped/Class.isPrimitive;
     use Wrapped/Class.{getName => getClassName};
 
-    use Wrapped/Field.{getName => getFieldName};
-    use Wrapped/Field.{getDeclaringClass => getFieldDeclaringClass};
     use Wrapped/Field.getType;
+    use Wrapped/Field.{getDeclaringClass => getFieldDeclaringClass};
     use Wrapped/Field.{getModifiers => getFieldModifiers};
+    use Wrapped/Field.{getName => getFieldName};
 
-    use Wrapped/Method.{getName => getMethodName};
+    use Wrapped/Method.getExceptionTypes;
+    use Wrapped/Method.getParameterTypes;
+    use Wrapped/Method.getReturnType;
     use Wrapped/Method.{getDeclaringClass => getMethodDeclaringClass};
+    use Wrapped/Method.{getModifiers => getMethodModifiers};
+    use Wrapped/Method.{getName => getMethodName};
+
+    use Wrapped/Modifier.isStatic;
+    use Wrapped/Modifier.isFinal;
 
     type alias Class = ##java.lang.Class
     type alias Field = ##java.lang.reflect.Field
@@ -49,7 +56,7 @@ namespace Transform {
         use Result.flatMap;
         let* methods = getMethodsFor(o, c);
         let defs1 = methods
-            |> List.filter(isBlackMagic >> Bool.not)
+            |> List.filter(isBlackMagicMethod >> Bool.not)
             |> List.map(visitMethod(o, c));
         let* fields = getFieldsFor(o, c);
         let defs2 = fields
@@ -85,9 +92,6 @@ namespace Transform {
 
     // MATT split into static/instance
     pub def visitMethod(o: Options, c: Class, m: Method): Ast.Def = {
-        import java.lang.reflect.Method.getParameterTypes(): & Pure;
-        import java.lang.reflect.Method.getReturnType(): & Pure;
-        import java.lang.reflect.Method.getExceptionTypes(): & Pure;
         let name = getMethodName(m);
         let return = getReturnType(m) |> visitType;
         let eff = match o  {
@@ -96,7 +100,7 @@ namespace Transform {
         };
         let importClazz = getMethodDeclaringClass(m);
         let importClazzName = getCanonicalName(importClazz);
-        let context = if (isStatic(m)) Context.Static else Context.Instance;
+        let context = if (isStaticMethod(m)) Context.Static else Context.Instance;
         let importParamTypes = { getParameterTypes(m) |> Array.toList |> List.map(visitType) } as & Pure;
         let outerParamTypes = match context {
             case Context.Static => importParamTypes
@@ -237,26 +241,21 @@ namespace Transform {
     }
 
     def isStaticField(f: Field): Bool = {
-        import static java.lang.reflect.Modifier.isStatic(Int): & Pure;
         getFieldModifiers(f) |> isStatic
     }
 
     def isFinalField(f: Field): Bool = {
-        import static java.lang.reflect.Modifier.isFinal(Int): & Pure;
         getFieldModifiers(f) |> isFinal
     }
 
-    def isStatic(m: Method): Bool = {
-        import java.lang.reflect.Method.getModifiers(): & Pure;
-        import static java.lang.reflect.Modifier.isStatic(Int): & Pure;
-        getModifiers(m) |> isStatic
+    def isStaticMethod(m: Method): Bool = {
+        getMethodModifiers(m) |> isStatic
     }
 
     /// A method with an undocumented modifier.
     /// Causes issues as it may have signature overlap.
-    def isBlackMagic(m: Method): Bool = {
-        import java.lang.reflect.Method.getModifiers(): & Pure;
-        getModifiers(m) &&& 4096 != 0
+    def isBlackMagicMethod(m: Method): Bool = {
+        getMethodModifiers(m) &&& 4096 != 0
     }
 
     def getterName(fieldName: String): String = {
