@@ -63,7 +63,8 @@ namespace Transform {
             |> List.flatMap(visitField(o, c));
         let Options(opts) = o;
         let name = opts.namespace_ |> Option.getWithDefault(getSimpleName(c));
-        Namespace(name, defs1 ::: defs2) |> Ok
+        let defs = List.sort(defs1 ::: defs2);
+        Namespace(name, defs) |> Ok
     }
 
     def getMethodsFor(o: Options, c: Class): Result[List[Method], Exception] = {

@@ -1,10 +1,10 @@
 namespace Ast {
     // Def(name, params, type, impl)
-    pub opaque type Def with Eq = (String, List[(String, Type_)], Type_, Effect, Impl)
+    pub opaque type Def with Eq, Order = (String, List[(String, Type_)], Type_, Effect, Impl)
 
-    pub opaque type Impl with Eq = (Import, Body)
+    pub opaque type Impl with Eq, Order = (Import, Body)
 
-    pub enum Import with Eq {
+    pub enum Import with Eq, Order {
         // Method(context, name, params)
         case Method(Context, String, List[Type_], Effect)
 
@@ -15,28 +15,28 @@ namespace Ast {
         case SetField(Context, String, Effect, String)
     }
 
-    pub enum Body with Eq {
+    pub enum Body with Eq, Order {
         case TryCatch(Wrap)
         case NoTry(Wrap)
     }
 
-    pub enum Wrap with Eq {
+    pub enum Wrap with Eq, Order {
         case WrapOption(Call)
         case NoWrap(Call)
     }
 
-    pub enum Arg with Eq {
+    pub enum Arg with Eq, Order {
         case Cast(String, Type_)
         case NoCast(String)
     }
 
     // Call(name, params)
-    pub opaque type Call with Eq = (String, List[Arg])
+    pub opaque type Call with Eq, Order = (String, List[Arg])
 
     // Namespace(name, defs)
-    pub opaque type Namespace with Eq = (String, List[Def])
+    pub opaque type Namespace with Eq, Order = (String, List[Def])
 
-    pub enum Type_ with Eq {
+    pub enum Type_ with Eq, Order {
         case Int8_
         case Int16_
         case Int32_
@@ -53,12 +53,12 @@ namespace Ast {
         case Result_(Type_, Type_)
     }
 
-    pub enum Context with Eq {
+    pub enum Context with Eq, Order {
         case Static
         case Instance
     }
 
-    pub enum Effect with Eq {
+    pub enum Effect with Eq, Order {
         case Pure_
         case Impure_
     }
