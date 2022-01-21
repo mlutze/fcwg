@@ -51,6 +51,7 @@ namespace Ast {
         case Ref(String)
         case Array_(Type_)
         case Result_(Type_, Type_)
+        case Option_(Type_)
     }
 
     pub enum Context with Eq, Order {
@@ -171,6 +172,7 @@ namespace Ast {
             case Ref(name) => "##${name}"
             case Array_(ct) => "Array[${ct}]"
             case Result_(t, e) => "Result[${t}, ${e}]"
+            case Option_(t) => "Option[${t}]"
         }
     }
 }

@@ -117,10 +117,17 @@ namespace Transform {
             case (Options(opts), _) if opts.resultLevel >= ResultLevel.ResultAll => true
             case _ => false
         };
-        let outerReturnType = if (catchException) {
-            Type_.Result_(return, Type_.Ref("java.lang.Exception"))
-        } else {
-            return
+        let doWrap = match (o, isPrimitive(getReturnType(m))) {
+            case (Options(opts), false) if opts.optionLevel >= OptionLevel.OptionRef => true
+            case (Options(opts), _) if opts.optionLevel >= OptionLevel.OptionAll => true
+            case _ => false
+        };
+        let outerReturnType = match (catchException, doWrap) {
+            case (false, false) => return
+            case (true, false) => Type_.Result_(return, Type_.Ref("java.lang.Exception"))
+            case (false, true) => Type_.Option_(return)
+            case (true, true) => Type_.Result_(Type_.Option_(return), Type_.Ref("java.lang.Exception"))
+            case _ => unreachable!()
         };
         let paramNames = List.range(0, List.length(outerParamTypes)) |> List.map(i -> "x${i}");
         let isInherited = importClazzName != getCanonicalName(c);
@@ -134,11 +141,7 @@ namespace Transform {
         let params = List.zip(paramNames, outerParamTypes);
         let imp = Import.Method(context, importClazzName + "." + name, importParamTypes, eff);
         let call = Call(name, args);
-        let wrap = match (o, isPrimitive(getReturnType(m))) {
-            case (Options(opts), false) if opts.optionLevel >= OptionLevel.OptionRef => Wrap.WrapOption(call)
-            case (Options(opts), _) if opts.optionLevel >= OptionLevel.OptionAll => Wrap.WrapOption(call)
-            case _ => Wrap.NoWrap(call)
-        };
+        let wrap = if (doWrap) Wrap.WrapOption(call) else Wrap.NoWrap(call);
         let body = if (catchException) Body.TryCatch(wrap) else Body.NoTry(wrap);
         let impl = Impl(imp, body);
         Def(name, params, outerReturnType, eff, impl)
@@ -182,14 +185,16 @@ namespace Transform {
         let funcName = getterName(name);
         let imp = Import.GetField(context, importClazzName + "." + name, eff, funcName);
         let call = Call(funcName, args);
-        let wrap = match (o, isPrimitive(getType(f))) {
-            case (Options(opts), false) if opts.optionLevel >= OptionLevel.OptionRef => Wrap.WrapOption(call)
-            case (Options(opts), _) if opts.optionLevel >= OptionLevel.OptionAll => Wrap.WrapOption(call)
-            case _ => Wrap.NoWrap(call)
+        let doWrap = match (o, isPrimitive(getType(f))) {
+            case (Options(opts), false) if opts.optionLevel >= OptionLevel.OptionRef => true
+            case (Options(opts), _) if opts.optionLevel >= OptionLevel.OptionAll => true
+            case _ => false
         };
+        let outerReturnType = if (doWrap) Type_.Option_(fieldType) else fieldType;
+        let wrap = if (doWrap) Wrap.WrapOption(call) else Wrap.NoWrap(call);
         let body = Body.NoTry(wrap);
         let impl = Impl(imp, body);
-        Def(funcName, params, fieldType, eff, impl)
+        Def(funcName, params, outerReturnType, eff, impl)
     }
 
     /// Creates a setter for the given field.

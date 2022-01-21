@@ -16,6 +16,7 @@ namespace TestTransform {
     use Ast.Type_;
     use Ast.Wrap;
 
+    use Options.OptionLevel;
     use Options.Options.Options;
     use Options.Options;
     use Options.PureLevel;
@@ -97,6 +98,21 @@ namespace TestTransform {
         let Options(opts) = defaultOptions();
         let o = Options({ resultLevel = ResultLevel.ResultChecked | opts });
         visitMethod(o, clazz, method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Result_(Type_.Ref("java.lang.Class"), Type_.Ref("java.lang.Exception")), Effect.Impure_, impl)
+    }
+
+    @test
+    def testVisitMethodOptionResult(): Bool = {
+        let clazz = forName("java.lang.Class") |> unsafeGet;
+        let string = forName("java.lang.String") |> unsafeGet;
+        let method = getMethod(clazz, "forName", [string] as & Pure) |> unsafeGet;
+        let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Effect.Impure_);
+        let call = Call("forName", mkArgs("x0" :: Nil));
+        let wrap = Wrap.WrapOption(call);
+        let body = Body.TryCatch(wrap);
+        let impl = Impl(imp, body);
+        let Options(opts) = defaultOptions();
+        let o = Options({ resultLevel = ResultLevel.ResultChecked, optionLevel = OptionLevel.OptionRef | opts });
+        visitMethod(o, clazz, method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Result_(Type_.Option_(Type_.Ref("java.lang.Class")), Type_.Ref("java.lang.Exception")), Effect.Impure_, impl)
     }
 
     @test
