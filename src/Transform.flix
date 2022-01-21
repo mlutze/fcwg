@@ -34,6 +34,8 @@ namespace Transform {
 
     use Wrapped/Field.{getName => getFieldName};
     use Wrapped/Field.{getDeclaringClass => getFieldDeclaringClass};
+    use Wrapped/Field.getType;
+    use Wrapped/Field.{getModifiers => getFieldModifiers};
 
     use Wrapped/Method.{getName => getMethodName};
     use Wrapped/Method.{getDeclaringClass => getMethodDeclaringClass};
@@ -142,7 +144,6 @@ namespace Transform {
     }
 
     def mkGetter(o: Options, c: Class, f: Field): Ast.Def = {
-        import java.lang.reflect.Field.getType(): & Pure;
         let context = if (isStaticField(f)) Context.Static else Context.Instance;
         let eff = match (o, isFinalField(f)) {
             case (Options(opts), true) if opts.pureLevel >= PureLevel.PureFinal => Effect.Pure_
@@ -181,7 +182,6 @@ namespace Transform {
     }
 
     def mkSetter(o: Options, c: Class, f: Field): Ast.Def = {
-        import java.lang.reflect.Field.getType(): & Pure;
         let context = if (isStaticField(f)) Context.Static else Context.Instance;
         let eff = match o {
             case Options(opts) if opts.pureLevel >= PureLevel.PureAll => Effect.Pure_
@@ -237,15 +237,13 @@ namespace Transform {
     }
 
     def isStaticField(f: Field): Bool = {
-        import java.lang.reflect.Field.getModifiers(): & Pure;
         import static java.lang.reflect.Modifier.isStatic(Int): & Pure;
-        getModifiers(f) |> isStatic
+        getFieldModifiers(f) |> isStatic
     }
 
     def isFinalField(f: Field): Bool = {
-        import java.lang.reflect.Field.getModifiers(): & Pure;
         import static java.lang.reflect.Modifier.isFinal(Int): & Pure;
-        getModifiers(f) |> isFinal
+        getFieldModifiers(f) |> isFinal
     }
 
     def isStatic(m: Method): Bool = {
