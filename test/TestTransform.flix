@@ -30,32 +30,39 @@ namespace TestTransform {
     use Transform.visitMethod;
     use Transform.visitType;
 
+    use Wrapped/Class.arrayType;
+    use Wrapped/Class.forName;
+    use Wrapped/Class.getField;
+    use Wrapped/Class.getMethod;
+
     type alias Class = ##java.lang.Class
     type alias Method = ##java.lang.reflect.Method
 
     def mkArgs(args: List[String]): List[Arg] = List.map(Arg.NoCast, args)
 
+    def unsafeGet(r: Result[a, _]): a = {
+        match r {
+            case Ok(x) => x
+            case Err(_) => bug!("unexpected error")
+        }
+    }
+
     @test
     def testVisitType(): Bool = {
-        import static java.lang.Class.forName(String): & Pure;
-        let tpe = forName("java.lang.String");
+        let tpe = forName("java.lang.String") |> unsafeGet;
         visitType(tpe) == Type_.String_
     }
 
     @test
     def testVisitTypeArray(): Bool = {
-        import static java.lang.Class.forName(String): & Pure;
-        import java.lang.Class.arrayType(): & Pure;
-        let tpe = forName("java.lang.StringBuilder") |> arrayType;
+        let tpe = forName("java.lang.StringBuilder") |> unsafeGet |> arrayType;
         visitType(tpe) == Type_.Array_(Type_.Ref("java.lang.StringBuilder"))
     }
 
     @test
     def testVisitMethod(): Bool = {
-        import static java.lang.Class.forName(String): & Pure;
-        import java.lang.Class.getMethod(String, Array[Class]): & Pure;
-        let string = forName("java.lang.String");
-        let method = getMethod(string, "concat", [string] as & Pure);
+        let string = forName("java.lang.String") |> unsafeGet;
+        let method = getMethod(string, "concat", [string] as & Pure) |> unsafeGet;
         let imp = Import.Method(Context.Instance, "java.lang.String.concat", Type_.String_ :: Nil, Effect.Impure_);
         let call = Call("concat", mkArgs("x0" :: "x1" :: Nil));
         let wrap = Wrap.NoWrap(call);
@@ -66,11 +73,9 @@ namespace TestTransform {
 
     @test
     def testVisitMethodExceptionNoResult(): Bool = {
-        import static java.lang.Class.forName(String): & Pure;
-        import java.lang.Class.getMethod(String, Array[Class]): & Pure;
-        let clazz = forName("java.lang.Class");
-        let string = forName("java.lang.String");
-        let method = getMethod(clazz, "forName", [string] as & Pure);
+        let clazz = forName("java.lang.Class") |> unsafeGet;
+        let string = forName("java.lang.String") |> unsafeGet;
+        let method = getMethod(clazz, "forName", [string] as & Pure) |> unsafeGet;
         let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Effect.Impure_);
         let call = Call("forName", mkArgs("x0" :: Nil));
         let wrap = Wrap.NoWrap(call);
@@ -81,11 +86,9 @@ namespace TestTransform {
 
     @test
     def testVisitMethodException(): Bool = {
-        import static java.lang.Class.forName(String): & Pure;
-        import java.lang.Class.getMethod(String, Array[Class]): & Pure;
-        let clazz = forName("java.lang.Class");
-        let string = forName("java.lang.String");
-        let method = getMethod(clazz, "forName", [string] as & Pure);
+        let clazz = forName("java.lang.Class") |> unsafeGet;
+        let string = forName("java.lang.String") |> unsafeGet;
+        let method = getMethod(clazz, "forName", [string] as & Pure) |> unsafeGet;
         let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Effect.Impure_);
         let call = Call("forName", mkArgs("x0" :: Nil));
         let wrap = Wrap.NoWrap(call);
@@ -98,10 +101,8 @@ namespace TestTransform {
 
     @test
     def testVisitMethodUnit(): Bool = {
-        import static java.lang.Class.forName(String): & Pure;
-        import java.lang.Class.getMethod(String, Array[Class]): & Pure;
-        let throwable = forName("java.lang.Throwable");
-        let method = getMethod(throwable, "printStackTrace", [] as & Pure);
+        let throwable = forName("java.lang.Throwable") |> unsafeGet;
+        let method = getMethod(throwable, "printStackTrace", [] as & Pure) |> unsafeGet;
         let imp = Import.Method(Context.Instance, "java.lang.Throwable.printStackTrace", Nil, Effect.Impure_);
         let call = Call("printStackTrace", mkArgs("x0" :: Nil));
         let wrap = Wrap.NoWrap(call);
@@ -114,10 +115,8 @@ namespace TestTransform {
 
     @test
     def testVisitField(): Bool = {
-        import static java.lang.Class.forName(String): & Pure;
-        import java.lang.Class.getField(String): & Pure;
-        let string = forName("java.lang.String");
-        let field = getField(string, "CASE_INSENSITIVE_ORDER");
+        let string = forName("java.lang.String") |> unsafeGet;
+        let field = getField(string, "CASE_INSENSITIVE_ORDER") |> unsafeGet;
         let imp = Import.GetField(Context.Static, "java.lang.String.CASE_INSENSITIVE_ORDER", Effect.Impure_, "getCASE_INSENSITIVE_ORDER");
         let call = Call("getCASE_INSENSITIVE_ORDER", Nil);
         let wrap = Wrap.NoWrap(call);
@@ -128,10 +127,8 @@ namespace TestTransform {
 
     @test
     def testVisitFieldPure(): Bool = {
-        import static java.lang.Class.forName(String): & Pure;
-        import java.lang.Class.getField(String): & Pure;
-        let string = forName("java.lang.String");
-        let field = getField(string, "CASE_INSENSITIVE_ORDER");
+        let string = forName("java.lang.String") |> unsafeGet;
+        let field = getField(string, "CASE_INSENSITIVE_ORDER") |> unsafeGet;
         let imp = Import.GetField(Context.Static, "java.lang.String.CASE_INSENSITIVE_ORDER", Effect.Pure_, "getCASE_INSENSITIVE_ORDER");
         let call = Call("getCASE_INSENSITIVE_ORDER", Nil);
         let wrap = Wrap.NoWrap(call);
@@ -144,8 +141,7 @@ namespace TestTransform {
 
     @test
     def testVisitClassSetNamespace(): Bool = {
-        import static java.lang.Class.forName(String): & Pure;
-        let clazz = forName("java.lang.String");
+        let clazz = forName("java.lang.String") |> unsafeGet;
         let Options(opts) = defaultOptions();
         let o = Options({ namespace_ = Some("MyString") | opts });
         {
@@ -156,8 +152,7 @@ namespace TestTransform {
 
     @test
     def testVisitClassIgnoreInherited(): Bool = {
-        import static java.lang.Class.forName(String): & Pure;
-        let clazz = forName("java.lang.String");
+        let clazz = forName("java.lang.String") |> unsafeGet;
         {
             let* Namespace(_, defs) = visitClass(defaultOptions(), clazz);
             Ok(List.count(match Def(name, _, _, _, _) -> name == "wait", defs) == 0)
@@ -166,8 +161,7 @@ namespace TestTransform {
 
     @test
     def testVisitClassIncludeInherited(): Bool = {
-        import static java.lang.Class.forName(String): & Pure;
-        let clazz = forName("java.lang.Exception");
+        let clazz = forName("java.lang.Exception") |> unsafeGet;
         let Options(default) = defaultOptions();
         let opts = Options({ superLevel = SuperLevel.SuperButObject | default });
         {
@@ -178,11 +172,9 @@ namespace TestTransform {
 
     @test
     def testVisitMethodCastInherited(): Bool = {
-        import static java.lang.Class.forName(String): & Pure;
-        import java.lang.Class.getMethod(String, Array[Class]): & Pure;
-        let throwable = forName("java.lang.Throwable");
-        let exception = forName("java.lang.Exception");
-        let method = getMethod(throwable, "getMessage", [] as & Pure);
+        let throwable = forName("java.lang.Throwable") |> unsafeGet;
+        let exception = forName("java.lang.Exception") |> unsafeGet;
+        let method = getMethod(throwable, "getMessage", [] as & Pure) |> unsafeGet;
         let imp = Import.Method(Context.Instance, "java.lang.Throwable.getMessage", Nil, Effect.Impure_);
         let call = Call("getMessage", Arg.Cast("x0", Type_.Ref("java.lang.Throwable")) :: Nil);
         let wrap = Wrap.NoWrap(call);
