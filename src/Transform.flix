@@ -23,8 +23,13 @@ namespace Transform {
     use Options.ResultLevel;
     use Options.SuperLevel;
 
+    use Wrapped/Class.getCanonicalName;
+    use Wrapped/Class.getComponentType;
+    use Wrapped/Class.getFields;
     use Wrapped/Class.getMethods;
     use Wrapped/Class.getSimpleName;
+    use Wrapped/Class.isArray;
+    use Wrapped/Class.isPrimitive;
     use Wrapped/Class.{getName => getClassName};
 
     use Wrapped/Field.{getName => getFieldName};
@@ -44,10 +49,9 @@ namespace Transform {
         let defs1 = methods
             |> List.filter(isBlackMagic >> Bool.not)
             |> List.map(visitMethod(o, c));
-        let defs2 = {
-            getFieldsFor(o, c)
-            |> List.flatMap(visitField(o, c))
-        };
+        let* fields = getFieldsFor(o, c);
+        let defs2 = fields
+            |> List.flatMap(visitField(o, c));
         let Options(opts) = o;
         let name = opts.namespace_ |> Option.getWithDefault(getSimpleName(c));
         Namespace(name, defs1 ::: defs2) |> Ok
@@ -65,23 +69,22 @@ namespace Transform {
         } as & Pure |> Ok
     }
 
-    def getFieldsFor(o: Options, c: Class): List[Field] = {
-        import java.lang.Class.getFields(): & Pure;
+    def getFieldsFor(o: Options, c: Class): Result[List[Field], Exception] = {
+        use Result.flatMap;
         let Options(opts) = o;
         let clazzName = getClassName(c);
+        let* fields = getFields(c);
         match opts.superLevel {
-            case SuperLevel.SuperNone => getFields(c) |> Array.toList |> List.filter(m -> getClassName(getFieldDeclaringClass(m)) == clazzName)
-            case SuperLevel.SuperButObject => getFields(c) |> Array.toList |> List.filter(m -> getClassName(getFieldDeclaringClass(m)) != "java.lang.Object")
-            case SuperLevel.SuperAll => getFields(c) |> Array.toList
-        } as & Pure
+            case SuperLevel.SuperNone => fields |> Array.toList |> List.filter(m -> getClassName(getFieldDeclaringClass(m)) == clazzName)
+            case SuperLevel.SuperButObject => fields |> Array.toList |> List.filter(m -> getClassName(getFieldDeclaringClass(m)) != "java.lang.Object")
+            case SuperLevel.SuperAll => fields |> Array.toList
+        } as & Pure |> Ok
     }
 
     // MATT split into static/instance
     pub def visitMethod(o: Options, c: Class, m: Method): Ast.Def = {
         import java.lang.reflect.Method.getParameterTypes(): & Pure;
         import java.lang.reflect.Method.getReturnType(): & Pure;
-        import java.lang.Class.getCanonicalName(): & Pure;
-        import java.lang.Class.isPrimitive(): & Pure;
         import java.lang.reflect.Method.getExceptionTypes(): & Pure;
         let name = getMethodName(m);
         let return = getReturnType(m) |> visitType;
@@ -140,8 +143,6 @@ namespace Transform {
 
     def mkGetter(o: Options, c: Class, f: Field): Ast.Def = {
         import java.lang.reflect.Field.getType(): & Pure;
-        import java.lang.Class.getCanonicalName(): & Pure;
-        import java.lang.Class.isPrimitive(): & Pure;
         let context = if (isStaticField(f)) Context.Static else Context.Instance;
         let eff = match (o, isFinalField(f)) {
             case (Options(opts), true) if opts.pureLevel >= PureLevel.PureFinal => Effect.Pure_
@@ -181,7 +182,6 @@ namespace Transform {
 
     def mkSetter(o: Options, c: Class, f: Field): Ast.Def = {
         import java.lang.reflect.Field.getType(): & Pure;
-        import java.lang.Class.getCanonicalName(): & Pure;
         let context = if (isStaticField(f)) Context.Static else Context.Instance;
         let eff = match o {
             case Options(opts) if opts.pureLevel >= PureLevel.PureAll => Effect.Pure_
@@ -215,9 +215,6 @@ namespace Transform {
     }
 
     pub def visitType(t: Class): Ast.Type_ = {
-        import java.lang.Class.getCanonicalName(): & Pure;
-        import java.lang.Class.isArray(): & Pure;
-        import java.lang.Class.getComponentType(): & Pure;
         if (isArray(t)) {
             let ct = getComponentType(t);
             Type_.Array_(visitType(ct))
