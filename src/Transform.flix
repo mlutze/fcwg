@@ -28,9 +28,10 @@ namespace Transform {
     use Wrapped/Class.{getName => getClassName};
 
     use Wrapped/Field.{getName => getFieldName};
+    use Wrapped/Field.{getDeclaringClass => getFieldDeclaringClass};
 
     use Wrapped/Method.{getName => getMethodName};
-
+    use Wrapped/Method.{getDeclaringClass => getMethodDeclaringClass};
 
     type alias Class = ##java.lang.Class
     type alias Field = ##java.lang.reflect.Field
@@ -54,25 +55,23 @@ namespace Transform {
 
     def getMethodsFor(o: Options, c: Class): Result[List[Method], Exception] = {
         use Result.flatMap;
-        import java.lang.reflect.Method.getDeclaringClass(): & Pure;
         let Options(opts) = o;
         let clazzName = getClassName(c);
         let* methods = getMethods(c);
         match opts.superLevel {
-            case SuperLevel.SuperNone => methods |> Array.toList |> List.filter(m -> getClassName(getDeclaringClass(m)) == clazzName)
-            case SuperLevel.SuperButObject => methods |> Array.toList |> List.filter(m -> getClassName(getDeclaringClass(m)) != "java.lang.Object")
+            case SuperLevel.SuperNone => methods |> Array.toList |> List.filter(m -> getClassName(getMethodDeclaringClass(m)) == clazzName)
+            case SuperLevel.SuperButObject => methods |> Array.toList |> List.filter(m -> getClassName(getMethodDeclaringClass(m)) != "java.lang.Object")
             case SuperLevel.SuperAll => methods |> Array.toList
         } as & Pure |> Ok
     }
 
     def getFieldsFor(o: Options, c: Class): List[Field] = {
         import java.lang.Class.getFields(): & Pure;
-        import java.lang.reflect.Field.getDeclaringClass(): & Pure;
         let Options(opts) = o;
         let clazzName = getClassName(c);
         match opts.superLevel {
-            case SuperLevel.SuperNone => getFields(c) |> Array.toList |> List.filter(m -> getClassName(getDeclaringClass(m)) == clazzName)
-            case SuperLevel.SuperButObject => getFields(c) |> Array.toList |> List.filter(m -> getClassName(getDeclaringClass(m)) != "java.lang.Object")
+            case SuperLevel.SuperNone => getFields(c) |> Array.toList |> List.filter(m -> getClassName(getFieldDeclaringClass(m)) == clazzName)
+            case SuperLevel.SuperButObject => getFields(c) |> Array.toList |> List.filter(m -> getClassName(getFieldDeclaringClass(m)) != "java.lang.Object")
             case SuperLevel.SuperAll => getFields(c) |> Array.toList
         } as & Pure
     }
@@ -81,7 +80,6 @@ namespace Transform {
     pub def visitMethod(o: Options, c: Class, m: Method): Ast.Def = {
         import java.lang.reflect.Method.getParameterTypes(): & Pure;
         import java.lang.reflect.Method.getReturnType(): & Pure;
-        import java.lang.reflect.Method.getDeclaringClass(): & Pure;
         import java.lang.Class.getCanonicalName(): & Pure;
         import java.lang.Class.isPrimitive(): & Pure;
         import java.lang.reflect.Method.getExceptionTypes(): & Pure;
@@ -91,7 +89,7 @@ namespace Transform {
             case Options(opts) if opts.pureLevel >= PureLevel.PureButUnit and return != Type_.Unit_ => Effect.Pure_
             case _ => Effect.Impure_
         };
-        let importClazz = getDeclaringClass(m);
+        let importClazz = getMethodDeclaringClass(m);
         let importClazzName = getCanonicalName(importClazz);
         let context = if (isStatic(m)) Context.Static else Context.Instance;
         let importParamTypes = { getParameterTypes(m) |> Array.toList |> List.map(visitType) } as & Pure;
@@ -141,7 +139,6 @@ namespace Transform {
     }
 
     def mkGetter(o: Options, c: Class, f: Field): Ast.Def = {
-        import java.lang.reflect.Field.getDeclaringClass(): & Pure;
         import java.lang.reflect.Field.getType(): & Pure;
         import java.lang.Class.getCanonicalName(): & Pure;
         import java.lang.Class.isPrimitive(): & Pure;
@@ -152,7 +149,7 @@ namespace Transform {
             case _ => Effect.Impure_
         };
         let name = getFieldName(f);
-        let importClazz = getDeclaringClass(f);
+        let importClazz = getFieldDeclaringClass(f);
         let importClazzName = getCanonicalName(importClazz);
         let fieldType = visitType(getType(f));
         let paramTypes = match context {
@@ -183,7 +180,6 @@ namespace Transform {
     }
 
     def mkSetter(o: Options, c: Class, f: Field): Ast.Def = {
-        import java.lang.reflect.Field.getDeclaringClass(): & Pure;
         import java.lang.reflect.Field.getType(): & Pure;
         import java.lang.Class.getCanonicalName(): & Pure;
         let context = if (isStaticField(f)) Context.Static else Context.Instance;
@@ -192,7 +188,7 @@ namespace Transform {
             case _ => Effect.Impure_
         };
         let name = getFieldName(f);
-        let importClazz = getDeclaringClass(f);
+        let importClazz = getFieldDeclaringClass(f);
         let importClazzName = getCanonicalName(importClazz);
         let fieldType = visitType(getType(f));
         let paramTypes = match context {
