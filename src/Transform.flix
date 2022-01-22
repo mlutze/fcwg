@@ -94,6 +94,69 @@ namespace Transform {
         } as & Pure |> Ok
     }
 
+    /// Gets the effect for the imported return type [tpe].
+    def mkEffect(o: Options, tpe: Type_): Effect = match o {
+        case Options(opts) if opts.pureLevel >= PureLevel.PureButUnit and tpe != Type_.Unit_ => Effect.Pure_
+        case Options(opts) if opts.pureLevel >= PureLevel.PureAll => Effect.Pure_
+        case _ => Effect.Impure_
+    }
+
+    def mkParamNames(n: Int): List[String] = List.range(0, n) |> List.map(i -> "x${i}")
+
+    def mkOuterParamTypes(context: Context, clazz: Class, importParams: List[Type_]): List[Type_] = match context {
+        case Context.Static => importParams
+        case Context.Instance => visitType(clazz) :: importParams
+    }
+
+    def shouldResult(o: Options, m: Method): Bool = {
+        let canFail = getExceptionTypes(m) |> Array.isEmpty |> Bool.not;
+        match (o, canFail) {
+            case (Options(opts), true) if opts.resultLevel >= ResultLevel.ResultChecked => true
+            case (Options(opts), _) if opts.resultLevel >= ResultLevel.ResultAll => true
+            case _ => false
+        }
+    }
+
+    def shouldOption(o: Options, m: Method): Bool = {
+        match (o, isPrimitive(getReturnType(m))) {
+            case (Options(opts), false) if opts.optionLevel >= OptionLevel.OptionRef => true
+            case (Options(opts), _) if opts.optionLevel >= OptionLevel.OptionAll => true
+            case _ => false
+        }
+    }
+
+    def mkOuterReturnType(doResult: { doResult :: Bool }, doOption: { doOption :: Bool }, importReturnType: Type_): Type_ = {
+        match (doResult.doResult, doOption.doOption) {
+            case (false, false) => importReturnType
+            case (true, false) => Type_.Result_(importReturnType, Type_.Ref("java.lang.Exception"))
+            case (false, true) => Type_.Option_(importReturnType)
+            case (true, true) => Type_.Result_(Type_.Option_(importReturnType), Type_.Ref("java.lang.Exception"))
+            case _ => unreachable!()
+        }
+    }
+
+    def visitMethod2(o: Options, c: Class, m: Method): Ast.Def = {
+        let name = getMethodName(m);
+
+        // build the import statement
+        let importClazz = getMethodDeclaringClass(m);
+        let importClazzName = getCanonicalName(importClazz);
+        let importReturnType = getReturnType(m) |> visitType;
+        let context = if (isStaticMethod(m)) Context.Static else Context.Instance;
+        let importParamTypes = { getParameterTypes(m) |> Array.toList |> List.map(visitType) } as & Pure;
+        let eff = mkEffect(o, importReturnType);
+        let import_ = Import.Method(context, name, importParamTypes, eff);
+
+        // build the call expression
+        let argNames = ???
+
+
+        let doResult = shouldResult(o, m);
+        let doOption = shouldOption(o, m);
+        let outerReturnType = mkOuterReturnType(doResult = doResult, doOption = doOption, importReturnType);
+        ???
+    }
+
     // MATT split into static/instance
     /// Transforms the Java method into a Flix function.
     pub def visitMethod(o: Options, c: Class, m: Method): Ast.Def = {
