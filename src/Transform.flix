@@ -94,20 +94,26 @@ namespace Transform {
         } as & Pure |> Ok
     }
 
-    /// Gets the effect for the imported return type [tpe].
+    def getMethodContext(m: Method): Context = if (isStaticMethod(m)) Context.Static else Context.Instance
+
+    def isInheritedMethod(c: Class, m: Method): Bool = {
+        let importClazzName = getCanonicalName(c);
+        let methodClazz = getMethodDeclaringClass(m);
+        let methodClazzName = getCanonicalName(methodClazz);
+        importClazzName != methodClazzName
+    }
+
+    /// Creates the effect for the imported return type [tpe].
     def mkEffect(o: Options, tpe: Type_): Effect = match o {
         case Options(opts) if opts.pureLevel >= PureLevel.PureButUnit and tpe != Type_.Unit_ => Effect.Pure_
         case Options(opts) if opts.pureLevel >= PureLevel.PureAll => Effect.Pure_
         case _ => Effect.Impure_
     }
 
+    /// Creates a list of [n] standard parameter names (x0, x1, ..., xn)
     def mkParamNames(n: Int): List[String] = List.range(0, n) |> List.map(i -> "x${i}")
 
-    def mkOuterParamTypes(context: Context, clazz: Class, importParams: List[Type_]): List[Type_] = match context {
-        case Context.Static => importParams
-        case Context.Instance => visitType(clazz) :: importParams
-    }
-
+    /// Returns true iff the function should return a Result.
     def shouldResult(o: Options, m: Method): Bool = {
         let canFail = getExceptionTypes(m) |> Array.isEmpty |> Bool.not;
         match (o, canFail) {
@@ -117,6 +123,7 @@ namespace Transform {
         }
     }
 
+    /// Returns true iff the function should return an Option.
     def shouldOption(o: Options, m: Method): Bool = {
         match (o, isPrimitive(getReturnType(m))) {
             case (Options(opts), false) if opts.optionLevel >= OptionLevel.OptionRef => true
@@ -125,6 +132,7 @@ namespace Transform {
         }
     }
 
+    /// Creates the return type for the function.
     def mkOuterReturnType(doResult: { doResult :: Bool }, doOption: { doOption :: Bool }, importReturnType: Type_): Type_ = {
         match (doResult.doResult, doOption.doOption) {
             case (false, false) => importReturnType
@@ -135,80 +143,68 @@ namespace Transform {
         }
     }
 
-    def visitMethod2(o: Options, c: Class, m: Method): Ast.Def = {
+    /// Creates the arguments to be used for the internal call.
+    def mkCallArgs(c: Class, m: Method): List[Arg] = {
+        match getMethodContext(m) {
+            case Context.Instance if isInheritedMethod(c, m) =>
+                let paramNames = mkParamNames(getParameterTypes(m) |> Array.length + 1);
+                let tpe = getMethodDeclaringClass(m) |> visitType;
+                match paramNames {
+                    case hd :: tl => Arg.Cast(hd, tpe) :: List.map(Arg.NoCast, tl)
+                    case Nil => unreachable!()
+                }
+            case Context.Instance =>
+                let paramNames = mkParamNames(getParameterTypes(m) |> Array.length + 1);
+                List.map(Arg.NoCast, paramNames)
+            case Context.Static =>
+                let paramNames = mkParamNames(getParameterTypes(m) |> Array.length);
+                List.map(Arg.NoCast, paramNames)
+        }
+    }
+
+    /// Creates the parameters for the interface to the function.
+    def mkOuterParams(c: Class, m: Method, importParamTypes: List[Type_]): List[(String, Type_)] = {
+        match getMethodContext(m) {
+            case Context.Instance =>
+                let paramNames = mkParamNames(getParameterTypes(m) |> Array.length + 1);
+                let paramTypes = visitType(c) :: importParamTypes;
+                List.zip(paramNames, paramTypes)
+            case Context.Static =>
+                let paramNames = mkParamNames(getParameterTypes(m) |> Array.length + 1);
+                let paramTypes = importParamTypes;
+                List.zip(paramNames, paramTypes)
+        }
+    }
+
+    /// Transforms the Java method into a Flix function.
+    pub def visitMethod(o: Options, c: Class, m: Method): Ast.Def = {
         let name = getMethodName(m);
 
         // build the import statement
         let importClazz = getMethodDeclaringClass(m);
         let importClazzName = getCanonicalName(importClazz);
         let importReturnType = getReturnType(m) |> visitType;
-        let context = if (isStaticMethod(m)) Context.Static else Context.Instance;
+        let context = getMethodContext(m);
         let importParamTypes = { getParameterTypes(m) |> Array.toList |> List.map(visitType) } as & Pure;
         let eff = mkEffect(o, importReturnType);
-        let import_ = Import.Method(context, name, importParamTypes, eff);
+        let importName = importClazzName + "." + name;
+        let import_ = Import.Method(context, importName, importParamTypes, eff);
 
         // build the call expression
-        let argNames = ???
-
-
         let doResult = shouldResult(o, m);
         let doOption = shouldOption(o, m);
+        let args = mkCallArgs(c, m);
+        let call = Call(name, args);
+        let wrap = if (doOption) Wrap.WrapOption(call) else Wrap.NoWrap(call);
+        let body = if (doResult) Body.TryCatch(wrap) else Body.NoTry(wrap);
+
+        let impl = Impl(import_, body);
+
         let outerReturnType = mkOuterReturnType(doResult = doResult, doOption = doOption, importReturnType);
-        ???
+        let outerParams = mkOuterParams(c, m, importParamTypes);
+        Def(name, outerParams, outerReturnType, eff, impl)
     }
 
-    // MATT split into static/instance
-    /// Transforms the Java method into a Flix function.
-    pub def visitMethod(o: Options, c: Class, m: Method): Ast.Def = {
-        let name = getMethodName(m);
-        let return = getReturnType(m) |> visitType;
-        let eff = match o  {
-            case Options(opts) if opts.pureLevel >= PureLevel.PureButUnit and return != Type_.Unit_ => Effect.Pure_
-            case _ => Effect.Impure_
-        };
-        let importClazz = getMethodDeclaringClass(m);
-        let importClazzName = getCanonicalName(importClazz);
-        let context = if (isStaticMethod(m)) Context.Static else Context.Instance;
-        let importParamTypes = { getParameterTypes(m) |> Array.toList |> List.map(visitType) } as & Pure;
-        let outerParamTypes = match context {
-            case Context.Static => importParamTypes
-            case Context.Instance => visitType(c) :: importParamTypes
-        };
-        let canFail = getExceptionTypes(m) |> Array.isEmpty |> Bool.not;
-        let catchException = match (o, canFail) {
-            case (Options(opts), true) if opts.resultLevel >= ResultLevel.ResultChecked => true
-            case (Options(opts), _) if opts.resultLevel >= ResultLevel.ResultAll => true
-            case _ => false
-        };
-        let doWrap = match (o, isPrimitive(getReturnType(m))) {
-            case (Options(opts), false) if opts.optionLevel >= OptionLevel.OptionRef => true
-            case (Options(opts), _) if opts.optionLevel >= OptionLevel.OptionAll => true
-            case _ => false
-        };
-        let outerReturnType = match (catchException, doWrap) {
-            case (false, false) => return
-            case (true, false) => Type_.Result_(return, Type_.Ref("java.lang.Exception"))
-            case (false, true) => Type_.Option_(return)
-            case (true, true) => Type_.Result_(Type_.Option_(return), Type_.Ref("java.lang.Exception"))
-            case _ => unreachable!()
-        };
-        let paramNames = List.range(0, List.length(outerParamTypes)) |> List.map(i -> "x${i}");
-        let isInherited = importClazzName != getCanonicalName(c);
-        let args = match context {
-            case Context.Instance if isInherited => match paramNames {
-                case hd :: tl => Arg.Cast(hd, visitType(importClazz)) :: List.map(Arg.NoCast, tl)
-                case Nil => bug!("unexpected empty parameter list")
-            }
-            case _ => List.map(Arg.NoCast, paramNames)
-        };
-        let params = List.zip(paramNames, outerParamTypes);
-        let imp = Import.Method(context, importClazzName + "." + name, importParamTypes, eff);
-        let call = Call(name, args);
-        let wrap = if (doWrap) Wrap.WrapOption(call) else Wrap.NoWrap(call);
-        let body = if (catchException) Body.TryCatch(wrap) else Body.NoTry(wrap);
-        let impl = Impl(imp, body);
-        Def(name, params, outerReturnType, eff, impl)
-    }
 
     /// Transforms the Java field into a Flix getter and setter.
     pub def visitField(o: Options, c: Class, f: Field): List[Ast.Def] = {
