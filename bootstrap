@@ -3,6 +3,7 @@ set -e
 
 java -jar flix.jar build-jar
 java -jar fcwg.jar -pprn Wrapped/Class java.lang.Class > src/Wrapped/Class.flix
+java -jar fcwg.jar -pprn Wrapped/Constructor java.lang.reflect.Constructor > src/Wrapped/Constructor.flix
 java -jar fcwg.jar -pprsn Wrapped/Exception java.lang.Exception > src/Wrapped/Exception.flix
 java -jar fcwg.jar -pprn Wrapped/Field java.lang.reflect.Field > src/Wrapped/Field.flix
 java -jar fcwg.jar -pprn Wrapped/Modifier java.lang.reflect.Modifier > src/Wrapped/Modifier.flix
