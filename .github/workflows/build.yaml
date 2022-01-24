@@ -16,5 +16,5 @@ jobs:
           distribution: zulu
       - run: |
           curl -L https://github.com/flix/flix/releases/latest/download/flix.jar > flix.jar
-          alias flix=java -jar flix.jar
+          alias flix="java -jar flix.jar"
           flix test
