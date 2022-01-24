@@ -13,6 +13,7 @@ jobs:
       - uses: actions/setup-java@v2.5.0
         with:
           java-version: 13
+          distribution: zulu
       - run: |
           curl -L https://github.com/flix/flix/releases/latest/download/flix.jar > flix.jar
           alias flix=java -jar flix.jar
