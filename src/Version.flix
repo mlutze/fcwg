@@ -1,5 +1,5 @@
 namespace Version {
-    pub opaque type SemanticVersion = (Int, Int, Int)
+    pub opaque type SemanticVersion = (Int32, Int32, Int32)
 
     /// Returns the fcwg version.
     pub def version(): SemanticVersion = SemanticVersion(0, 1, 0)

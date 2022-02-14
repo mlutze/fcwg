@@ -111,7 +111,7 @@ namespace Transform {
     }
 
     /// Creates a list of [n] standard parameter names (x0, x1, ..., xn)
-    def mkParamNames(n: Int): List[String] = List.range(0, n) |> List.map(i -> "x${i}")
+    def mkParamNames(n: Int32): List[String] = List.range(0, n) |> List.map(i -> "x${i}")
 
     /// Returns true iff the function should return a Result.
     def shouldResult(o: Options, m: Method): Bool = {
