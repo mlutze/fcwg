@@ -188,7 +188,7 @@ namespace Transform {
         let importParamTypes = { getParameterTypes(m) |> Array.toList |> List.map(visitType) } as & Pure;
         let eff = mkEffect(o, importReturnType);
         let importName = importClazzName + "." + name;
-        let import_ = Import.Method(context, importName, importParamTypes, eff);
+        let import_ = Import.Method(context, importName, importParamTypes, importReturnType, eff);
 
         // build the call expression
         let doResult = shouldResult(o, m);
@@ -242,7 +242,7 @@ namespace Transform {
         };
         let params = List.zip(paramNames, paramTypes);
         let funcName = getterName(name);
-        let imp = Import.GetField(context, importClazzName + "." + name, eff, funcName);
+        let imp = Import.GetField(context, importClazzName + "." + name, fieldType, eff, funcName);
         let call = Call(funcName, args);
         let doWrap = match (o, isPrimitive(getType(f))) {
             case (Options(opts), false) if opts.optionLevel >= OptionLevel.OptionRef => true
@@ -282,7 +282,7 @@ namespace Transform {
         };
         let params = List.zip(paramNames, paramTypes);
         let funcName = setterName(name);
-        let imp = Import.SetField(context, importClazzName + "." + name, eff, funcName);
+        let imp = Import.SetField(context, importClazzName + "." + name, Type_.Unit_, eff, funcName);
         let call = Call(funcName, args);
         let wrap = Wrap.NoWrap(call);
         let body = Body.NoTry(wrap);

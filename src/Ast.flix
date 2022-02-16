@@ -5,14 +5,14 @@ namespace Ast {
     pub opaque type Impl with Eq, Order = (Import, Body)
 
     pub enum Import with Eq, Order {
-        // Method(context, name, params, effect)
-        case Method(Context, String, List[Type_], Effect)
+        // Method(context, name, params, return, effect)
+        case Method(Context, String, List[Type_], Type_, Effect)
 
-        // GetField(context, field, effect, alias)
-        case GetField(Context, String, Effect, String)
+        // GetField(context, field, return, effect, alias)
+        case GetField(Context, String, Type_, Effect, String)
 
-        // SetField(context, field, effect, alias)
-        case SetField(Context, String, Effect, String)
+        // SetField(context, field, return, effect, alias)
+        case SetField(Context, String, Type_, Effect, String)
     }
 
     pub enum Body with Eq, Order {
@@ -114,13 +114,13 @@ namespace Ast {
 
     instance ToString[Import] {
         pub def toString(x: Import): String = match x {
-            case Method(context, name, params, eff) =>
+            case Method(context, name, params, return, eff) =>
                 let paramString = params |> List.map(ToString.toString) |> String.intercalate(", ");
-                "import ${context}${name}(${paramString}): & ${eff};\n"
-            case GetField(context, name, eff, func) =>
-                "import ${context} get ${name}: & ${eff} as ${func};\n"
-            case SetField(context, name, eff, func) =>
-                "import ${context} set ${name}: & ${eff} as ${func};\n"
+                "import ${context}${name}(${paramString}): ${return} & ${eff};\n"
+            case GetField(context, name, return, eff, func) =>
+                "import ${context} get ${name}: ${return} & ${eff} as ${func};\n"
+            case SetField(context, name, return, eff, func) =>
+                "import ${context} set ${name}: ${return} & ${eff} as ${func};\n"
         }
     }
 
