@@ -57,7 +57,7 @@ namespace TestTransform {
     @test
     def testVisitTypeArray(): Bool = {
         let tpe = forName("java.lang.StringBuilder") |> unsafeGet |> arrayType;
-        visitType(tpe) == Type_.Array_(Type_.Ref("java.lang.StringBuilder"))
+        visitType(tpe) == Type_.Array_(Type_.Ref_("java.lang.StringBuilder"))
     }
 
     @test
@@ -77,12 +77,12 @@ namespace TestTransform {
         let clazz = forName("java.lang.Class") |> unsafeGet;
         let string = forName("java.lang.String") |> unsafeGet;
         let method = getMethod(clazz, "forName", [string] as & Pure) |> unsafeGet;
-        let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Type_.Ref("java.lang.Class"), Effect.Impure_);
+        let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Type_.Ref_("java.lang.Class"), Effect.Impure_);
         let call = Call("forName", mkArgs("x0" :: Nil));
         let wrap = Wrap.NoWrap(call);
         let body = Body.NoTry(wrap);
         let impl = Impl(imp, body);
-        visitMethod(defaultOptions(), string, method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Ref("java.lang.Class"), Effect.Impure_, impl)
+        visitMethod(defaultOptions(), string, method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Ref_("java.lang.Class"), Effect.Impure_, impl)
     }
 
     @test
@@ -90,14 +90,14 @@ namespace TestTransform {
         let clazz = forName("java.lang.Class") |> unsafeGet;
         let string = forName("java.lang.String") |> unsafeGet;
         let method = getMethod(clazz, "forName", [string] as & Pure) |> unsafeGet;
-        let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Type_.Ref("java.lang.Class"), Effect.Impure_);
+        let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Type_.Ref_("java.lang.Class"), Effect.Impure_);
         let call = Call("forName", mkArgs("x0" :: Nil));
         let wrap = Wrap.NoWrap(call);
         let body = Body.TryCatch(wrap);
         let impl = Impl(imp, body);
         let Options(opts) = defaultOptions();
         let o = Options({ resultLevel = ResultLevel.ResultChecked | opts });
-        visitMethod(o, clazz, method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Result_(Type_.Ref("java.lang.Class"), Type_.Ref("java.lang.Exception")), Effect.Impure_, impl)
+        visitMethod(o, clazz, method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Result_(Type_.Ref_("java.lang.Class"), Type_.Ref_("java.lang.Exception")), Effect.Impure_, impl)
     }
 
     @test
@@ -105,14 +105,14 @@ namespace TestTransform {
         let clazz = forName("java.lang.Class") |> unsafeGet;
         let string = forName("java.lang.String") |> unsafeGet;
         let method = getMethod(clazz, "forName", [string] as & Pure) |> unsafeGet;
-        let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Type_.Ref("java.lang.Class"), Effect.Impure_);
+        let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Type_.Ref_("java.lang.Class"), Effect.Impure_);
         let call = Call("forName", mkArgs("x0" :: Nil));
         let wrap = Wrap.WrapOption(call);
         let body = Body.TryCatch(wrap);
         let impl = Impl(imp, body);
         let Options(opts) = defaultOptions();
         let o = Options({ resultLevel = ResultLevel.ResultChecked, optionLevel = OptionLevel.OptionRef | opts });
-        visitMethod(o, clazz, method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Result_(Type_.Option_(Type_.Ref("java.lang.Class")), Type_.Ref("java.lang.Exception")), Effect.Impure_, impl)
+        visitMethod(o, clazz, method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Result_(Type_.Option_(Type_.Ref_("java.lang.Class")), Type_.Ref_("java.lang.Exception")), Effect.Impure_, impl)
     }
 
     @test
@@ -126,33 +126,33 @@ namespace TestTransform {
         let impl = Impl(imp, body);
         let Options(default) = defaultOptions();
         let o = Options({ pureLevel = PureLevel.PureButUnit | default });
-        visitMethod(o, throwable, method) == Def("printStackTrace", ("x0", Type_.Ref("java.lang.Throwable")) :: Nil, Type_.Unit_, Effect.Impure_, impl)
+        visitMethod(o, throwable, method) == Def("printStackTrace", ("x0", Type_.Ref_("java.lang.Throwable")) :: Nil, Type_.Unit_, Effect.Impure_, impl)
     }
 
     @test
     def testVisitField(): Bool = {
         let string = forName("java.lang.String") |> unsafeGet;
         let field = getField(string, "CASE_INSENSITIVE_ORDER") |> unsafeGet;
-        let imp = Import.GetField(Context.Static, "java.lang.String.CASE_INSENSITIVE_ORDER", Type_.Ref("java.util.Comparator"), Effect.Impure_, "getCASE_INSENSITIVE_ORDER");
+        let imp = Import.GetField(Context.Static, "java.lang.String.CASE_INSENSITIVE_ORDER", Type_.Ref_("java.util.Comparator"), Effect.Impure_, "getCASE_INSENSITIVE_ORDER");
         let call = Call("getCASE_INSENSITIVE_ORDER", Nil);
         let wrap = Wrap.NoWrap(call);
         let body = Body.NoTry(wrap);
         let impl = Impl(imp, body);
-        visitField(defaultOptions(), string, field) == Def("getCASE_INSENSITIVE_ORDER", Nil, Type_.Ref("java.util.Comparator"), Effect.Impure_, impl) :: Nil
+        visitField(defaultOptions(), string, field) == Def("getCASE_INSENSITIVE_ORDER", Nil, Type_.Ref_("java.util.Comparator"), Effect.Impure_, impl) :: Nil
     }
 
     @test
     def testVisitFieldPure(): Bool = {
         let string = forName("java.lang.String") |> unsafeGet;
         let field = getField(string, "CASE_INSENSITIVE_ORDER") |> unsafeGet;
-        let imp = Import.GetField(Context.Static, "java.lang.String.CASE_INSENSITIVE_ORDER", Type_.Ref("java.util.Comparator"), Effect.Pure_, "getCASE_INSENSITIVE_ORDER");
+        let imp = Import.GetField(Context.Static, "java.lang.String.CASE_INSENSITIVE_ORDER", Type_.Ref_("java.util.Comparator"), Effect.Pure_, "getCASE_INSENSITIVE_ORDER");
         let call = Call("getCASE_INSENSITIVE_ORDER", Nil);
         let wrap = Wrap.NoWrap(call);
         let body = Body.NoTry(wrap);
         let impl = Impl(imp, body);
         let Options(opts) = defaultOptions();
         let o = Options({ pureLevel = PureLevel.PureFinal | opts });
-        visitField(o, string, field) == Def("getCASE_INSENSITIVE_ORDER", Nil, Type_.Ref("java.util.Comparator"), Effect.Pure_, impl) :: Nil
+        visitField(o, string, field) == Def("getCASE_INSENSITIVE_ORDER", Nil, Type_.Ref_("java.util.Comparator"), Effect.Pure_, impl) :: Nil
     }
 
     @test
@@ -192,7 +192,7 @@ namespace TestTransform {
         let exception = forName("java.lang.Exception") |> unsafeGet;
         let method = getMethod(throwable, "getMessage", [] as & Pure) |> unsafeGet;
         let imp = Import.Method(Context.Instance, "java.lang.Throwable.getMessage", Nil, Type_.String_, Effect.Impure_);
-        let call = Call("getMessage", Arg.Cast("x0", Type_.Ref("java.lang.Throwable")) :: Nil);
+        let call = Call("getMessage", Arg.Cast("x0", Type_.Ref_("java.lang.Throwable")) :: Nil);
         let wrap = Wrap.NoWrap(call);
         let body = Body.NoTry(wrap);
         let impl = Impl(imp, body);
@@ -200,6 +200,6 @@ namespace TestTransform {
         let Options(default) = defaultOptions();
         let opts = Options({ superLevel = SuperLevel.SuperButObject | default });
 
-        visitMethod(opts, exception, method) == Def("getMessage", ("x0", Type_.Ref("java.lang.Exception")) :: Nil, Type_.String_, Effect.Impure_, impl) 
+        visitMethod(opts, exception, method) == Def("getMessage", ("x0", Type_.Ref_("java.lang.Exception")) :: Nil, Type_.String_, Effect.Impure_, impl) 
     }
 }
