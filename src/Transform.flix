@@ -136,9 +136,9 @@ namespace Transform {
     def mkOuterReturnType(doResult: { doResult :: Bool }, doOption: { doOption :: Bool }, importReturnType: Type_): Type_ = {
         match (doResult.doResult, doOption.doOption) {
             case (false, false) => importReturnType
-            case (true, false) => Type_.Result_(importReturnType, Type_.Ref("java.lang.Exception"))
+            case (true, false) => Type_.Result_(importReturnType, Type_.Ref_("java.lang.Exception"))
             case (false, true) => Type_.Option_(importReturnType)
-            case (true, true) => Type_.Result_(Type_.Option_(importReturnType), Type_.Ref("java.lang.Exception"))
+            case (true, true) => Type_.Result_(Type_.Option_(importReturnType), Type_.Ref_("java.lang.Exception"))
             case _ => unreachable!()
         }
     }
@@ -308,7 +308,7 @@ namespace Transform {
                 case "java.lang.String" => Type_.String_
                 case "java.math.BigInteger" => Type_.BigInt_
                 case "void" => Type_.Unit_
-                case name => Type_.Ref(name)
+                case name => Type_.Ref_(name)
             }
         }
     }

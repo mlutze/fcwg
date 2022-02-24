@@ -48,7 +48,7 @@ namespace Ast {
         case String_
         case BigInt_
         case Unit_
-        case Ref(String)
+        case Ref_(String)
         case Array_(Type_)
         case Result_(Type_, Type_)
         case Option_(Type_)
@@ -169,7 +169,7 @@ namespace Ast {
             case String_ => "String"
             case BigInt_ => "BigInt"
             case Unit_ => "Unit"
-            case Ref(name) => "##${name}"
+            case Ref_(name) => "##${name}"
             case Array_(ct) => "Array[${ct}]"
             case Result_(t, e) => "Result[${t}, ${e}]"
             case Option_(t) => "Option[${t}]"
