@@ -119,7 +119,7 @@ namespace Options {
             case (GetVersion, _) => Success(GetVersion)
             case (Go(_, opts1), clazz :: Nil) => Success(Go(clazz, opts1))
             case (GoInteractive(_, opts1), clazz :: Nil) => Success(GoInteractive(clazz, opts1))
-            case _ => Failure(Nel.singleton("Exactly one class must be specified."))
+            case _ => Failure(Nec.singleton("Exactly one class must be specified."))
         }
     }
 

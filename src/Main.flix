@@ -33,7 +33,7 @@ def main(args: Array[String]): Int32 & Impure =
             System/StdErr.println("Unsupported operation.");
             1
         case Failure(errs) =>
-            errs |> Nel.foreach(System/StdErr.print);
+            errs |> Nec.foreach(System/StdErr.print);
             System/StdErr.print(usage());
             2
     }
