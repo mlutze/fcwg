@@ -3,3 +3,6 @@
 
 ### v0.0.2
    Flix v0.27.0 update: Adds full type and effect signatures to all imports.
+
+### v0.0.3
+   Flix v0.27.0 update: Uses Nec rather than Nel in Validation.
