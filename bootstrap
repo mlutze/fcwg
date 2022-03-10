@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
+java -jar flix.jar build
 java -jar flix.jar build-jar
 java -jar fcwg.jar -pprn Wrapped/Class java.lang.Class > src/Wrapped/Class.flix
 java -jar fcwg.jar -pprsn Wrapped/Exception java.lang.Exception > src/Wrapped/Exception.flix
