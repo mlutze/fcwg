@@ -5,8 +5,8 @@ namespace Ast {
     pub opaque type Impl with Eq, Order = (Import, Body)
 
     pub enum Import with Eq, Order {
-        // Method(context, name, params, return, effect)
-        case Method(Context, String, List[Type_], Type_, Effect)
+        // Method(context, name, params, return, effect, alias)
+        case Method(Context, String, List[Type_], Type_, Effect, String)
 
         // GetField(context, field, return, effect, alias)
         case GetField(Context, String, Type_, Effect, String)
@@ -114,9 +114,9 @@ namespace Ast {
 
     instance ToString[Import] {
         pub def toString(x: Import): String = match x {
-            case Method(context, name, params, return, eff) =>
+            case Method(context, name, params, return, eff, alias_) =>
                 let paramString = params |> List.map(ToString.toString) |> String.intercalate(", ");
-                "import ${context}${name}(${paramString}): ${return} & ${eff};\n"
+                "import ${context}${name}(${paramString}): ${return} & ${eff} as ${alias_};\n"
             case GetField(context, name, return, eff, func) =>
                 "import ${context} get ${name}: ${return} & ${eff} as ${func};\n"
             case SetField(context, name, return, eff, func) =>

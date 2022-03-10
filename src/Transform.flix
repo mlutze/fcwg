@@ -178,7 +178,8 @@ namespace Transform {
 
     /// Transforms the Java method into a Flix function.
     pub def visitMethod(o: Options, c: Class, m: Method): Ast.Def = {
-        let name = getMethodName(m) |> cleanName;
+        let methodName = getMethodName(m);
+        let alias_ = cleanName(methodName);
 
         // build the import statement
         let importClazz = getMethodDeclaringClass(m);
@@ -187,14 +188,14 @@ namespace Transform {
         let context = getMethodContext(m);
         let importParamTypes = { getParameterTypes(m) |> Array.toList |> List.map(visitType) } as & Pure;
         let eff = mkEffect(o, importReturnType);
-        let importName = importClazzName + "." + name;
-        let import_ = Import.Method(context, importName, importParamTypes, importReturnType, eff);
+        let importName = importClazzName + "." + methodName;
+        let import_ = Import.Method(context, importName, importParamTypes, importReturnType, eff, alias_);
 
         // build the call expression
         let doResult = shouldResult(o, m);
         let doOption = shouldOption(o, m);
         let args = mkCallArgs(c, m);
-        let call = Call(name, args);
+        let call = Call(alias_, args);
         let wrap = if (doOption) Wrap.WrapOption(call) else Wrap.NoWrap(call);
         let body = if (doResult) Body.TryCatch(wrap) else Body.NoTry(wrap);
 
@@ -202,7 +203,7 @@ namespace Transform {
 
         let outerReturnType = mkOuterReturnType(doResult = doResult, doOption = doOption, importReturnType);
         let outerParams = mkOuterParams(c, m, importParamTypes);
-        Def(name, outerParams, outerReturnType, eff, impl)
+        Def(alias_, outerParams, outerReturnType, eff, impl)
     }
 
 
