@@ -178,7 +178,7 @@ namespace Transform {
 
     /// Transforms the Java method into a Flix function.
     pub def visitMethod(o: Options, c: Class, m: Method): Ast.Def = {
-        let name = getMethodName(m);
+        let name = getMethodName(m) |> cleanName;
 
         // build the import statement
         let importClazz = getMethodDeclaringClass(m);
@@ -345,5 +345,24 @@ namespace Transform {
         let head = String.charAt(0, fieldName);
         let tail = String.sliceRight(1, fieldName);
         "set" + "${Char.toUpperCase(head)}" + tail
+    }
+
+    def cleanName(name: String): String = {
+        if (Set.memberOf(name, flixKeywords())) {
+            name + "_"
+        } else {
+            name
+        }
+    }
+
+    def flixKeywords(): Set[String] = Set#{
+        "!=", "$DEFAULT$", "&&&", "*", "**", "+", "-", "..", "/", ":", "::", ":::", ":=", "<", "<+>", "<-", "<<<", "<=",
+        "<=>", "==", "=>", ">", ">=", ">>>", "???", "@", "Absent", "Bool", "Impure", "Nil", "Predicate", "Present", "Pure",
+        "RecordRow", "SchemaRow", "Type", "^^^", "alias", "case", "catch", "chan",
+        "class", "def", "deref", "else", "enum", "false", "fix", "force", "if", "import",
+        "inline", "instance", "into", "lat", "law", "lawless", "lazy", "let", "let*", "match", "mut", "namespace",
+        "null", "opaque", "override", "pub", "ref", "reify", "reifyBool",
+        "reifyEff", "reifyType", "rel", "rigid", "scoped", "sealed", "set", "spawn",
+        "static", "true", "type", "unlawful", "use", "where", "with", "|||", "~~~"
     }
 }
