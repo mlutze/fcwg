@@ -209,7 +209,7 @@ namespace TestTransform {
         let object = forName("java.lang.Object") |> unsafeGet;
         let method = getMethod(field, "set", [object, object] as & Pure) |> unsafeGet;
         let imp = Import.Method(Context.Instance, "java.lang.reflect.Field.set", Type_.Ref_("java.lang.Object") :: Type_.Ref_("java.lang.Object") :: Nil, Type_.Unit_, Effect.Impure_, "set_");
-        let call = Call("set_", mkArgs("x0" :: "x1" :: Nil));
+        let call = Call("set_", mkArgs("x0" :: "x1" :: "x2" :: Nil));
         let wrap = Wrap.NoWrap(call);
         let body = Body.NoTry(wrap);
         let impl = Impl(imp, body);
@@ -217,7 +217,7 @@ namespace TestTransform {
         visitMethod(defaultOptions(), field, method) == 
             Def(
                 "set_",
-                ("x0", Type_.Ref_("java.lang.reflect.Field")) :: ("x1", Type_.Ref_("java.lang.reflect.Object")) :: ("x2", Type_.Ref_("java.lang.reflect.Object")) :: Nil,
+                ("x0", Type_.Ref_("java.lang.reflect.Field")) :: ("x1", Type_.Ref_("java.lang.Object")) :: ("x2", Type_.Ref_("java.lang.Object")) :: Nil,
                 Type_.Unit_,
                 Effect.Impure_,
                 impl
