@@ -178,7 +178,8 @@ namespace Transform {
 
     /// Transforms the Java method into a Flix function.
     pub def visitMethod(o: Options, c: Class, m: Method): Ast.Def = {
-        let name = getMethodName(m);
+        let methodName = getMethodName(m);
+        let alias_ = cleanName(methodName);
 
         // build the import statement
         let importClazz = getMethodDeclaringClass(m);
@@ -187,14 +188,14 @@ namespace Transform {
         let context = getMethodContext(m);
         let importParamTypes = { getParameterTypes(m) |> Array.toList |> List.map(visitType) } as & Pure;
         let eff = mkEffect(o, importReturnType);
-        let importName = importClazzName + "." + name;
-        let import_ = Import.Method(context, importName, importParamTypes, importReturnType, eff);
+        let importName = importClazzName + "." + methodName;
+        let import_ = Import.Method(context, importName, importParamTypes, importReturnType, eff, alias_);
 
         // build the call expression
         let doResult = shouldResult(o, m);
         let doOption = shouldOption(o, m);
         let args = mkCallArgs(c, m);
-        let call = Call(name, args);
+        let call = Call(alias_, args);
         let wrap = if (doOption) Wrap.WrapOption(call) else Wrap.NoWrap(call);
         let body = if (doResult) Body.TryCatch(wrap) else Body.NoTry(wrap);
 
@@ -202,7 +203,7 @@ namespace Transform {
 
         let outerReturnType = mkOuterReturnType(doResult = doResult, doOption = doOption, importReturnType);
         let outerParams = mkOuterParams(c, m, importParamTypes);
-        Def(name, outerParams, outerReturnType, eff, impl)
+        Def(alias_, outerParams, outerReturnType, eff, impl)
     }
 
 
@@ -345,5 +346,24 @@ namespace Transform {
         let head = String.charAt(0, fieldName);
         let tail = String.sliceRight(1, fieldName);
         "set" + "${Char.toUpperCase(head)}" + tail
+    }
+
+    def cleanName(name: String): String = {
+        if (Set.memberOf(name, flixKeywords())) {
+            name + "_"
+        } else {
+            name
+        }
+    }
+
+    def flixKeywords(): Set[String] = Set#{
+        "!=", "$DEFAULT$", "&&&", "*", "**", "+", "-", "..", "/", ":", "::", ":::", ":=", "<", "<+>", "<-", "<<<", "<=",
+        "<=>", "==", "=>", ">", ">=", ">>>", "???", "@", "Absent", "Bool", "Impure", "Nil", "Predicate", "Present", "Pure",
+        "RecordRow", "SchemaRow", "Type", "^^^", "alias", "case", "catch", "chan",
+        "class", "def", "deref", "else", "enum", "false", "fix", "force", "if", "import",
+        "inline", "instance", "into", "lat", "law", "lawless", "lazy", "let", "let*", "match", "mut", "namespace",
+        "null", "opaque", "override", "pub", "ref", "reify", "reifyBool",
+        "reifyEff", "reifyType", "rel", "rigid", "scoped", "sealed", "set", "spawn",
+        "static", "true", "type", "unlawful", "use", "where", "with", "|||", "~~~"
     }
 }
