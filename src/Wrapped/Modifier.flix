@@ -1,18 +1,18 @@
 namespace Wrapped/Modifier {
     pub def classModifiers(): Int32 & Pure = {
-        import static java.lang.reflect.Modifier.classModifiers(): Int32 & Pure;
+        import static java.lang.reflect.Modifier.classModifiers(): Int32 & Pure as classModifiers;
         classModifiers()
     }
     
     
     pub def constructorModifiers(): Int32 & Pure = {
-        import static java.lang.reflect.Modifier.constructorModifiers(): Int32 & Pure;
+        import static java.lang.reflect.Modifier.constructorModifiers(): Int32 & Pure as constructorModifiers;
         constructorModifiers()
     }
     
     
     pub def fieldModifiers(): Int32 & Pure = {
-        import static java.lang.reflect.Modifier.fieldModifiers(): Int32 & Pure;
+        import static java.lang.reflect.Modifier.fieldModifiers(): Int32 & Pure as fieldModifiers;
         fieldModifiers()
     }
     
@@ -90,97 +90,97 @@ namespace Wrapped/Modifier {
     
     
     pub def interfaceModifiers(): Int32 & Pure = {
-        import static java.lang.reflect.Modifier.interfaceModifiers(): Int32 & Pure;
+        import static java.lang.reflect.Modifier.interfaceModifiers(): Int32 & Pure as interfaceModifiers;
         interfaceModifiers()
     }
     
     
     pub def isAbstract(x0: Int32): Bool & Pure = {
-        import static java.lang.reflect.Modifier.isAbstract(Int32): Bool & Pure;
+        import static java.lang.reflect.Modifier.isAbstract(Int32): Bool & Pure as isAbstract;
         isAbstract(x0)
     }
     
     
     pub def isFinal(x0: Int32): Bool & Pure = {
-        import static java.lang.reflect.Modifier.isFinal(Int32): Bool & Pure;
+        import static java.lang.reflect.Modifier.isFinal(Int32): Bool & Pure as isFinal;
         isFinal(x0)
     }
     
     
     pub def isInterface(x0: Int32): Bool & Pure = {
-        import static java.lang.reflect.Modifier.isInterface(Int32): Bool & Pure;
+        import static java.lang.reflect.Modifier.isInterface(Int32): Bool & Pure as isInterface;
         isInterface(x0)
     }
     
     
     pub def isNative(x0: Int32): Bool & Pure = {
-        import static java.lang.reflect.Modifier.isNative(Int32): Bool & Pure;
+        import static java.lang.reflect.Modifier.isNative(Int32): Bool & Pure as isNative;
         isNative(x0)
     }
     
     
     pub def isPrivate(x0: Int32): Bool & Pure = {
-        import static java.lang.reflect.Modifier.isPrivate(Int32): Bool & Pure;
+        import static java.lang.reflect.Modifier.isPrivate(Int32): Bool & Pure as isPrivate;
         isPrivate(x0)
     }
     
     
     pub def isProtected(x0: Int32): Bool & Pure = {
-        import static java.lang.reflect.Modifier.isProtected(Int32): Bool & Pure;
+        import static java.lang.reflect.Modifier.isProtected(Int32): Bool & Pure as isProtected;
         isProtected(x0)
     }
     
     
     pub def isPublic(x0: Int32): Bool & Pure = {
-        import static java.lang.reflect.Modifier.isPublic(Int32): Bool & Pure;
+        import static java.lang.reflect.Modifier.isPublic(Int32): Bool & Pure as isPublic;
         isPublic(x0)
     }
     
     
     pub def isStatic(x0: Int32): Bool & Pure = {
-        import static java.lang.reflect.Modifier.isStatic(Int32): Bool & Pure;
+        import static java.lang.reflect.Modifier.isStatic(Int32): Bool & Pure as isStatic;
         isStatic(x0)
     }
     
     
     pub def isStrict(x0: Int32): Bool & Pure = {
-        import static java.lang.reflect.Modifier.isStrict(Int32): Bool & Pure;
+        import static java.lang.reflect.Modifier.isStrict(Int32): Bool & Pure as isStrict;
         isStrict(x0)
     }
     
     
     pub def isSynchronized(x0: Int32): Bool & Pure = {
-        import static java.lang.reflect.Modifier.isSynchronized(Int32): Bool & Pure;
+        import static java.lang.reflect.Modifier.isSynchronized(Int32): Bool & Pure as isSynchronized;
         isSynchronized(x0)
     }
     
     
     pub def isTransient(x0: Int32): Bool & Pure = {
-        import static java.lang.reflect.Modifier.isTransient(Int32): Bool & Pure;
+        import static java.lang.reflect.Modifier.isTransient(Int32): Bool & Pure as isTransient;
         isTransient(x0)
     }
     
     
     pub def isVolatile(x0: Int32): Bool & Pure = {
-        import static java.lang.reflect.Modifier.isVolatile(Int32): Bool & Pure;
+        import static java.lang.reflect.Modifier.isVolatile(Int32): Bool & Pure as isVolatile;
         isVolatile(x0)
     }
     
     
     pub def methodModifiers(): Int32 & Pure = {
-        import static java.lang.reflect.Modifier.methodModifiers(): Int32 & Pure;
+        import static java.lang.reflect.Modifier.methodModifiers(): Int32 & Pure as methodModifiers;
         methodModifiers()
     }
     
     
     pub def parameterModifiers(): Int32 & Pure = {
-        import static java.lang.reflect.Modifier.parameterModifiers(): Int32 & Pure;
+        import static java.lang.reflect.Modifier.parameterModifiers(): Int32 & Pure as parameterModifiers;
         parameterModifiers()
     }
     
     
     pub def toString(x0: Int32): String & Pure = {
-        import static java.lang.reflect.Modifier.toString(Int32): String & Pure;
+        import static java.lang.reflect.Modifier.toString(Int32): String & Pure as toString;
         toString(x0)
     }
 }
