@@ -32,6 +32,7 @@ namespace Transform {
     use Wrapped/Class.isPrimitive;
     use Wrapped/Class.{getName => getClassName};
 
+    use Wrapped/Constructor.{getExceptionTypes => getConstructorExceptionTypes};
     use Wrapped/Constructor.{getParameterTypes => getConstructorParameterTypes};
 
     use Wrapped/Field.getType;
@@ -39,7 +40,7 @@ namespace Transform {
     use Wrapped/Field.{getModifiers => getFieldModifiers};
     use Wrapped/Field.{getName => getFieldName};
 
-    use Wrapped/Method.getExceptionTypes;
+    use Wrapped/Method.{getExceptionTypes => getMethodExceptionTypes};
     use Wrapped/Method.{getParameterTypes => getMethodParameterTypes};
     use Wrapped/Method.getReturnType;
     use Wrapped/Method.{getDeclaringClass => getMethodDeclaringClass};
@@ -117,8 +118,17 @@ namespace Transform {
     def mkParamNames(n: Int32): List[String] = List.range(0, n) |> List.map(i -> "x${i}")
 
     /// Returns true iff the function should return a Result.
-    def shouldResult(o: Options, m: Method): Bool = {
-        let canFail = getExceptionTypes(m) |> Array.isEmpty |> Bool.not;
+    def shouldResultMethod(o: Options, m: Method): Bool = {
+        let canFail = getMethodExceptionTypes(m) |> Array.isEmpty |> Bool.not;
+        match (o, canFail) {
+            case (Options(opts), true) if opts.resultLevel >= ResultLevel.ResultChecked => true
+            case (Options(opts), _) if opts.resultLevel >= ResultLevel.ResultAll => true
+            case _ => false
+        }
+    }
+
+    def shouldResultConstructor(o: Options, c: Constructor): Bool = {
+        let canFail = getConstructorExceptionTypes(c) |> Array.isEmpty |> Bool.not;
         match (o, canFail) {
             case (Options(opts), true) if opts.resultLevel >= ResultLevel.ResultChecked => true
             case (Options(opts), _) if opts.resultLevel >= ResultLevel.ResultAll => true
@@ -195,7 +205,7 @@ namespace Transform {
         let import_ = Import.Method(context, importName, importParamTypes, importReturnType, eff, alias_);
 
         // build the call expression
-        let doResult = shouldResult(o, m);
+        let doResult = shouldResultMethod(o, m);
         let doOption = shouldOption(o, m);
         let args = mkCallArgs(c, m);
         let call = Call(alias_, args);
@@ -219,7 +229,19 @@ namespace Transform {
         let importName = getClassName(c);
         let import_ = Import.Constructor(importName, importParamTypes, importReturnType, eff, alias_);
 
-        ???
+        // build the call expression
+        let doResult = shouldResultConstructor(o, cst);
+        let paramNames = mkParamNames(List.length(importParamTypes));
+        let args = paramNames |> List.map(Arg.NoCast);
+        let call = Call(alias_, args);
+        // a constructor will never return null, so never wrap
+        let wrap = Wrap.NoWrap(call);
+        let body = if (doResult) Body.TryCatch(wrap) else Body.NoTry(wrap);
+
+        let impl = Impl(import_, body);
+        let outerReturnType = mkOuterReturnType(doResult = doResult, doOption = false, importReturnType);
+        let outerParams = List.zip(paramNames, importParamTypes);
+        Def(alias_, outerParams, outerReturnType, eff, impl)
     }
 
 
