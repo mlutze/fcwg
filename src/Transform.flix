@@ -230,7 +230,7 @@ namespace Transform {
     }
 
     pub def visitConstructor(o: Options, c: Class, cst: Constructor): Ast.Def = {
-        let alias_ = getClassName(c) |> constructorName;
+        let alias_ = getSimpleName(c) |> constructorName;
 
         // build the import statement
         let importParamTypes = { getConstructorParameterTypes(cst) |> Array.toList |> List.map(visitType) } as & Pure;
