@@ -47,6 +47,30 @@ namespace Wrapped/Exception {
     }
     
     
+    pub def newException(): ##java.lang.Exception & Pure = {
+        import new java.lang.Exception(): ##java.lang.Exception & Pure as newException;
+        newException()
+    }
+    
+    
+    /// pub def newException(x0: ##java.lang.Throwable): ##java.lang.Exception & Pure = {
+    ///     import new java.lang.Exception(##java.lang.Throwable): ##java.lang.Exception & Pure as newException;
+    ///     newException(x0)
+    /// }
+    
+    
+    /// pub def newException(x0: String): ##java.lang.Exception & Pure = {
+    ///     import new java.lang.Exception(String): ##java.lang.Exception & Pure as newException;
+    ///     newException(x0)
+    /// }
+    
+    
+    /// pub def newException(x0: String, x1: ##java.lang.Throwable): ##java.lang.Exception & Pure = {
+    ///     import new java.lang.Exception(String, ##java.lang.Throwable): ##java.lang.Exception & Pure as newException;
+    ///     newException(x0, x1)
+    /// }
+    
+    
     pub def printStackTrace(x0: ##java.lang.Exception): Unit & Impure = {
         import java.lang.Throwable.printStackTrace(): Unit & Impure as printStackTrace;
         printStackTrace(x0 as ##java.lang.Throwable)
