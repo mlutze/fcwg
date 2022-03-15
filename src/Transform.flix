@@ -25,6 +25,7 @@ namespace Transform {
 
     use Wrapped/Class.getCanonicalName;
     use Wrapped/Class.getComponentType;
+    use Wrapped/Class.getConstructors;
     use Wrapped/Class.getFields;
     use Wrapped/Class.getMethods;
     use Wrapped/Class.getSimpleName;
@@ -66,9 +67,12 @@ namespace Transform {
         let* fields = getFieldsFor(o, c);
         let defs2 = fields
             |> List.flatMap(visitField(o, c));
+        let* constructors = getConstructorsFor(o, c);
+        let defs3 = constructors
+            |> List.map(visitConstructor(o, c));
         let Options(opts) = o;
         let name = opts.namespace_ |> Option.getWithDefault(getSimpleName(c));
-        let defs = List.sort(defs1 ::: defs2);
+        let defs = List.sort(defs1 ::: defs2 ::: defs3);
         Namespace(name, defs) |> Ok
     }
 
@@ -96,6 +100,12 @@ namespace Transform {
             case SuperLevel.SuperButObject => fields |> Array.toList |> List.filter(m -> getClassName(getFieldDeclaringClass(m)) != "java.lang.Object")
             case SuperLevel.SuperAll => fields |> Array.toList
         } as & Pure |> Ok
+    }
+
+    def getConstructorsFor(_o: Options, c: Class): Result[List[Constructor], Exception] = {
+        use Result.flatMap;
+        let* csts = getConstructors(c);
+        { csts |> Array.toList } as & Pure |> Ok
     }
 
     def getMethodContext(m: Method): Context = if (isStaticMethod(m)) Context.Static else Context.Instance
