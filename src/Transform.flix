@@ -23,7 +23,6 @@ namespace Transform {
     use Options.ResultLevel;
     use Options.SuperLevel;
 
-    use Wrapped/Class.getCanonicalName;
     use Wrapped/Class.getComponentType;
     use Wrapped/Class.getFields;
     use Wrapped/Class.getMethods;
@@ -97,9 +96,9 @@ namespace Transform {
     def getMethodContext(m: Method): Context = if (isStaticMethod(m)) Context.Static else Context.Instance
 
     def isInheritedMethod(c: Class, m: Method): Bool = {
-        let importClazzName = getCanonicalName(c);
+        let importClazzName = getClassName(c);
         let methodClazz = getMethodDeclaringClass(m);
-        let methodClazzName = getCanonicalName(methodClazz);
+        let methodClazzName = getClassName(methodClazz);
         importClazzName != methodClazzName
     }
 
@@ -183,7 +182,7 @@ namespace Transform {
 
         // build the import statement
         let importClazz = getMethodDeclaringClass(m);
-        let importClazzName = getCanonicalName(importClazz);
+        let importClazzName = getClassName(importClazz);
         let importReturnType = getReturnType(m) |> visitType;
         let context = getMethodContext(m);
         let importParamTypes = { getParameterTypes(m) |> Array.toList |> List.map(visitType) } as & Pure;
@@ -226,14 +225,14 @@ namespace Transform {
         };
         let name = getFieldName(f);
         let importClazz = getFieldDeclaringClass(f);
-        let importClazzName = getCanonicalName(importClazz);
+        let importClazzName = getClassName(importClazz);
         let fieldType = visitType(getType(f));
         let paramTypes = match context {
             case Context.Static => Nil
             case Context.Instance => visitType(c) :: Nil
         };
         let paramNames = List.range(0, List.length(paramTypes)) |> List.map(i -> "x${i}");
-        let isInherited = importClazzName != getCanonicalName(c);
+        let isInherited = importClazzName != getClassName(c);
         let args = match context {
             case Context.Static => List.map(Arg.NoCast, paramNames)
             case Context.Instance if isInherited => match paramNames {
@@ -266,14 +265,14 @@ namespace Transform {
         };
         let name = getFieldName(f);
         let importClazz = getFieldDeclaringClass(f);
-        let importClazzName = getCanonicalName(importClazz);
+        let importClazzName = getClassName(importClazz);
         let fieldType = visitType(getType(f));
         let paramTypes = match context {
             case Context.Static => fieldType :: Nil
             case Context.Instance => visitType(c) :: fieldType :: Nil
         };
         let paramNames = List.range(0, List.length(paramTypes)) |> List.map(i -> "x${i}");
-        let isInherited = importClazzName != getCanonicalName(c);
+        let isInherited = importClazzName != getClassName(c);
         let args = match context {
             case Context.Static => List.map(Arg.NoCast, paramNames)
             case Context.Instance if isInherited => match paramNames {
@@ -297,7 +296,7 @@ namespace Transform {
             let ct = getComponentType(t);
             Type_.Array_(visitType(ct))
         } else {
-            match getCanonicalName(t) {
+            match getClassName(t) {
                 case "byte" => Type_.Int8_
                 case "short" => Type_.Int16_
                 case "int" => Type_.Int32_

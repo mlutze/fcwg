@@ -223,4 +223,17 @@ namespace TestTransform {
                 impl
             )
     }
+
+    @test
+    def testReturnNestedClass(): Bool = {
+        let character = forName("java.lang.Character$UnicodeBlock") |> unsafeGet;
+        let field = getField(character, "CUNEIFORM") |> unsafeGet;
+        let imp = Import.GetField(Context.Static, "java.lang.Character$UnicodeBlock.CUNEIFORM", Type_.Ref_("java.lang.Character$UnicodeBlock"), Effect.Impure_, "getCUNEIFORM");
+        let call = Call("getCUNEIFORM", Nil);
+        let wrap = Wrap.NoWrap(call);
+        let body = Body.NoTry(wrap);
+        let impl = Impl(imp, body);
+
+        visitField(defaultOptions(), character, field) == Def("getCUNEIFORM", Nil, Type_.Ref_("java.lang.Character$UnicodeBlock"), Effect.Impure_, impl) :: Nil
+    }
 }
