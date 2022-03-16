@@ -5,6 +5,10 @@ namespace Ast {
     pub opaque type Impl with Eq, Order = (Import, Body)
 
     pub enum Import with Eq, Order {
+
+        // Constructor(name, params, return, effect, alias)
+        case Constructor(String, List[Type_], Type_, Effect, String)
+
         // Method(context, name, params, return, effect, alias)
         case Method(Context, String, List[Type_], Type_, Effect, String)
 
@@ -114,6 +118,9 @@ namespace Ast {
 
     instance ToString[Import] {
         pub def toString(x: Import): String = match x {
+            case Constructor(name, params, return, eff, alias_) =>
+                let paramString = params |> List.map(ToString.toString) |> String.intercalate(", ");
+                "import new ${name}(${paramString}): ${return} & ${eff} as ${alias_};\n"
             case Method(context, name, params, return, eff, alias_) =>
                 let paramString = params |> List.map(ToString.toString) |> String.intercalate(", ");
                 "import ${context}${name}(${paramString}): ${return} & ${eff} as ${alias_};\n"
