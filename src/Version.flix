@@ -7,7 +7,7 @@ namespace Version {
     instance ToString[SemanticVersion] {
         pub def toString(x: SemanticVersion): String =
             let SemanticVersion(major, minor, patch) = x;
-            "${major}.${minor}.${patch}"
+            "v${major}.${minor}.${patch}"
     }
 
 }
