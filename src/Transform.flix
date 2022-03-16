@@ -24,6 +24,7 @@ namespace Transform {
     use Options.SuperLevel;
 
     use Wrapped/Class.getComponentType;
+    use Wrapped/Class.getConstructors;
     use Wrapped/Class.getFields;
     use Wrapped/Class.getMethods;
     use Wrapped/Class.getSimpleName;
@@ -31,13 +32,16 @@ namespace Transform {
     use Wrapped/Class.isPrimitive;
     use Wrapped/Class.{getName => getClassName};
 
+    use Wrapped/Constructor.{getExceptionTypes => getConstructorExceptionTypes};
+    use Wrapped/Constructor.{getParameterTypes => getConstructorParameterTypes};
+
     use Wrapped/Field.getType;
     use Wrapped/Field.{getDeclaringClass => getFieldDeclaringClass};
     use Wrapped/Field.{getModifiers => getFieldModifiers};
     use Wrapped/Field.{getName => getFieldName};
 
-    use Wrapped/Method.getExceptionTypes;
-    use Wrapped/Method.getParameterTypes;
+    use Wrapped/Method.{getExceptionTypes => getMethodExceptionTypes};
+    use Wrapped/Method.{getParameterTypes => getMethodParameterTypes};
     use Wrapped/Method.getReturnType;
     use Wrapped/Method.{getDeclaringClass => getMethodDeclaringClass};
     use Wrapped/Method.{getModifiers => getMethodModifiers};
@@ -47,6 +51,7 @@ namespace Transform {
     use Wrapped/Modifier.isFinal;
 
     type alias Class = ##java.lang.Class
+    type alias Constructor = ##java.lang.reflect.Constructor
     type alias Field = ##java.lang.reflect.Field
     type alias Method = ##java.lang.reflect.Method
     type alias Exception = ##java.lang.Exception
@@ -61,9 +66,12 @@ namespace Transform {
         let* fields = getFieldsFor(o, c);
         let defs2 = fields
             |> List.flatMap(visitField(o, c));
+        let* constructors = getConstructorsFor(o, c);
+        let defs3 = constructors
+            |> List.map(visitConstructor(o, c));
         let Options(opts) = o;
         let name = opts.namespace_ |> Option.getWithDefault(getSimpleName(c));
-        let defs = List.sort(defs1 ::: defs2);
+        let defs = List.sort(defs1 ::: defs2 ::: defs3);
         Namespace(name, defs) |> Ok
     }
 
@@ -93,6 +101,12 @@ namespace Transform {
         } as & Pure |> Ok
     }
 
+    def getConstructorsFor(_o: Options, c: Class): Result[List[Constructor], Exception] = {
+        use Result.flatMap;
+        let* csts = getConstructors(c);
+        { csts |> Array.toList } as & Pure |> Ok
+    }
+
     def getMethodContext(m: Method): Context = if (isStaticMethod(m)) Context.Static else Context.Instance
 
     def isInheritedMethod(c: Class, m: Method): Bool = {
@@ -113,8 +127,17 @@ namespace Transform {
     def mkParamNames(n: Int32): List[String] = List.range(0, n) |> List.map(i -> "x${i}")
 
     /// Returns true iff the function should return a Result.
-    def shouldResult(o: Options, m: Method): Bool = {
-        let canFail = getExceptionTypes(m) |> Array.isEmpty |> Bool.not;
+    def shouldResultMethod(o: Options, m: Method): Bool = {
+        let canFail = getMethodExceptionTypes(m) |> Array.isEmpty |> Bool.not;
+        match (o, canFail) {
+            case (Options(opts), true) if opts.resultLevel >= ResultLevel.ResultChecked => true
+            case (Options(opts), _) if opts.resultLevel >= ResultLevel.ResultAll => true
+            case _ => false
+        }
+    }
+
+    def shouldResultConstructor(o: Options, c: Constructor): Bool = {
+        let canFail = getConstructorExceptionTypes(c) |> Array.isEmpty |> Bool.not;
         match (o, canFail) {
             case (Options(opts), true) if opts.resultLevel >= ResultLevel.ResultChecked => true
             case (Options(opts), _) if opts.resultLevel >= ResultLevel.ResultAll => true
@@ -146,17 +169,17 @@ namespace Transform {
     def mkCallArgs(c: Class, m: Method): List[Arg] = {
         match getMethodContext(m) {
             case Context.Instance if isInheritedMethod(c, m) =>
-                let paramNames = mkParamNames(getParameterTypes(m) |> Array.length + 1);
+                let paramNames = mkParamNames(getMethodParameterTypes(m) |> Array.length + 1);
                 let tpe = getMethodDeclaringClass(m) |> visitType;
                 match paramNames {
                     case hd :: tl => Arg.Cast(hd, tpe) :: List.map(Arg.NoCast, tl)
                     case Nil => unreachable!()
                 }
             case Context.Instance =>
-                let paramNames = mkParamNames(getParameterTypes(m) |> Array.length + 1);
+                let paramNames = mkParamNames(getMethodParameterTypes(m) |> Array.length + 1);
                 List.map(Arg.NoCast, paramNames)
             case Context.Static =>
-                let paramNames = mkParamNames(getParameterTypes(m) |> Array.length);
+                let paramNames = mkParamNames(getMethodParameterTypes(m) |> Array.length);
                 List.map(Arg.NoCast, paramNames)
         }
     }
@@ -165,11 +188,11 @@ namespace Transform {
     def mkOuterParams(c: Class, m: Method, importParamTypes: List[Type_]): List[(String, Type_)] = {
         match getMethodContext(m) {
             case Context.Instance =>
-                let paramNames = mkParamNames(getParameterTypes(m) |> Array.length + 1);
+                let paramNames = mkParamNames(getMethodParameterTypes(m) |> Array.length + 1);
                 let paramTypes = visitType(c) :: importParamTypes;
                 List.zip(paramNames, paramTypes)
             case Context.Static =>
-                let paramNames = mkParamNames(getParameterTypes(m) |> Array.length + 1);
+                let paramNames = mkParamNames(getMethodParameterTypes(m) |> Array.length + 1);
                 let paramTypes = importParamTypes;
                 List.zip(paramNames, paramTypes)
         }
@@ -185,13 +208,13 @@ namespace Transform {
         let importClazzName = getClassName(importClazz);
         let importReturnType = getReturnType(m) |> visitType;
         let context = getMethodContext(m);
-        let importParamTypes = { getParameterTypes(m) |> Array.toList |> List.map(visitType) } as & Pure;
+        let importParamTypes = { getMethodParameterTypes(m) |> Array.toList |> List.map(visitType) } as & Pure;
         let eff = mkEffect(o, importReturnType);
         let importName = importClazzName + "." + methodName;
         let import_ = Import.Method(context, importName, importParamTypes, importReturnType, eff, alias_);
 
         // build the call expression
-        let doResult = shouldResult(o, m);
+        let doResult = shouldResultMethod(o, m);
         let doOption = shouldOption(o, m);
         let args = mkCallArgs(c, m);
         let call = Call(alias_, args);
@@ -202,6 +225,31 @@ namespace Transform {
 
         let outerReturnType = mkOuterReturnType(doResult = doResult, doOption = doOption, importReturnType);
         let outerParams = mkOuterParams(c, m, importParamTypes);
+        Def(alias_, outerParams, outerReturnType, eff, impl)
+    }
+
+    pub def visitConstructor(o: Options, c: Class, cst: Constructor): Ast.Def = {
+        let alias_ = getSimpleName(c) |> constructorName;
+
+        // build the import statement
+        let importParamTypes = { getConstructorParameterTypes(cst) |> Array.toList |> List.map(visitType) } as & Pure;
+        let importReturnType = c |> visitType;
+        let eff = mkEffect(o, importReturnType);
+        let importName = getClassName(c);
+        let import_ = Import.Constructor(importName, importParamTypes, importReturnType, eff, alias_);
+
+        // build the call expression
+        let doResult = shouldResultConstructor(o, cst);
+        let paramNames = mkParamNames(List.length(importParamTypes));
+        let args = paramNames |> List.map(Arg.NoCast);
+        let call = Call(alias_, args);
+        // a constructor will never return null, so never wrap
+        let wrap = Wrap.NoWrap(call);
+        let body = if (doResult) Body.TryCatch(wrap) else Body.NoTry(wrap);
+
+        let impl = Impl(import_, body);
+        let outerReturnType = mkOuterReturnType(doResult = doResult, doOption = false, importReturnType);
+        let outerParams = List.zip(paramNames, importParamTypes);
         Def(alias_, outerParams, outerReturnType, eff, impl)
     }
 
@@ -347,6 +395,16 @@ namespace Transform {
         "set" + "${Char.toUpperCase(head)}" + tail
     }
 
+    /// Creates a valid Flix constructor name from the field name.
+    def constructorName(className: String): String = {
+        // safe because class names are never empty
+        let head = String.charAt(0, className);
+        let tail = String.sliceRight(1, className);
+        "new" + "${Char.toUpperCase(head)}" + tail
+    }
+
+    /// Cleans a name, slightly mangling it
+    /// in case it conflicts with a Flix keyword.
     def cleanName(name: String): String = {
         if (Set.memberOf(name, flixKeywords())) {
             name + "_"
