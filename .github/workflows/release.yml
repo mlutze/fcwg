@@ -12,7 +12,11 @@ jobs:
           java-version: 13
           distribution: zulu
       - run: |
-          curl -L https://github.com/flix/flix/releases/latest/download/flix.jar > flix.jar
+          today=$(date -d today +%Y-%m-%d)
+          yesterday=$(date -d yesterday +%Y-%m-%d)
+          today_url="https://flix.dev/nightly/flix-${today}.jar"
+          yesterday_url="https://flix.dev/nightly/flix-${yesterday}.jar"
+          curl -L -f "${today_url}" > flix.jar || curl -L -f "${yesterday_url}" > flix.jar
           java -jar flix.jar build
           java -jar flix.jar build-pkg
           java -jar flix.jar build-jar
