@@ -1,0 +1,23 @@
+name: Build on nightly
+
+# Controls when the workflow will run
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2.5.0
+        with:
+          java-version: 13
+          distribution: zulu
+      - run: |
+          today=$(date -d today +%Y-%m-%d)
+          yesterday=$(date -d yesterday +%Y-%m-%d)
+          today_url="https://flix.dev/nightly/flix-${today}.jar"
+          yesterday_url="https://flix.dev/nightly/flix-${yesterday}.jar"
+          curl -L -f "${today_url" > flix.jar || curl -L -f "${yesterday_url}" > flix.jar
+          java -jar flix.jar test
