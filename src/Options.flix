@@ -20,7 +20,6 @@ namespace Options {
     pub enum OptionLevel with Eq, Order {
         case OptionNone
         case OptionRef
-        case OptionAll
     }
 
     pub enum PureLevel with Eq, Order {
@@ -134,8 +133,7 @@ namespace Options {
             case Option =>
                 let o = match opts.optionLevel {
                     case OptionNone => OptionRef
-                    case OptionRef => OptionAll
-                    case OptionAll => OptionAll
+                    case OptionRef => OptionRef
                 };
                 { optionLevel = o | opts }
             case Pure_ =>
