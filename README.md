@@ -23,12 +23,10 @@ reducing a great deal of boilerplate to a relatively easy refactoring job.
 
 ## Usage
 ```
-Usage: fcwg [OPTIONS] <class file>
-  -g              --generic                Wraps generic types in Generic
+Usage: fcwg [OPTIONS] <class file>          
   -h              --help                   Prints this help information and exits.
-  -i              --interactive            Launches interactive mode.
   -n <namespace>  --namespace=<namespace>  Sets the namespace. Uses the class's namespace by default.
-  -o              --option                 Once: Returns Option for functions returning reference types. Twice: Returns Option for all functions.
+  -o              --option                 Returns Option for functions returning reference types.
   -p              --pure                   Once: Casts getters for final fields to Pure. Twice: Casts all functions but those returning Unit. Thrice: Casts all functions.
   -r              --result                 Once: Returns Result for methods with checked exceptions. Twice: Returns Result for all methods.
   -s              --super                  Once: Includes super class declarations, excluding Object. Twice: Includes Object.

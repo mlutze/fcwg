@@ -172,7 +172,6 @@ namespace Transform {
     def shouldOption(o: Options, m: Method): Bool = {
         match (o, isPrimitive(getReturnType(m))) {
             case (Options(opts), false) if opts.optionLevel >= OptionLevel.OptionRef => true
-            case (Options(opts), _) if opts.optionLevel >= OptionLevel.OptionAll => true
             case _ => false
         }
     }
@@ -317,7 +316,6 @@ namespace Transform {
         let call = Call(funcName, args);
         let doWrap = match (o, isPrimitive(getType(f))) {
             case (Options(opts), false) if opts.optionLevel >= OptionLevel.OptionRef => true
-            case (Options(opts), _) if opts.optionLevel >= OptionLevel.OptionAll => true
             case _ => false
         };
         let outerReturnType = if (doWrap) Type_.Option_(fieldType) else fieldType;
