@@ -41,13 +41,13 @@ namespace Wrapped/Class {
     }
     
     
-    /// pub def forName(x0: ##java.lang.Module, x1: String): ##java.lang.Class & Pure = {
-    ///     import static java.lang.Class.forName(##java.lang.Module, String): ##java.lang.Class & Pure as forName;
-    ///     forName(x0, x1)
-    /// }
+    pub def forNameModuleString(x0: ##java.lang.Module, x1: String): ##java.lang.Class & Pure = {
+        import static java.lang.Class.forName(##java.lang.Module, String): ##java.lang.Class & Pure as forName;
+        forName(x0, x1)
+    }
     
     
-    pub def forName(x0: String): Result[##java.lang.Class, ##java.lang.Exception] & Pure = {
+    pub def forNameString(x0: String): Result[##java.lang.Class, ##java.lang.Exception] & Pure = {
         import static java.lang.Class.forName(String): ##java.lang.Class & Pure as forName;
         try {
             Ok(forName(x0))
@@ -57,14 +57,14 @@ namespace Wrapped/Class {
     }
     
     
-    /// pub def forName(x0: String, x1: Bool, x2: ##java.lang.ClassLoader): Result[##java.lang.Class, ##java.lang.Exception] & Pure = {
-    ///     import static java.lang.Class.forName(String, Bool, ##java.lang.ClassLoader): ##java.lang.Class & Pure as forName;
-    ///     try {
-    ///         Ok(forName(x0, x1, x2))
-    ///     } catch {
-    ///         case e: ##java.lang.Exception => Err(e)
-    ///     }
-    /// }
+    pub def forNameStringBoolClassLoader(x0: String, x1: Bool, x2: ##java.lang.ClassLoader): Result[##java.lang.Class, ##java.lang.Exception] & Pure = {
+        import static java.lang.Class.forName(String, Bool, ##java.lang.ClassLoader): ##java.lang.Class & Pure as forName;
+        try {
+            Ok(forName(x0, x1, x2))
+        } catch {
+            case e: ##java.lang.Exception => Err(e)
+        }
+    }
     
     
     pub def getAnnotatedInterfaces(x0: ##java.lang.Class): Array[##java.lang.reflect.AnnotatedType] & Pure = {
