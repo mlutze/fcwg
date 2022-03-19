@@ -438,10 +438,30 @@ namespace Transform {
 
     // Returns a string idenitifying the type,
     // suitable for use in an identifier.
-    def typeToIdentifierString(t: Type_): String = {
-        ToString.toString(t)
-        |> String.replace(from = "[", to = "")
-        |> String.replace(from = "]", to = "")
+    def typeToIdentifierString(t: Type_): String = match t {
+        case Type_.Int8_ => "Int8"
+        case Type_.Int16_ => "Int16"
+        case Type_.Int32_ => "Int32"
+        case Type_.Int64_ => "Int64"
+        case Type_.Float32_ => "Float32"
+        case Type_.Float64_ => "Float64"
+        case Type_.Bool_ => "Bool"
+        case Type_.Char_ => "Char"
+        case Type_.String_ => "String"
+        case Type_.BigInt_ => "BigInt"
+        case Type_.Array_(_) => "Array"
+
+        // print nothing for unit
+        case Type_.Unit_ => ""
+
+        // take the simple name for Java types
+        case Type_.Ref_(clazz) =>
+            let (_, name) = String.breakOnRight(substr = ".", clazz);
+            name
+
+        // Flix types should never occur
+        case Type_.Result_(_, _) => "Result"
+        case Type_.Option_(_) => "Option"
     }
 
     def flixKeywords(): Set[String] = Set#{
