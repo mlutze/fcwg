@@ -10,3 +10,6 @@
 
 ### v0.0.4
    Flix v0.27.0 update: Avoids generating code with Flix keywords as identifiers.
+
+### v0.0.5
+   Adds support for constructors.
