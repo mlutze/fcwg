@@ -71,8 +71,31 @@ namespace Transform {
             |> List.map(visitConstructor(o, c));
         let Options(opts) = o;
         let name = opts.namespace_ |> Option.getWithDefault(getSimpleName(c));
-        let defs = List.sort(defs1 ::: defs2 ::: defs3);
+        let defs = disambiguateDefs(defs1 ::: defs2 ::: defs3)
+            |> List.sort;
         Namespace(name, defs) |> Ok
+    }
+
+    /// Modifies the names of definitions to disambiguate them.
+    def disambiguateDefs(defs: List[Def]): List[Def] = {
+        def disambiguateGroup(group) = {
+            if (List.length(group) == 1) {
+                group
+            } else {
+                group |> List.map(
+                    match Def(name, params, ret, eff, impl) ->
+                        let tpes = params |> List.map(snd) |> List.map(typeToIdentifierString);
+                        let newName = name ++ String.intercalate("", tpes);
+                        Def(newName, params, ret, eff, impl)
+                )
+            }
+        };
+        def sameName(d1, d2) = {
+            let Def(name1, _, _, _, _) = d1;
+            let Def(name2, _, _, _, _) = d2;
+            name1 == name2
+        };
+        List.groupBy(sameName, defs) |> List.map(disambiguateGroup) |> List.flatten
     }
 
     /// Gets the methods relevant to the class.
@@ -411,6 +434,14 @@ namespace Transform {
         } else {
             name
         }
+    }
+
+    // Returns a string idenitifying the type,
+    // suitable for use in an identifier.
+    def typeToIdentifierString(t: Type_): String = {
+        ToString.toString(t)
+        |> String.replace(from = "[", to = "")
+        |> String.replace(from = "]", to = "")
     }
 
     def flixKeywords(): Set[String] = Set#{
