@@ -10,4 +10,8 @@ namespace TestVersion {
     def testVersionValid(): Bool =
         let SemanticVersion(major, minor, patch) = version();
         major >= 0 and minor >= 0 and patch >= 0
+
+    @test
+    def testSkipVersion010(): Bool =
+        version() != SemanticVersion(0, 1, 0)
 }
