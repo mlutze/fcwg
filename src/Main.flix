@@ -4,7 +4,7 @@ use Options.usage;
 use Transform.visitClass;
 use Version.version;
 
-use Wrapped/Class.forName;
+use Wrapped/Class.forNameString;
 use Wrapped/Exception.getMessage;
 
 // The main entry point.
@@ -13,7 +13,7 @@ def main(args: Array[String]): Int32 & Impure =
     match parse(args) {
         case Success(Command.Go(name, options)) =>
             match {
-                let* clazz = forName(name);
+                let* clazz = forNameString(name);
                 visitClass(options, clazz)
             } {
                 case Ok(ns) =>

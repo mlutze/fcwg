@@ -20,7 +20,6 @@ namespace Options {
     pub enum OptionLevel with Eq, Order {
         case OptionNone
         case OptionRef
-        case OptionAll
     }
 
     pub enum PureLevel with Eq, Order {
@@ -72,11 +71,11 @@ namespace Options {
 
 
     def options(): List[OptionDescr[Flag]] =
-        {optionIds = 'g' :: Nil, optionNames = "generic" :: Nil, argDescriptor = NoArg(Generic), explanation = "Wraps generic types in Generic"} ::
+        /// {optionIds = 'g' :: Nil, optionNames = "generic" :: Nil, argDescriptor = NoArg(Generic), explanation = "Wraps generic types in Generic"} ::
         {optionIds = 'h' :: Nil, optionNames = "help" :: Nil, argDescriptor = NoArg(Help), explanation = "Prints this help information and exits."} ::
-        {optionIds = 'i' :: Nil, optionNames = "interactive" :: Nil, argDescriptor = NoArg(Interactive), explanation = "Launches interactive mode." } ::
+        /// {optionIds = 'i' :: Nil, optionNames = "interactive" :: Nil, argDescriptor = NoArg(Interactive), explanation = "Launches interactive mode." } ::
         {optionIds = 'n' :: Nil, optionNames = "namespace" :: Nil, argDescriptor = ReqArg(namespace_, "<namespace>"), explanation = "Sets the namespace. Uses the class's namespace by default."} ::
-        {optionIds = 'o' :: Nil, optionNames = "option" :: Nil, argDescriptor = NoArg(Option), explanation = "Once: Returns Option for functions returning reference types. Twice: Returns Option for all functions."} ::
+        {optionIds = 'o' :: Nil, optionNames = "option" :: Nil, argDescriptor = NoArg(Option), explanation = "Returns Option for functions returning reference types."} ::
         {optionIds = 'p' :: Nil, optionNames = "pure" :: Nil, argDescriptor = NoArg(Pure_), explanation = "Once: Casts getters for final fields to Pure. Twice: Casts all functions but those returning Unit. Thrice: Casts all functions."} ::
         {optionIds = 'r' :: Nil, optionNames = "result" :: Nil, argDescriptor = NoArg(Result), explanation = "Once: Returns Result for methods with checked exceptions. Twice: Returns Result for all methods."} ::
         {optionIds = 's' :: Nil, optionNames = "super" :: Nil, argDescriptor = NoArg(Super), explanation = "Once: Includes super class declarations, excluding Object. Twice: Includes Object."} ::
@@ -134,8 +133,7 @@ namespace Options {
             case Option =>
                 let o = match opts.optionLevel {
                     case OptionNone => OptionRef
-                    case OptionRef => OptionAll
-                    case OptionAll => OptionAll
+                    case OptionRef => OptionRef
                 };
                 { optionLevel = o | opts }
             case Pure_ =>

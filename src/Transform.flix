@@ -71,8 +71,31 @@ namespace Transform {
             |> List.map(visitConstructor(o, c));
         let Options(opts) = o;
         let name = opts.namespace_ |> Option.getWithDefault(getSimpleName(c));
-        let defs = List.sort(defs1 ::: defs2 ::: defs3);
+        let defs = disambiguateDefs(defs1 ::: defs2 ::: defs3)
+            |> List.sort;
         Namespace(name, defs) |> Ok
+    }
+
+    /// Modifies the names of definitions to disambiguate them.
+    def disambiguateDefs(defs: List[Def]): List[Def] = {
+        def disambiguateGroup(group) = {
+            if (List.length(group) == 1) {
+                group
+            } else {
+                group |> List.map(
+                    match Def(name, params, ret, eff, impl) ->
+                        let tpes = params |> List.map(snd) |> List.map(typeToIdentifierString);
+                        let newName = name ++ String.intercalate("", tpes);
+                        Def(newName, params, ret, eff, impl)
+                )
+            }
+        };
+        def sameName(d1, d2) = {
+            let Def(name1, _, _, _, _) = d1;
+            let Def(name2, _, _, _, _) = d2;
+            name1 == name2
+        };
+        List.groupBy(sameName, defs) |> List.map(disambiguateGroup) |> List.flatten
     }
 
     /// Gets the methods relevant to the class.
@@ -149,7 +172,6 @@ namespace Transform {
     def shouldOption(o: Options, m: Method): Bool = {
         match (o, isPrimitive(getReturnType(m))) {
             case (Options(opts), false) if opts.optionLevel >= OptionLevel.OptionRef => true
-            case (Options(opts), _) if opts.optionLevel >= OptionLevel.OptionAll => true
             case _ => false
         }
     }
@@ -294,7 +316,6 @@ namespace Transform {
         let call = Call(funcName, args);
         let doWrap = match (o, isPrimitive(getType(f))) {
             case (Options(opts), false) if opts.optionLevel >= OptionLevel.OptionRef => true
-            case (Options(opts), _) if opts.optionLevel >= OptionLevel.OptionAll => true
             case _ => false
         };
         let outerReturnType = if (doWrap) Type_.Option_(fieldType) else fieldType;
@@ -411,6 +432,34 @@ namespace Transform {
         } else {
             name
         }
+    }
+
+    // Returns a string idenitifying the type,
+    // suitable for use in an identifier.
+    def typeToIdentifierString(t: Type_): String = match t {
+        case Type_.Int8_ => "Int8"
+        case Type_.Int16_ => "Int16"
+        case Type_.Int32_ => "Int32"
+        case Type_.Int64_ => "Int64"
+        case Type_.Float32_ => "Float32"
+        case Type_.Float64_ => "Float64"
+        case Type_.Bool_ => "Bool"
+        case Type_.Char_ => "Char"
+        case Type_.String_ => "String"
+        case Type_.BigInt_ => "BigInt"
+        case Type_.Array_(_) => "Array"
+
+        // print nothing for unit
+        case Type_.Unit_ => ""
+
+        // take the simple name for Java types
+        case Type_.Ref_(clazz) =>
+            let (_, name) = String.breakOnRight(substr = ".", clazz);
+            name
+
+        // Flix types should never occur
+        case Type_.Result_(_, _) => "Result"
+        case Type_.Option_(_) => "Option"
     }
 
     def flixKeywords(): Set[String] = Set#{
