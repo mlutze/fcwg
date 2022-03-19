@@ -32,7 +32,7 @@ namespace TestTransform {
     use Transform.visitType;
 
     use Wrapped/Class.arrayType;
-    use Wrapped/Class.forName;
+    use Wrapped/Class.forNameString;
     use Wrapped/Class.getField;
     use Wrapped/Class.getMethod;
 
@@ -50,19 +50,19 @@ namespace TestTransform {
 
     @test
     def testVisitType(): Bool = {
-        let tpe = forName("java.lang.String") |> unsafeGet;
+        let tpe = forNameString("java.lang.String") |> unsafeGet;
         visitType(tpe) == Type_.String_
     }
 
     @test
     def testVisitTypeArray(): Bool = {
-        let tpe = forName("java.lang.StringBuilder") |> unsafeGet |> arrayType;
+        let tpe = forNameString("java.lang.StringBuilder") |> unsafeGet |> arrayType;
         visitType(tpe) == Type_.Array_(Type_.Ref_("java.lang.StringBuilder"))
     }
 
     @test
     def testVisitMethod(): Bool = {
-        let string = forName("java.lang.String") |> unsafeGet;
+        let string = forNameString("java.lang.String") |> unsafeGet;
         let method = getMethod(string, "concat", [string] as & Pure) |> unsafeGet;
         let imp = Import.Method(Context.Instance, "java.lang.String.concat", Type_.String_ :: Nil, Type_.String_, Effect.Impure_, "concat");
         let call = Call("concat", mkArgs("x0" :: "x1" :: Nil));
@@ -74,8 +74,8 @@ namespace TestTransform {
 
     @test
     def testVisitMethodExceptionNoResult(): Bool = {
-        let clazz = forName("java.lang.Class") |> unsafeGet;
-        let string = forName("java.lang.String") |> unsafeGet;
+        let clazz = forNameString("java.lang.Class") |> unsafeGet;
+        let string = forNameString("java.lang.String") |> unsafeGet;
         let method = getMethod(clazz, "forName", [string] as & Pure) |> unsafeGet;
         let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Type_.Ref_("java.lang.Class"), Effect.Impure_, "forName");
         let call = Call("forName", mkArgs("x0" :: Nil));
@@ -87,8 +87,8 @@ namespace TestTransform {
 
     @test
     def testVisitMethodException(): Bool = {
-        let clazz = forName("java.lang.Class") |> unsafeGet;
-        let string = forName("java.lang.String") |> unsafeGet;
+        let clazz = forNameString("java.lang.Class") |> unsafeGet;
+        let string = forNameString("java.lang.String") |> unsafeGet;
         let method = getMethod(clazz, "forName", [string] as & Pure) |> unsafeGet;
         let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Type_.Ref_("java.lang.Class"), Effect.Impure_, "forName");
         let call = Call("forName", mkArgs("x0" :: Nil));
@@ -102,8 +102,8 @@ namespace TestTransform {
 
     @test
     def testVisitMethodOptionResult(): Bool = {
-        let clazz = forName("java.lang.Class") |> unsafeGet;
-        let string = forName("java.lang.String") |> unsafeGet;
+        let clazz = forNameString("java.lang.Class") |> unsafeGet;
+        let string = forNameString("java.lang.String") |> unsafeGet;
         let method = getMethod(clazz, "forName", [string] as & Pure) |> unsafeGet;
         let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Type_.Ref_("java.lang.Class"), Effect.Impure_, "forName");
         let call = Call("forName", mkArgs("x0" :: Nil));
@@ -117,7 +117,7 @@ namespace TestTransform {
 
     @test
     def testVisitMethodUnit(): Bool = {
-        let throwable = forName("java.lang.Throwable") |> unsafeGet;
+        let throwable = forNameString("java.lang.Throwable") |> unsafeGet;
         let method = getMethod(throwable, "printStackTrace", [] as & Pure) |> unsafeGet;
         let imp = Import.Method(Context.Instance, "java.lang.Throwable.printStackTrace", Nil, Type_.Unit_, Effect.Impure_, "printStackTrace");
         let call = Call("printStackTrace", mkArgs("x0" :: Nil));
@@ -131,7 +131,7 @@ namespace TestTransform {
 
     @test
     def testVisitField(): Bool = {
-        let string = forName("java.lang.String") |> unsafeGet;
+        let string = forNameString("java.lang.String") |> unsafeGet;
         let field = getField(string, "CASE_INSENSITIVE_ORDER") |> unsafeGet;
         let imp = Import.GetField(Context.Static, "java.lang.String.CASE_INSENSITIVE_ORDER", Type_.Ref_("java.util.Comparator"), Effect.Impure_, "getCASE_INSENSITIVE_ORDER");
         let call = Call("getCASE_INSENSITIVE_ORDER", Nil);
@@ -143,7 +143,7 @@ namespace TestTransform {
 
     @test
     def testVisitFieldPure(): Bool = {
-        let string = forName("java.lang.String") |> unsafeGet;
+        let string = forNameString("java.lang.String") |> unsafeGet;
         let field = getField(string, "CASE_INSENSITIVE_ORDER") |> unsafeGet;
         let imp = Import.GetField(Context.Static, "java.lang.String.CASE_INSENSITIVE_ORDER", Type_.Ref_("java.util.Comparator"), Effect.Pure_, "getCASE_INSENSITIVE_ORDER");
         let call = Call("getCASE_INSENSITIVE_ORDER", Nil);
@@ -157,7 +157,7 @@ namespace TestTransform {
 
     @test
     def testVisitClassSetNamespace(): Bool = {
-        let clazz = forName("java.lang.String") |> unsafeGet;
+        let clazz = forNameString("java.lang.String") |> unsafeGet;
         let Options(opts) = defaultOptions();
         let o = Options({ namespace_ = Some("MyString") | opts });
         {
@@ -168,7 +168,7 @@ namespace TestTransform {
 
     @test
     def testVisitClassIgnoreInherited(): Bool = {
-        let clazz = forName("java.lang.String") |> unsafeGet;
+        let clazz = forNameString("java.lang.String") |> unsafeGet;
         {
             let* Namespace(_, defs) = visitClass(defaultOptions(), clazz);
             Ok(List.count(match Def(name, _, _, _, _) -> name == "wait", defs) == 0)
@@ -177,7 +177,7 @@ namespace TestTransform {
 
     @test
     def testVisitClassIncludeInherited(): Bool = {
-        let clazz = forName("java.lang.Exception") |> unsafeGet;
+        let clazz = forNameString("java.lang.Exception") |> unsafeGet;
         let Options(default) = defaultOptions();
         let opts = Options({ superLevel = SuperLevel.SuperButObject | default });
         {
@@ -188,8 +188,8 @@ namespace TestTransform {
 
     @test
     def testVisitMethodCastInherited(): Bool = {
-        let throwable = forName("java.lang.Throwable") |> unsafeGet;
-        let exception = forName("java.lang.Exception") |> unsafeGet;
+        let throwable = forNameString("java.lang.Throwable") |> unsafeGet;
+        let exception = forNameString("java.lang.Exception") |> unsafeGet;
         let method = getMethod(throwable, "getMessage", [] as & Pure) |> unsafeGet;
         let imp = Import.Method(Context.Instance, "java.lang.Throwable.getMessage", Nil, Type_.String_, Effect.Impure_, "getMessage");
         let call = Call("getMessage", Arg.Cast("x0", Type_.Ref_("java.lang.Throwable")) :: Nil);
@@ -205,8 +205,8 @@ namespace TestTransform {
 
     @test
     def testVisitMethodAvoidKeywords(): Bool = {
-        let field = forName("java.lang.reflect.Field") |> unsafeGet;
-        let object = forName("java.lang.Object") |> unsafeGet;
+        let field = forNameString("java.lang.reflect.Field") |> unsafeGet;
+        let object = forNameString("java.lang.Object") |> unsafeGet;
         let method = getMethod(field, "set", [object, object] as & Pure) |> unsafeGet;
         let imp = Import.Method(Context.Instance, "java.lang.reflect.Field.set", Type_.Ref_("java.lang.Object") :: Type_.Ref_("java.lang.Object") :: Nil, Type_.Unit_, Effect.Impure_, "set_");
         let call = Call("set_", mkArgs("x0" :: "x1" :: "x2" :: Nil));
@@ -226,7 +226,7 @@ namespace TestTransform {
 
     @test
     def testReturnNestedClass(): Bool = {
-        let character = forName("java.lang.Character$UnicodeBlock") |> unsafeGet;
+        let character = forNameString("java.lang.Character$UnicodeBlock") |> unsafeGet;
         let field = getField(character, "CUNEIFORM") |> unsafeGet;
         let imp = Import.GetField(Context.Static, "java.lang.Character$UnicodeBlock.CUNEIFORM", Type_.Ref_("java.lang.Character$UnicodeBlock"), Effect.Impure_, "getCUNEIFORM");
         let call = Call("getCUNEIFORM", Nil);

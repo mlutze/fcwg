@@ -53,40 +53,40 @@ namespace Wrapped/Exception {
     }
     
     
-    /// pub def newException(x0: ##java.lang.Throwable): ##java.lang.Exception & Pure = {
-    ///     import new java.lang.Exception(##java.lang.Throwable): ##java.lang.Exception & Pure as newException;
-    ///     newException(x0)
-    /// }
+    pub def newExceptionString(x0: String): ##java.lang.Exception & Pure = {
+        import new java.lang.Exception(String): ##java.lang.Exception & Pure as newException;
+        newException(x0)
+    }
     
     
-    /// pub def newException(x0: String): ##java.lang.Exception & Pure = {
-    ///     import new java.lang.Exception(String): ##java.lang.Exception & Pure as newException;
-    ///     newException(x0)
-    /// }
+    pub def newExceptionStringThrowable(x0: String, x1: ##java.lang.Throwable): ##java.lang.Exception & Pure = {
+        import new java.lang.Exception(String, ##java.lang.Throwable): ##java.lang.Exception & Pure as newException;
+        newException(x0, x1)
+    }
     
     
-    /// pub def newException(x0: String, x1: ##java.lang.Throwable): ##java.lang.Exception & Pure = {
-    ///     import new java.lang.Exception(String, ##java.lang.Throwable): ##java.lang.Exception & Pure as newException;
-    ///     newException(x0, x1)
-    /// }
+    pub def newExceptionThrowable(x0: ##java.lang.Throwable): ##java.lang.Exception & Pure = {
+        import new java.lang.Exception(##java.lang.Throwable): ##java.lang.Exception & Pure as newException;
+        newException(x0)
+    }
     
     
-    pub def printStackTrace(x0: ##java.lang.Exception): Unit & Impure = {
+    pub def printStackTraceException(x0: ##java.lang.Exception): Unit & Impure = {
         import java.lang.Throwable.printStackTrace(): Unit & Impure as printStackTrace;
         printStackTrace(x0 as ##java.lang.Throwable)
     }
     
     
-    /// pub def printStackTrace(x0: ##java.lang.Exception, x1: ##java.io.PrintStream): Unit & Impure = {
-    ///     import java.lang.Throwable.printStackTrace(##java.io.PrintStream): Unit & Impure as printStackTrace;
-    ///     printStackTrace(x0 as ##java.lang.Throwable, x1)
-    /// }
+    pub def printStackTraceExceptionPrintStream(x0: ##java.lang.Exception, x1: ##java.io.PrintStream): Unit & Impure = {
+        import java.lang.Throwable.printStackTrace(##java.io.PrintStream): Unit & Impure as printStackTrace;
+        printStackTrace(x0 as ##java.lang.Throwable, x1)
+    }
     
     
-    /// pub def printStackTrace(x0: ##java.lang.Exception, x1: ##java.io.PrintWriter): Unit & Impure = {
-    ///     import java.lang.Throwable.printStackTrace(##java.io.PrintWriter): Unit & Impure as printStackTrace;
-    ///     printStackTrace(x0 as ##java.lang.Throwable, x1)
-    /// }
+    pub def printStackTraceExceptionPrintWriter(x0: ##java.lang.Exception, x1: ##java.io.PrintWriter): Unit & Impure = {
+        import java.lang.Throwable.printStackTrace(##java.io.PrintWriter): Unit & Impure as printStackTrace;
+        printStackTrace(x0 as ##java.lang.Throwable, x1)
+    }
     
     
     pub def setStackTrace(x0: ##java.lang.Exception, x1: Array[##java.lang.StackTraceElement]): Unit & Impure = {
