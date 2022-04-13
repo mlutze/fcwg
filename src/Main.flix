@@ -6,6 +6,7 @@ use Version.version;
 
 use Wrapped/Class.forNameString;
 use Wrapped/Exception.getMessage;
+use Wrapped/System.exit;
 
 // The main entry point.
 def main(): Unit & Impure =
@@ -20,15 +21,24 @@ def main(): Unit & Impure =
                 case Ok(ns) =>
                     println(ns)
                 case Err(err) =>
-                    System/StdErr.println(getMessage(err))
+                    System/StdErr.println(getMessage(err));
+                    exitProcessError()
             }
         case Success(Command.GetVersion) =>
             println(version())
         case Success(Command.GetHelp) =>
             print(usage())
         case Success(_) =>
-            System/StdErr.println("Unsupported operation.")
+            System/StdErr.println("Unsupported operation.");
+            exitUnsupported()
         case Failure(errs) =>
             errs |> Nec.foreach(System/StdErr.print);
-            System/StdErr.print(usage())
+            System/StdErr.print(usage());
+            exitParseError()
     }
+
+def exitProcessError(): Unit & Impure = exit(1)
+
+def exitParseError(): Unit & Impure = exit(2)
+
+def exitUnsupported(): Unit & Impure = exit(3)
