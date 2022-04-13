@@ -8,8 +8,9 @@ use Wrapped/Class.forNameString;
 use Wrapped/Exception.getMessage;
 
 // The main entry point.
-def main(args: Array[String]): Int32 & Impure =
+def main(): Int32 & Impure =
     use Result.flatMap;
+    let args = Environment.getArgs();
     match parse(args) {
         case Success(Command.Go(name, options)) =>
             match {

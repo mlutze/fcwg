@@ -99,7 +99,7 @@ namespace Options {
     }
 
     /// Parses the command line arguments
-    pub def parse(args: Array[String]): Validation[Command, String] & Impure = {
+    pub def parse(args: List[String]): Validation[Command, String] = {
         let* opts = getOpt(Permute, options(), args);
         let command = opts.options |> List.foldLeft(
             (acc, opt0) -> match (acc, opt0) {
