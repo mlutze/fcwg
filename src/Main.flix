@@ -8,7 +8,7 @@ use Wrapped/Class.forNameString;
 use Wrapped/Exception.getMessage;
 
 // The main entry point.
-def main(): Int32 & Impure =
+def main(): Unit & Impure =
     use Result.flatMap;
     let args = Environment.getArgs();
     match parse(args) {
@@ -18,23 +18,17 @@ def main(): Int32 & Impure =
                 visitClass(options, clazz)
             } {
                 case Ok(ns) =>
-                    println(ns);
-                    0
+                    println(ns)
                 case Err(err) =>
-                    System/StdErr.println(getMessage(err));
-                    1
+                    System/StdErr.println(getMessage(err))
             }
         case Success(Command.GetVersion) =>
-            println(version());
-            0
+            println(version())
         case Success(Command.GetHelp) =>
-            print(usage());
-            0
+            print(usage())
         case Success(_) =>
-            System/StdErr.println("Unsupported operation.");
-            1
+            System/StdErr.println("Unsupported operation.")
         case Failure(errs) =>
             errs |> Nec.foreach(System/StdErr.print);
-            System/StdErr.print(usage());
-            2
+            System/StdErr.print(usage())
     }
