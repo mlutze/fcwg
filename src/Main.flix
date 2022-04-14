@@ -6,9 +6,10 @@ use Version.version;
 
 use Wrapped/Class.forNameString;
 use Wrapped/Exception.getMessage;
+use Wrapped/System.exit;
 
 // The main entry point.
-def main(): Int32 & Impure =
+def main(): Unit & Impure =
     use Result.flatMap;
     let args = Environment.getArgs();
     match parse(args) {
@@ -18,23 +19,26 @@ def main(): Int32 & Impure =
                 visitClass(options, clazz)
             } {
                 case Ok(ns) =>
-                    println(ns);
-                    0
+                    println(ns)
                 case Err(err) =>
                     System/StdErr.println(getMessage(err));
-                    1
+                    exitProcessError()
             }
         case Success(Command.GetVersion) =>
-            println(version());
-            0
+            println(version())
         case Success(Command.GetHelp) =>
-            print(usage());
-            0
+            print(usage())
         case Success(_) =>
             System/StdErr.println("Unsupported operation.");
-            1
+            exitUnsupported()
         case Failure(errs) =>
             errs |> Nec.foreach(System/StdErr.print);
             System/StdErr.print(usage());
-            2
+            exitParseError()
     }
+
+def exitProcessError(): Unit & Impure = exit(1)
+
+def exitParseError(): Unit & Impure = exit(2)
+
+def exitUnsupported(): Unit & Impure = exit(3)

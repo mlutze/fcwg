@@ -9,3 +9,4 @@ java -jar fcwg.jar -pprsn Wrapped/Exception java.lang.Exception > src/Wrapped/Ex
 java -jar fcwg.jar -pprn Wrapped/Field java.lang.reflect.Field > src/Wrapped/Field.flix
 java -jar fcwg.jar -pprn Wrapped/Modifier java.lang.reflect.Modifier > src/Wrapped/Modifier.flix
 java -jar fcwg.jar -pprn Wrapped/Method java.lang.reflect.Method > src/Wrapped/Method.flix
+java -jar fcwg.jar -prn Wrapped/System java.lang.System > src/Wrapped/System.flix

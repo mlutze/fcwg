@@ -2,7 +2,7 @@ namespace Version {
     pub opaque type SemanticVersion with Eq = (Int32, Int32, Int32)
 
     /// Returns the fcwg version.
-    pub def version(): SemanticVersion = SemanticVersion(0, 0, 5)
+    pub def version(): SemanticVersion = SemanticVersion(0, 0, 6)
 
     instance ToString[SemanticVersion] {
         pub def toString(x: SemanticVersion): String =
