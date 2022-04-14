@@ -7,9 +7,11 @@
 ### v0.0.3
    Flix v0.27.0 update: Uses Nec rather than Nel in Validation.
 
-
 ### v0.0.4
    Flix v0.27.0 update: Avoids generating code with Flix keywords as identifiers.
 
 ### v0.0.5
    Adds support for constructors.
+
+### v0.0.6
+   Flix v0.28.0 update: Changes the signature of main.
