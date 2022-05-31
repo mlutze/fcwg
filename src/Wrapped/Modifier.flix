@@ -173,12 +173,6 @@ namespace Wrapped/Modifier {
     }
     
     
-    pub def newModifier(): ##java.lang.reflect.Modifier & Pure = {
-        import new java.lang.reflect.Modifier(): ##java.lang.reflect.Modifier & Pure as newModifier;
-        newModifier()
-    }
-    
-    
     pub def parameterModifiers(): Int32 & Pure = {
         import static java.lang.reflect.Modifier.parameterModifiers(): Int32 & Pure as parameterModifiers;
         parameterModifiers()

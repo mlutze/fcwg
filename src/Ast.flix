@@ -1,8 +1,8 @@
 namespace Ast {
     ///  Def(name, params, return type, effect, impl)
-    pub opaque type Def with Eq, Order = (String, List[(String, Type_)], Type_, Effect, Impl)
+    pub enum Def(String, List[(String, Type_)], Type_, Effect, Impl) with Eq, Order
 
-    pub opaque type Impl with Eq, Order = (Import, Body)
+    pub enum Impl(Import, Body) with Eq, Order 
 
     pub enum Import with Eq, Order {
 
@@ -35,10 +35,10 @@ namespace Ast {
     }
 
     // Call(name, params)
-    pub opaque type Call with Eq, Order = (String, List[Arg])
+    pub enum Call(String, List[Arg]) with Eq, Order
 
     // Namespace(name, defs)
-    pub opaque type Namespace with Eq, Order = (String, List[Def])
+    pub enum Namespace(String, List[Def]) with Eq, Order
 
     pub enum Type_ with Eq, Order {
         case Int8_
