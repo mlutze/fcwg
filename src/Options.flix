@@ -41,14 +41,14 @@ namespace Options {
         case SuperAll
     }
 
-    pub opaque type Options = {
+    pub enum Options({
         generic :: Bool,
         namespace_ :: Option[String],
         optionLevel :: OptionLevel,
         pureLevel :: PureLevel,
         resultLevel :: ResultLevel,
         superLevel :: SuperLevel
-    }
+    })
 
     instance Eq[Options] {
         pub def eq(x0: Options, y0: Options): Bool =

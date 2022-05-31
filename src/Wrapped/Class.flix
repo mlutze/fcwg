@@ -375,9 +375,21 @@ namespace Wrapped/Class {
     }
     
     
+    pub def getPermittedSubclasses(x0: ##java.lang.Class): Array[##java.lang.Class] & Pure = {
+        import java.lang.Class.getPermittedSubclasses(): Array[##java.lang.Class] & Pure as getPermittedSubclasses;
+        getPermittedSubclasses(x0)
+    }
+    
+    
     pub def getProtectionDomain(x0: ##java.lang.Class): ##java.security.ProtectionDomain & Pure = {
         import java.lang.Class.getProtectionDomain(): ##java.security.ProtectionDomain & Pure as getProtectionDomain;
         getProtectionDomain(x0)
+    }
+    
+    
+    pub def getRecordComponents(x0: ##java.lang.Class): Array[##java.lang.reflect.RecordComponent] & Pure = {
+        import java.lang.Class.getRecordComponents(): Array[##java.lang.reflect.RecordComponent] & Pure as getRecordComponents;
+        getRecordComponents(x0)
     }
     
     
@@ -459,6 +471,12 @@ namespace Wrapped/Class {
     }
     
     
+    pub def isHidden(x0: ##java.lang.Class): Bool & Pure = {
+        import java.lang.Class.isHidden(): Bool & Pure as isHidden;
+        isHidden(x0)
+    }
+    
+    
     pub def isInstance(x0: ##java.lang.Class, x1: ##java.lang.Object): Bool & Pure = {
         import java.lang.Class.isInstance(##java.lang.Object): Bool & Pure as isInstance;
         isInstance(x0, x1)
@@ -492,6 +510,18 @@ namespace Wrapped/Class {
     pub def isPrimitive(x0: ##java.lang.Class): Bool & Pure = {
         import java.lang.Class.isPrimitive(): Bool & Pure as isPrimitive;
         isPrimitive(x0)
+    }
+    
+    
+    pub def isRecord(x0: ##java.lang.Class): Bool & Pure = {
+        import java.lang.Class.isRecord(): Bool & Pure as isRecord;
+        isRecord(x0)
+    }
+    
+    
+    pub def isSealed(x0: ##java.lang.Class): Bool & Pure = {
+        import java.lang.Class.isSealed(): Bool & Pure as isSealed;
+        isSealed(x0)
     }
     
     

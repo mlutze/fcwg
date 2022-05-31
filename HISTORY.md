@@ -15,3 +15,6 @@
 
 ### v0.0.6
    Flix v0.28.0 update: Changes the signature of main.
+
+### v0.0.7
+   Flix v0.29.0 update: Removes uses of `opaque type`.
