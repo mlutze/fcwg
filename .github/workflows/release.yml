@@ -9,7 +9,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v2.5.0
         with:
-          java-version: 13
+          java-version: 17
           distribution: zulu
       - run: |
           today=$(date -d today +%Y-%m-%d)
