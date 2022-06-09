@@ -177,7 +177,7 @@ namespace Ast {
             case BigInt_ => "BigInt"
             case Unit_ => "Unit"
             case Ref_(name) => "##${name}"
-            case Array_(ct) => "Array[${ct}]"
+            case Array_(ct) => "Array[${ct}, Static]" // TODO use regions properly
             case Result_(t, e) => "Result[${t}, ${e}]"
             case Option_(t) => "Option[${t}]"
         }
