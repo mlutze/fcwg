@@ -27,8 +27,8 @@ namespace Wrapped/Field {
     }
     
     
-    pub def getAnnotationsByType(x0: ##java.lang.reflect.Field, x1: ##java.lang.Class): Array[##java.lang.annotation.Annotation] & Pure = {
-        import java.lang.reflect.Field.getAnnotationsByType(##java.lang.Class): Array[##java.lang.annotation.Annotation] & Pure as getAnnotationsByType;
+    pub def getAnnotationsByType(x0: ##java.lang.reflect.Field, x1: ##java.lang.Class): Array[##java.lang.annotation.Annotation, Static] & Pure = {
+        import java.lang.reflect.Field.getAnnotationsByType(##java.lang.Class): Array[##java.lang.annotation.Annotation, Static] & Pure as getAnnotationsByType;
         getAnnotationsByType(x0, x1)
     }
     
@@ -63,8 +63,8 @@ namespace Wrapped/Field {
     }
     
     
-    pub def getDeclaredAnnotations(x0: ##java.lang.reflect.Field): Array[##java.lang.annotation.Annotation] & Pure = {
-        import java.lang.reflect.Field.getDeclaredAnnotations(): Array[##java.lang.annotation.Annotation] & Pure as getDeclaredAnnotations;
+    pub def getDeclaredAnnotations(x0: ##java.lang.reflect.Field): Array[##java.lang.annotation.Annotation, Static] & Pure = {
+        import java.lang.reflect.Field.getDeclaredAnnotations(): Array[##java.lang.annotation.Annotation, Static] & Pure as getDeclaredAnnotations;
         getDeclaredAnnotations(x0)
     }
     

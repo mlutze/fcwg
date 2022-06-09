@@ -29,14 +29,14 @@ namespace Wrapped/Exception {
     }
     
     
-    pub def getStackTrace(x0: ##java.lang.Exception): Array[##java.lang.StackTraceElement] & Pure = {
-        import java.lang.Throwable.getStackTrace(): Array[##java.lang.StackTraceElement] & Pure as getStackTrace;
+    pub def getStackTrace(x0: ##java.lang.Exception): Array[##java.lang.StackTraceElement, Static] & Pure = {
+        import java.lang.Throwable.getStackTrace(): Array[##java.lang.StackTraceElement, Static] & Pure as getStackTrace;
         getStackTrace(x0 as ##java.lang.Throwable)
     }
     
     
-    pub def getSuppressed(x0: ##java.lang.Exception): Array[##java.lang.Throwable] & Pure = {
-        import java.lang.Throwable.getSuppressed(): Array[##java.lang.Throwable] & Pure as getSuppressed;
+    pub def getSuppressed(x0: ##java.lang.Exception): Array[##java.lang.Throwable, Static] & Pure = {
+        import java.lang.Throwable.getSuppressed(): Array[##java.lang.Throwable, Static] & Pure as getSuppressed;
         getSuppressed(x0 as ##java.lang.Throwable)
     }
     
@@ -89,8 +89,8 @@ namespace Wrapped/Exception {
     }
     
     
-    pub def setStackTrace(x0: ##java.lang.Exception, x1: Array[##java.lang.StackTraceElement]): Unit & Impure = {
-        import java.lang.Throwable.setStackTrace(Array[##java.lang.StackTraceElement]): Unit & Impure as setStackTrace;
+    pub def setStackTrace(x0: ##java.lang.Exception, x1: Array[##java.lang.StackTraceElement, Static]): Unit & Impure = {
+        import java.lang.Throwable.setStackTrace(Array[##java.lang.StackTraceElement, Static]): Unit & Impure as setStackTrace;
         setStackTrace(x0 as ##java.lang.Throwable, x1)
     }
     
