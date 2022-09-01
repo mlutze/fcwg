@@ -1,7 +1,7 @@
 namespace TestVersion {
-    use Version.SemanticVersion;
-    use Version.SemanticVersion.SemanticVersion;
-    use Version.version;
+    use Version.SemanticVersion
+    use Version.SemanticVersion.SemanticVersion
+    use Version.version
 
     @test
     def testToString(): Bool = "${SemanticVersion(1, 2, 3)}" == "v1.2.3"
