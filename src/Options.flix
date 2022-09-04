@@ -1,9 +1,9 @@
 namespace Options {
-    use GetOpt.ArgDescr.{NoArg, ReqArg};
-    use GetOpt.ArgOrder.Permute;
-    use GetOpt.OptionDescr;
-    use GetOpt.getOpt;
-    use GetOpt.usageInfo;
+    use GetOpt.ArgDescr.{NoArg, ReqArg}
+    use GetOpt.ArgOrder.Permute
+    use GetOpt.OptionDescr
+    use GetOpt.getOpt
+    use GetOpt.usageInfo
 
     enum Flag {
         case Generic

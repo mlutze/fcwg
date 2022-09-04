@@ -1,12 +1,12 @@
-use Options.Command;
-use Options.parse;
-use Options.usage;
-use Transform.visitClass;
-use Version.version;
+use Options.Command
+use Options.parse
+use Options.usage
+use Transform.visitClass
+use Version.version
 
-use Wrapped/Class.forNameString;
-use Wrapped/Exception.getMessage;
-use Wrapped/System.exit;
+use Wrapped/Class.forNameString
+use Wrapped/Exception.getMessage
+use Wrapped/System.exit
 
 // The main entry point.
 def main(): Unit & Impure =

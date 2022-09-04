@@ -1,13 +1,13 @@
 namespace TestOptions {
-    use Options.Command;
-    use Options.OptionLevel;
-    use Options.Options.Options;
-    use Options.Options;
-    use Options.PureLevel;
-    use Options.ResultLevel;
-    use Options.SuperLevel;
-    use Options.defaultOptions;
-    use Options.parse;
+    use Options.Command
+    use Options.OptionLevel
+    use Options.Options.Options
+    use Options.Options
+    use Options.PureLevel
+    use Options.ResultLevel
+    use Options.SuperLevel
+    use Options.defaultOptions
+    use Options.parse
 
     @test
     def testParse01(): Bool  = {

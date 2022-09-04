@@ -1,40 +1,40 @@
 namespace TestTransform {
     
-    use Ast.Arg;
-    use Ast.Body;
-    use Ast.Call.Call;
-    use Ast.Call;
-    use Ast.Context;
-    use Ast.Def.Def;
-    use Ast.Def;
-    use Ast.Effect;
-    use Ast.Impl.Impl;
-    use Ast.Impl;
-    use Ast.Import;
-    use Ast.Namespace.Namespace;
-    use Ast.Namespace;
-    use Ast.Type_;
-    use Ast.Wrap;
+    use Ast.Arg
+    use Ast.Body
+    use Ast.Call.Call
+    use Ast.Call
+    use Ast.Context
+    use Ast.Def.Def
+    use Ast.Def
+    use Ast.Effect
+    use Ast.Impl.Impl
+    use Ast.Impl
+    use Ast.Import
+    use Ast.Namespace.Namespace
+    use Ast.Namespace
+    use Ast.Type_
+    use Ast.Wrap
 
-    use Options.OptionLevel;
-    use Options.Options.Options;
-    use Options.Options;
-    use Options.PureLevel;
-    use Options.ResultLevel;
-    use Options.SuperLevel;
-    use Options.defaultOptions;
+    use Options.OptionLevel
+    use Options.Options.Options
+    use Options.Options
+    use Options.PureLevel
+    use Options.ResultLevel
+    use Options.SuperLevel
+    use Options.defaultOptions
 
-    use Result.flatMap;
+    use Result.flatMap
 
-    use Transform.visitClass;
-    use Transform.visitField;
-    use Transform.visitMethod;
-    use Transform.visitType;
+    use Transform.visitClass
+    use Transform.visitField
+    use Transform.visitMethod
+    use Transform.visitType
 
-    use Wrapped/Class.arrayType;
-    use Wrapped/Class.forNameString;
-    use Wrapped/Class.getField;
-    use Wrapped/Class.getMethod;
+    use Wrapped/Class.arrayType
+    use Wrapped/Class.forNameString
+    use Wrapped/Class.getField
+    use Wrapped/Class.getMethod
 
     type alias Class = ##java.lang.Class
     type alias Method = ##java.lang.reflect.Method
