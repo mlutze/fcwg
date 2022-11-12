@@ -21,3 +21,6 @@
 
 ### v0.0.8
    Flix v0.29.0 update: Uses `UnscopedArray` in place of `Array`
+
+### v0.0.9
+   Flix v0.34.0 update: Uses `=` in record types.

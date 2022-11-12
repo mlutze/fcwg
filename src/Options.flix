@@ -42,12 +42,12 @@ namespace Options {
     }
 
     pub enum Options({
-        generic :: Bool,
-        namespace_ :: Option[String],
-        optionLevel :: OptionLevel,
-        pureLevel :: PureLevel,
-        resultLevel :: ResultLevel,
-        superLevel :: SuperLevel
+        generic = Bool,
+        namespace_ = Option[String],
+        optionLevel = OptionLevel,
+        pureLevel = PureLevel,
+        resultLevel = ResultLevel,
+        superLevel = SuperLevel
     })
 
     instance Eq[Options] {
