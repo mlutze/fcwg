@@ -177,7 +177,7 @@ namespace Transform {
     }
 
     /// Creates the return type for the function.
-    def mkOuterReturnType(doResult: { doResult :: Bool }, doOption: { doOption :: Bool }, importReturnType: Type_): Type_ = {
+    def mkOuterReturnType(doResult: { doResult = Bool }, doOption: { doOption = Bool }, importReturnType: Type_): Type_ = {
         match (doResult.doResult, doOption.doOption) {
             case (false, false) => importReturnType
             case (true, false) => Type_.Result_(importReturnType, Type_.Ref_("java.lang.Exception"))
