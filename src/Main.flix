@@ -32,7 +32,7 @@ def main(): Unit & Impure =
             System/StdErr.println("Unsupported operation.");
             exitUnsupported()
         case Failure(errs) =>
-            errs |> Nec.foreach(System/StdErr.print);
+            errs |> Nec.forEach(System/StdErr.print);
             System/StdErr.print(usage());
             exitParseError()
     }
