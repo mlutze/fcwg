@@ -24,3 +24,6 @@
 
 ### v0.0.9
    Flix v0.34.0 update: Uses `=` in record types.
+
+### v0.0.10
+   Flix v0.34.0 update: Uses `forEach` instead of `foreach`.
