@@ -63,7 +63,7 @@ namespace TestTransform {
     @test
     def testVisitMethod(): Bool = {
         let string = forNameString("java.lang.String") |> unsafeGet;
-        let method = getMethod(string, "concat", [string] as & Pure) |> unsafeGet;
+        let method = getMethod(string, "concat", unsafe_cast [string] as \ {}) |> unsafeGet;
         let imp = Import.Method(Context.Instance, "java.lang.String.concat", Type_.String_ :: Nil, Type_.String_, Effect.Impure_, "concat");
         let call = Call("concat", mkArgs("x0" :: "x1" :: Nil));
         let wrap = Wrap.NoWrap(call);
@@ -76,7 +76,7 @@ namespace TestTransform {
     def testVisitMethodExceptionNoResult(): Bool = {
         let clazz = forNameString("java.lang.Class") |> unsafeGet;
         let string = forNameString("java.lang.String") |> unsafeGet;
-        let method = getMethod(clazz, "forName", [string] as & Pure) |> unsafeGet;
+        let method = getMethod(clazz, "forName", unsafe_cast [string] as \ {}) |> unsafeGet;
         let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Type_.Ref_("java.lang.Class"), Effect.Impure_, "forName");
         let call = Call("forName", mkArgs("x0" :: Nil));
         let wrap = Wrap.NoWrap(call);
@@ -89,7 +89,7 @@ namespace TestTransform {
     def testVisitMethodException(): Bool = {
         let clazz = forNameString("java.lang.Class") |> unsafeGet;
         let string = forNameString("java.lang.String") |> unsafeGet;
-        let method = getMethod(clazz, "forName", [string] as & Pure) |> unsafeGet;
+        let method = getMethod(clazz, "forName", unsafe_cast [string] as \ {}) |> unsafeGet;
         let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Type_.Ref_("java.lang.Class"), Effect.Impure_, "forName");
         let call = Call("forName", mkArgs("x0" :: Nil));
         let wrap = Wrap.NoWrap(call);
@@ -104,7 +104,7 @@ namespace TestTransform {
     def testVisitMethodOptionResult(): Bool = {
         let clazz = forNameString("java.lang.Class") |> unsafeGet;
         let string = forNameString("java.lang.String") |> unsafeGet;
-        let method = getMethod(clazz, "forName", [string] as & Pure) |> unsafeGet;
+        let method = getMethod(clazz, "forName", unsafe_cast [string] as \ {}) |> unsafeGet;
         let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Type_.Ref_("java.lang.Class"), Effect.Impure_, "forName");
         let call = Call("forName", mkArgs("x0" :: Nil));
         let wrap = Wrap.WrapOption(call);
@@ -118,7 +118,7 @@ namespace TestTransform {
     @test
     def testVisitMethodUnit(): Bool = {
         let throwable = forNameString("java.lang.Throwable") |> unsafeGet;
-        let method = getMethod(throwable, "printStackTrace", [] as & Pure) |> unsafeGet;
+        let method = getMethod(throwable, "printStackTrace", unsafe_cast [] as \ {}) |> unsafeGet;
         let imp = Import.Method(Context.Instance, "java.lang.Throwable.printStackTrace", Nil, Type_.Unit_, Effect.Impure_, "printStackTrace");
         let call = Call("printStackTrace", mkArgs("x0" :: Nil));
         let wrap = Wrap.NoWrap(call);
@@ -190,7 +190,7 @@ namespace TestTransform {
     def testVisitMethodCastInherited(): Bool = {
         let throwable = forNameString("java.lang.Throwable") |> unsafeGet;
         let exception = forNameString("java.lang.Exception") |> unsafeGet;
-        let method = getMethod(throwable, "getMessage", [] as & Pure) |> unsafeGet;
+        let method = getMethod(throwable, "getMessage", unsafe_cast [] as \ {}) |> unsafeGet;
         let imp = Import.Method(Context.Instance, "java.lang.Throwable.getMessage", Nil, Type_.String_, Effect.Impure_, "getMessage");
         let call = Call("getMessage", Arg.Cast("x0", Type_.Ref_("java.lang.Throwable")) :: Nil);
         let wrap = Wrap.NoWrap(call);
@@ -207,7 +207,7 @@ namespace TestTransform {
     def testVisitMethodAvoidKeywords(): Bool = {
         let field = forNameString("java.lang.reflect.Field") |> unsafeGet;
         let object = forNameString("java.lang.Object") |> unsafeGet;
-        let method = getMethod(field, "set", [object, object] as & Pure) |> unsafeGet;
+        let method = getMethod(field, "set", unsafe_cast [object, object] as \ {}) |> unsafeGet;
         let imp = Import.Method(Context.Instance, "java.lang.reflect.Field.set", Type_.Ref_("java.lang.Object") :: Type_.Ref_("java.lang.Object") :: Nil, Type_.Unit_, Effect.Impure_, "set_");
         let call = Call("set_", mkArgs("x0" :: "x1" :: "x2" :: Nil));
         let wrap = Wrap.NoWrap(call);
