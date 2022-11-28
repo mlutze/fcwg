@@ -27,3 +27,6 @@
 
 ### v0.0.10
    Flix v0.34.0 update: Uses `forEach` instead of `foreach`.
+
+### v0.0.11
+   Flix v0.35.0 update: Uses `unsafe_cast e as t` instead of `e as t`
