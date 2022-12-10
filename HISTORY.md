@@ -30,3 +30,6 @@
 
 ### v0.0.11
    Flix v0.35.0 update: Uses `unsafe_cast e as t` instead of `e as t`
+
+### v0.0.12
+   Flix v0.35.0 update: Uses `unsafe_cast e as _ \ t` instead of `unsafe_cast e as \ t`
