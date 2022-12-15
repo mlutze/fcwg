@@ -33,3 +33,6 @@
 
 ### v0.0.12
    Flix v0.35.0 update: Uses `unsafe_cast e as _ \ t` instead of `unsafe_cast e as \ t`
+
+### v0.0.13
+   Flix v0.35.0 update: Uses `println` instead of `print`
