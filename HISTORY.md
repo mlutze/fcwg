@@ -36,3 +36,6 @@
 
 ### v0.0.13
    Flix v0.35.0 update: Uses `println` instead of `print`
+
+### v0.0.14
+   Flix v0.35.0 update: Uses `println` instead of `print`
