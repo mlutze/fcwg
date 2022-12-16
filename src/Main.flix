@@ -27,7 +27,7 @@ def main(): Unit & Impure =
         case Success(Command.GetVersion) =>
             println(version())
         case Success(Command.GetHelp) =>
-            print(usage())
+            println(usage())
         case Success(_) =>
             System/StdErr.println("Unsupported operation.");
             exitUnsupported()
