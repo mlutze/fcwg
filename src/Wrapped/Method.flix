@@ -107,7 +107,7 @@ namespace Wrapped/Method {
     }
     
     
-    pub def invoke(x0: ##java.lang.reflect.Method, x1: ##java.lang.Object, x2: Array[##java.lang.Object, Static]): Result[##java.lang.Object, ##java.lang.Exception] & Pure = {
+    pub def invoke(x0: ##java.lang.reflect.Method, x1: ##java.lang.Object, x2: Array[##java.lang.Object, Static]): Result[##java.lang.Exception, ##java.lang.Object] & Pure = {
         import java.lang.reflect.Method.invoke(##java.lang.Object, Array[##java.lang.Object, Static]): ##java.lang.Object & Pure as invoke;
         try {
             Ok(invoke(x0, x1, x2))

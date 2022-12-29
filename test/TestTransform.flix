@@ -41,7 +41,7 @@ namespace TestTransform {
 
     def mkArgs(args: List[String]): List[Arg] = List.map(Arg.NoCast, args)
 
-    def unsafeGet(r: Result[a, _]): a = {
+    def unsafeGet(r: Result[_, a]): a = {
         match r {
             case Ok(x) => x
             case Err(_) => bug!("unexpected error")
@@ -97,7 +97,7 @@ namespace TestTransform {
         let impl = Impl(imp, body);
         let Options(opts) = defaultOptions();
         let o = Options({ resultLevel = ResultLevel.ResultChecked | opts });
-        visitMethod(o, clazz, method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Result_(Type_.Ref_("java.lang.Class"), Type_.Ref_("java.lang.Exception")), Effect.Impure_, impl)
+        visitMethod(o, clazz, method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Result_(Type_.Ref_("java.lang.Exception"), Type_.Ref_("java.lang.Class")), Effect.Impure_, impl)
     }
 
     @test

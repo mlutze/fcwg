@@ -47,7 +47,7 @@ namespace Wrapped/Class {
     }
     
     
-    pub def forNameString(x0: String): Result[##java.lang.Class, ##java.lang.Exception] & Pure = {
+    pub def forNameString(x0: String): Result[##java.lang.Exception, ##java.lang.Class] & Pure = {
         import static java.lang.Class.forName(String): ##java.lang.Class & Pure as forName;
         try {
             Ok(forName(x0))
@@ -57,7 +57,7 @@ namespace Wrapped/Class {
     }
     
     
-    pub def forNameStringBoolClassLoader(x0: String, x1: Bool, x2: ##java.lang.ClassLoader): Result[##java.lang.Class, ##java.lang.Exception] & Pure = {
+    pub def forNameStringBoolClassLoader(x0: String, x1: Bool, x2: ##java.lang.ClassLoader): Result[##java.lang.Exception, ##java.lang.Class] & Pure = {
         import static java.lang.Class.forName(String, Bool, ##java.lang.ClassLoader): ##java.lang.Class & Pure as forName;
         try {
             Ok(forName(x0, x1, x2))
@@ -121,7 +121,7 @@ namespace Wrapped/Class {
     }
     
     
-    pub def getConstructor(x0: ##java.lang.Class, x1: Array[##java.lang.Class, Static]): Result[##java.lang.reflect.Constructor, ##java.lang.Exception] & Pure = {
+    pub def getConstructor(x0: ##java.lang.Class, x1: Array[##java.lang.Class, Static]): Result[##java.lang.Exception, ##java.lang.reflect.Constructor] & Pure = {
         import java.lang.Class.getConstructor(Array[##java.lang.Class, Static]): ##java.lang.reflect.Constructor & Pure as getConstructor;
         try {
             Ok(getConstructor(x0, x1))
@@ -131,7 +131,7 @@ namespace Wrapped/Class {
     }
     
     
-    pub def getConstructors(x0: ##java.lang.Class): Result[Array[##java.lang.reflect.Constructor, Static], ##java.lang.Exception] & Pure = {
+    pub def getConstructors(x0: ##java.lang.Class): Result[##java.lang.Exception, Array[##java.lang.reflect.Constructor, Static]] & Pure = {
         import java.lang.Class.getConstructors(): Array[##java.lang.reflect.Constructor, Static] & Pure as getConstructors;
         try {
             Ok(getConstructors(x0))
@@ -159,7 +159,7 @@ namespace Wrapped/Class {
     }
     
     
-    pub def getDeclaredClasses(x0: ##java.lang.Class): Result[Array[##java.lang.Class, Static], ##java.lang.Exception] & Pure = {
+    pub def getDeclaredClasses(x0: ##java.lang.Class): Result[##java.lang.Exception, Array[##java.lang.Class, Static]] & Pure = {
         import java.lang.Class.getDeclaredClasses(): Array[##java.lang.Class, Static] & Pure as getDeclaredClasses;
         try {
             Ok(getDeclaredClasses(x0))
@@ -169,7 +169,7 @@ namespace Wrapped/Class {
     }
     
     
-    pub def getDeclaredConstructor(x0: ##java.lang.Class, x1: Array[##java.lang.Class, Static]): Result[##java.lang.reflect.Constructor, ##java.lang.Exception] & Pure = {
+    pub def getDeclaredConstructor(x0: ##java.lang.Class, x1: Array[##java.lang.Class, Static]): Result[##java.lang.Exception, ##java.lang.reflect.Constructor] & Pure = {
         import java.lang.Class.getDeclaredConstructor(Array[##java.lang.Class, Static]): ##java.lang.reflect.Constructor & Pure as getDeclaredConstructor;
         try {
             Ok(getDeclaredConstructor(x0, x1))
@@ -179,7 +179,7 @@ namespace Wrapped/Class {
     }
     
     
-    pub def getDeclaredConstructors(x0: ##java.lang.Class): Result[Array[##java.lang.reflect.Constructor, Static], ##java.lang.Exception] & Pure = {
+    pub def getDeclaredConstructors(x0: ##java.lang.Class): Result[##java.lang.Exception, Array[##java.lang.reflect.Constructor, Static]] & Pure = {
         import java.lang.Class.getDeclaredConstructors(): Array[##java.lang.reflect.Constructor, Static] & Pure as getDeclaredConstructors;
         try {
             Ok(getDeclaredConstructors(x0))
@@ -189,7 +189,7 @@ namespace Wrapped/Class {
     }
     
     
-    pub def getDeclaredField(x0: ##java.lang.Class, x1: String): Result[##java.lang.reflect.Field, ##java.lang.Exception] & Pure = {
+    pub def getDeclaredField(x0: ##java.lang.Class, x1: String): Result[##java.lang.Exception, ##java.lang.reflect.Field] & Pure = {
         import java.lang.Class.getDeclaredField(String): ##java.lang.reflect.Field & Pure as getDeclaredField;
         try {
             Ok(getDeclaredField(x0, x1))
@@ -199,7 +199,7 @@ namespace Wrapped/Class {
     }
     
     
-    pub def getDeclaredFields(x0: ##java.lang.Class): Result[Array[##java.lang.reflect.Field, Static], ##java.lang.Exception] & Pure = {
+    pub def getDeclaredFields(x0: ##java.lang.Class): Result[##java.lang.Exception, Array[##java.lang.reflect.Field, Static]] & Pure = {
         import java.lang.Class.getDeclaredFields(): Array[##java.lang.reflect.Field, Static] & Pure as getDeclaredFields;
         try {
             Ok(getDeclaredFields(x0))
@@ -209,7 +209,7 @@ namespace Wrapped/Class {
     }
     
     
-    pub def getDeclaredMethod(x0: ##java.lang.Class, x1: String, x2: Array[##java.lang.Class, Static]): Result[##java.lang.reflect.Method, ##java.lang.Exception] & Pure = {
+    pub def getDeclaredMethod(x0: ##java.lang.Class, x1: String, x2: Array[##java.lang.Class, Static]): Result[##java.lang.Exception, ##java.lang.reflect.Method] & Pure = {
         import java.lang.Class.getDeclaredMethod(String, Array[##java.lang.Class, Static]): ##java.lang.reflect.Method & Pure as getDeclaredMethod;
         try {
             Ok(getDeclaredMethod(x0, x1, x2))
@@ -219,7 +219,7 @@ namespace Wrapped/Class {
     }
     
     
-    pub def getDeclaredMethods(x0: ##java.lang.Class): Result[Array[##java.lang.reflect.Method, Static], ##java.lang.Exception] & Pure = {
+    pub def getDeclaredMethods(x0: ##java.lang.Class): Result[##java.lang.Exception, Array[##java.lang.reflect.Method, Static]] & Pure = {
         import java.lang.Class.getDeclaredMethods(): Array[##java.lang.reflect.Method, Static] & Pure as getDeclaredMethods;
         try {
             Ok(getDeclaredMethods(x0))
@@ -229,7 +229,7 @@ namespace Wrapped/Class {
     }
     
     
-    pub def getDeclaringClass(x0: ##java.lang.Class): Result[##java.lang.Class, ##java.lang.Exception] & Pure = {
+    pub def getDeclaringClass(x0: ##java.lang.Class): Result[##java.lang.Exception, ##java.lang.Class] & Pure = {
         import java.lang.Class.getDeclaringClass(): ##java.lang.Class & Pure as getDeclaringClass;
         try {
             Ok(getDeclaringClass(x0))
@@ -239,7 +239,7 @@ namespace Wrapped/Class {
     }
     
     
-    pub def getEnclosingClass(x0: ##java.lang.Class): Result[##java.lang.Class, ##java.lang.Exception] & Pure = {
+    pub def getEnclosingClass(x0: ##java.lang.Class): Result[##java.lang.Exception, ##java.lang.Class] & Pure = {
         import java.lang.Class.getEnclosingClass(): ##java.lang.Class & Pure as getEnclosingClass;
         try {
             Ok(getEnclosingClass(x0))
@@ -249,7 +249,7 @@ namespace Wrapped/Class {
     }
     
     
-    pub def getEnclosingConstructor(x0: ##java.lang.Class): Result[##java.lang.reflect.Constructor, ##java.lang.Exception] & Pure = {
+    pub def getEnclosingConstructor(x0: ##java.lang.Class): Result[##java.lang.Exception, ##java.lang.reflect.Constructor] & Pure = {
         import java.lang.Class.getEnclosingConstructor(): ##java.lang.reflect.Constructor & Pure as getEnclosingConstructor;
         try {
             Ok(getEnclosingConstructor(x0))
@@ -259,7 +259,7 @@ namespace Wrapped/Class {
     }
     
     
-    pub def getEnclosingMethod(x0: ##java.lang.Class): Result[##java.lang.reflect.Method, ##java.lang.Exception] & Pure = {
+    pub def getEnclosingMethod(x0: ##java.lang.Class): Result[##java.lang.Exception, ##java.lang.reflect.Method] & Pure = {
         import java.lang.Class.getEnclosingMethod(): ##java.lang.reflect.Method & Pure as getEnclosingMethod;
         try {
             Ok(getEnclosingMethod(x0))
@@ -275,7 +275,7 @@ namespace Wrapped/Class {
     }
     
     
-    pub def getField(x0: ##java.lang.Class, x1: String): Result[##java.lang.reflect.Field, ##java.lang.Exception] & Pure = {
+    pub def getField(x0: ##java.lang.Class, x1: String): Result[##java.lang.Exception, ##java.lang.reflect.Field] & Pure = {
         import java.lang.Class.getField(String): ##java.lang.reflect.Field & Pure as getField;
         try {
             Ok(getField(x0, x1))
@@ -285,7 +285,7 @@ namespace Wrapped/Class {
     }
     
     
-    pub def getFields(x0: ##java.lang.Class): Result[Array[##java.lang.reflect.Field, Static], ##java.lang.Exception] & Pure = {
+    pub def getFields(x0: ##java.lang.Class): Result[##java.lang.Exception, Array[##java.lang.reflect.Field, Static]] & Pure = {
         import java.lang.Class.getFields(): Array[##java.lang.reflect.Field, Static] & Pure as getFields;
         try {
             Ok(getFields(x0))
@@ -313,7 +313,7 @@ namespace Wrapped/Class {
     }
     
     
-    pub def getMethod(x0: ##java.lang.Class, x1: String, x2: Array[##java.lang.Class, Static]): Result[##java.lang.reflect.Method, ##java.lang.Exception] & Pure = {
+    pub def getMethod(x0: ##java.lang.Class, x1: String, x2: Array[##java.lang.Class, Static]): Result[##java.lang.Exception, ##java.lang.reflect.Method] & Pure = {
         import java.lang.Class.getMethod(String, Array[##java.lang.Class, Static]): ##java.lang.reflect.Method & Pure as getMethod;
         try {
             Ok(getMethod(x0, x1, x2))
@@ -323,7 +323,7 @@ namespace Wrapped/Class {
     }
     
     
-    pub def getMethods(x0: ##java.lang.Class): Result[Array[##java.lang.reflect.Method, Static], ##java.lang.Exception] & Pure = {
+    pub def getMethods(x0: ##java.lang.Class): Result[##java.lang.Exception, Array[##java.lang.reflect.Method, Static]] & Pure = {
         import java.lang.Class.getMethods(): Array[##java.lang.reflect.Method, Static] & Pure as getMethods;
         try {
             Ok(getMethods(x0))
@@ -531,7 +531,7 @@ namespace Wrapped/Class {
     }
     
     
-    pub def newInstance(x0: ##java.lang.Class): Result[##java.lang.Object, ##java.lang.Exception] & Pure = {
+    pub def newInstance(x0: ##java.lang.Class): Result[##java.lang.Exception, ##java.lang.Object] & Pure = {
         import java.lang.Class.newInstance(): ##java.lang.Object & Pure as newInstance;
         try {
             Ok(newInstance(x0))

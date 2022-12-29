@@ -93,13 +93,13 @@ namespace Options {
     
     def namespace_(x: String): Option[Flag] = Some(Namespace(x)) // MATT validate namespace
 
-    def flatMap(f: t1 -> Validation[t2, e] & f, v: Validation[t1, e]): Validation[t2, e] & f = match v {
+    def flatMap(f: t1 -> Validation[e, t2] & f, v: Validation[e, t1]): Validation[e, t2] & f = match v {
         case Success(x) => f(x)
         case Failure(e) => Failure(e)
     }
 
     /// Parses the command line arguments
-    pub def parse(args: List[String]): Validation[Command, String] = {
+    pub def parse(args: List[String]): Validation[String, Command] = {
         let* opts = getOpt(Permute, options(), args);
         let command = opts.options |> List.foldLeft(
             (acc, opt0) -> match (acc, opt0) {

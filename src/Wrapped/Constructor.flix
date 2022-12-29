@@ -107,7 +107,7 @@ namespace Wrapped/Constructor {
     }
     
     
-    pub def newInstance(x0: ##java.lang.reflect.Constructor, x1: Array[##java.lang.Object, Static]): Result[##java.lang.Object, ##java.lang.Exception] & Pure = {
+    pub def newInstance(x0: ##java.lang.reflect.Constructor, x1: Array[##java.lang.Object, Static]): Result[##java.lang.Exception, ##java.lang.Object] & Pure = {
         import java.lang.reflect.Constructor.newInstance(Array[##java.lang.Object, Static]): ##java.lang.Object & Pure as newInstance;
         try {
             Ok(newInstance(x0, x1))
