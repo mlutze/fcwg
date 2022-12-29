@@ -107,7 +107,7 @@ namespace Wrapped/System {
     }
     
     
-    pub def inheritedChannel(): Result[##java.nio.channels.Channel, ##java.lang.Exception] & Impure = {
+    pub def inheritedChannel(): Result[##java.lang.Exception, ##java.nio.channels.Channel] & Impure = {
         import static java.lang.System.inheritedChannel(): ##java.nio.channels.Channel & Impure as inheritedChannel;
         try {
             Ok(inheritedChannel())
