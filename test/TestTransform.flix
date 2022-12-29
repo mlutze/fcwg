@@ -41,7 +41,7 @@ namespace TestTransform {
 
     def mkArgs(args: List[String]): List[Arg] = List.map(Arg.NoCast, args)
 
-    def unsafeGet(r: Result[a, _]): a = {
+    def unsafeGet(r: Result[_, a]): a = {
         match r {
             case Ok(x) => x
             case Err(_) => bug!("unexpected error")

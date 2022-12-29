@@ -57,7 +57,7 @@ namespace Transform {
     type alias Exception = ##java.lang.Exception
 
     /// Transforms the Java class into a Flix namespace.
-    pub def visitClass(o: Options, c: Class): Result[Namespace, Exception] = {
+    pub def visitClass(o: Options, c: Class): Result[Exception, Namespace] = {
         use Result.flatMap;
         let* methods = getMethodsFor(o, c);
         let defs1 = methods
@@ -99,7 +99,7 @@ namespace Transform {
     }
 
     /// Gets the methods relevant to the class.
-    def getMethodsFor(o: Options, c: Class): Result[List[Method], Exception] = {
+    def getMethodsFor(o: Options, c: Class): Result[Exception, List[Method]] = {
         use Result.flatMap;
         let Options(opts) = o;
         let clazzName = getClassName(c);
@@ -112,7 +112,7 @@ namespace Transform {
     }
 
     /// Gets the fields relevant to the class.
-    def getFieldsFor(o: Options, c: Class): Result[List[Field], Exception] = {
+    def getFieldsFor(o: Options, c: Class): Result[Exception, List[Field]] = {
         use Result.flatMap;
         let Options(opts) = o;
         let clazzName = getClassName(c);
@@ -124,7 +124,7 @@ namespace Transform {
         } as _ \ {} |> Ok
     }
 
-    def getConstructorsFor(_o: Options, c: Class): Result[List[Constructor], Exception] = {
+    def getConstructorsFor(_o: Options, c: Class): Result[Exception, List[Constructor]] = {
         use Result.flatMap;
         let* csts = getConstructors(c);
         unsafe_cast { csts |> Array.toList } as _ \ {} |> Ok
