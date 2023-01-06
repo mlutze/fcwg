@@ -25,7 +25,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           draft: true
-          prerelease: true
           tag_name: ${{ env.fcwg_version }}
           files: |
             fcwg.jar
