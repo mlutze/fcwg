@@ -42,3 +42,6 @@
 
 ### v0.0.15
    Flix v0.35.0 update: Uses subject-last for `Result` type
+
+### v0.0.16
+   No changes; releasing as non-prerelease.
