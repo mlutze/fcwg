@@ -45,3 +45,6 @@
 
 ### v0.0.16
    No changes; releasing as non-prerelease.
+
+### v0.0.17
+   Flix v0.35.0 update: Uses named paramter in `String.sliceRight`

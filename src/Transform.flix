@@ -404,7 +404,7 @@ namespace Transform {
     def getterName(fieldName: String): String = {
         // safe because field names are never empty
         let head = String.charAt(0, fieldName);
-        let tail = String.sliceRight(1, fieldName);
+        let tail = String.sliceRight(start = 1, fieldName);
         "get" + "${Char.toUpperCase(head)}" + tail
     }
 
@@ -412,7 +412,7 @@ namespace Transform {
     def setterName(fieldName: String): String = {
         // safe because field names are never empty
         let head = String.charAt(0, fieldName);
-        let tail = String.sliceRight(1, fieldName);
+        let tail = String.sliceRight(start = 1, fieldName);
         "set" + "${Char.toUpperCase(head)}" + tail
     }
 
@@ -420,7 +420,7 @@ namespace Transform {
     def constructorName(className: String): String = {
         // safe because class names are never empty
         let head = String.charAt(0, className);
-        let tail = String.sliceRight(1, className);
+        let tail = String.sliceRight(start = 1, className);
         "new" + "${Char.toUpperCase(head)}" + tail
     }
 
