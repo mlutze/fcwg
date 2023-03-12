@@ -48,3 +48,6 @@
 
 ### v0.0.17
    Flix v0.35.0 update: Uses named paramter in `String.sliceRight`
+
+### v0.0.18
+   No changes; adding `flix.toml`
