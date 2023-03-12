@@ -1,0 +1,4 @@
+[package]
+name    = "fcwg"
+version = "0.0.18"
+flix    = "0.34.0"
