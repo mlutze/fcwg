@@ -3,6 +3,7 @@ use Options.parse
 use Options.usage
 use Transform.visitClass
 use Version.version
+use Validation.{Success, Failure}
 
 use Wrapped/Class.forNameString
 use Wrapped/Exception.getMessage

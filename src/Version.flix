@@ -1,8 +1,10 @@
 namespace Version {
+    use SemanticVersion.SemanticVersion
+
     pub enum SemanticVersion(Int32, Int32, Int32) with Eq
 
     /// Returns the fcwg version.
-    pub def version(): SemanticVersion = SemanticVersion(0, 0, 18)
+    pub def version(): SemanticVersion = SemanticVersion(0, 0, 19)
 
     instance ToString[SemanticVersion] {
         pub def toString(x: SemanticVersion): String =

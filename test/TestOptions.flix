@@ -8,6 +8,7 @@ namespace TestOptions {
     use Options.SuperLevel
     use Options.defaultOptions
     use Options.parse
+    use Validation.{Success, Failure}
 
     @test
     def testParse01(): Bool  = {
