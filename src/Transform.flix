@@ -104,11 +104,11 @@ namespace Transform {
         let Options(opts) = o;
         let clazzName = getClassName(c);
         let* methods = getMethods(c);
-        unsafe_cast match opts.superLevel {
+        unchecked_cast(match opts.superLevel {
             case SuperLevel.SuperNone => methods |> Array.toList |> List.filter(m -> getClassName(getMethodDeclaringClass(m)) == clazzName)
             case SuperLevel.SuperButObject => methods |> Array.toList |> List.filter(m -> getClassName(getMethodDeclaringClass(m)) != "java.lang.Object")
             case SuperLevel.SuperAll => methods |> Array.toList
-        } as _ \ {} |> Ok
+        } as _ \ {}) |> Ok
     }
 
     /// Gets the fields relevant to the class.
@@ -117,17 +117,17 @@ namespace Transform {
         let Options(opts) = o;
         let clazzName = getClassName(c);
         let* fields = getFields(c);
-        unsafe_cast match opts.superLevel {
+        unchecked_cast(match opts.superLevel {
             case SuperLevel.SuperNone => fields |> Array.toList |> List.filter(m -> getClassName(getFieldDeclaringClass(m)) == clazzName)
             case SuperLevel.SuperButObject => fields |> Array.toList |> List.filter(m -> getClassName(getFieldDeclaringClass(m)) != "java.lang.Object")
             case SuperLevel.SuperAll => fields |> Array.toList
-        } as _ \ {} |> Ok
+        } as _ \ {}) |> Ok
     }
 
     def getConstructorsFor(_o: Options, c: Class): Result[Exception, List[Constructor]] = {
         use Result.flatMap;
         let* csts = getConstructors(c);
-        unsafe_cast { csts |> Array.toList } as _ \ {} |> Ok
+        unchecked_cast({ csts |> Array.toList } as _ \ {}) |> Ok
     }
 
     def getMethodContext(m: Method): Context = if (isStaticMethod(m)) Context.Static else Context.Instance
@@ -230,7 +230,7 @@ namespace Transform {
         let importClazzName = getClassName(importClazz);
         let importReturnType = getReturnType(m) |> visitType;
         let context = getMethodContext(m);
-        let importParamTypes = unsafe_cast { getMethodParameterTypes(m) |> Array.toList |> List.map(visitType) } as _ \ {};
+        let importParamTypes = unchecked_cast({ getMethodParameterTypes(m) |> Array.toList |> List.map(visitType) } as _ \ {});
         let eff = mkEffect(o, importReturnType);
         let importName = importClazzName + "." + methodName;
         let import_ = Import.Method(context, importName, importParamTypes, importReturnType, eff, alias_);
@@ -254,7 +254,7 @@ namespace Transform {
         let alias_ = getSimpleName(c) |> constructorName;
 
         // build the import statement
-        let importParamTypes = unsafe_cast { getConstructorParameterTypes(cst) |> Array.toList |> List.map(visitType) } as _ \ {};
+        let importParamTypes = unchecked_cast({ getConstructorParameterTypes(cst) |> Array.toList |> List.map(visitType) } as _ \ {});
         let importReturnType = c |> visitType;
         let eff = mkEffect(o, importReturnType);
         let importName = getClassName(c);

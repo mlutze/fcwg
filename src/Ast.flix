@@ -1,4 +1,16 @@
 namespace Ast {
+    use Arg.{Cast, NoCast}
+    use Body.{NoTry, TryCatch}
+    use Call.Call
+    use Def.Def;
+    use Effect.{Pure_, Impure_}
+    use Impl.Impl;
+    use Import.{Constructor, Method, GetField, SetField}
+    use Namespace.Namespace;
+    use Type_.{Int8_, Int16_, Int32_, Int64_, Float32_, Float64_, Bool_, Char_, String_, BigInt_, Unit_, Ref_, Array_, Result_, Option_}
+    use Wrap.{NoWrap, WrapOption}
+    use Context.{Instance, Static}
+
     ///  Def(name, params, return type, effect, impl)
     pub enum Def(String, List[(String, Type_)], Type_, Effect, Impl) with Eq, Order
 

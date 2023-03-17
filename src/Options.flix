@@ -4,6 +4,15 @@ namespace Options {
     use GetOpt.OptionDescr
     use GetOpt.getOpt
     use GetOpt.usageInfo
+    use Validation.{Success, Failure}
+
+    use Command.{GetHelp, GetVersion, GoInteractive, Go}
+    use Flag.{Generic, Help, Interactive, Namespace, Option, Pure_, Result, Super, Version}
+    use OptionLevel.{OptionNone, OptionRef}
+    use Options.Options
+    use PureLevel.{PureNone, PureFinal, PureButUnit, PureAll}
+    use ResultLevel.{ResultNone, ResultChecked, ResultAll}
+    use SuperLevel.{SuperNone, SuperButObject, SuperAll}
 
     enum Flag {
         case Generic
