@@ -152,7 +152,7 @@ namespace Ast {
 
     instance ToString[Arg] {
         pub def toString(x: Arg): String = match x {
-            case Cast(name, tpe) => "unsafe_cast ${name} as ${tpe}"
+            case Cast(name, tpe) => "unchecked_cast(${name} as ${tpe})"
             case NoCast(name) => "${name}"
         }
     }
