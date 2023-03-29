@@ -102,32 +102,35 @@ namespace Options {
     
     def namespace_(x: String): Option[Flag] = Some(Namespace(x)) // MATT validate namespace
 
-    def flatMap(f: t1 -> Validation[e, t2] & f, v: Validation[e, t1]): Validation[e, t2] & f = match v {
-        case Success(x) => f(x)
-        case Failure(e) => Failure(e)
-    }
-
     /// Parses the command line arguments
     pub def parse(args: List[String]): Validation[String, Command] = {
-        let* opts = getOpt(Permute, options(), args);
-        let command = opts.options |> List.foldLeft(
-            (acc, opt0) -> match (acc, opt0) {
-                case (GetHelp, _) => GetHelp
-                case (GetVersion, _) => GetVersion
-                case (_, Help) => GetHelp
-                case (_, Version) => GetVersion
-                case (Go(clazz, opts1), Interactive) => GoInteractive(clazz, opts1)
-                case (GoInteractive(clazz, opts1), Interactive) => GoInteractive(clazz, opts1)
-                case (Go(clazz, opts1), opt) => Go(clazz, addOpt(opt, opts1))
-                case (GoInteractive(clazz, opts1), opt) => GoInteractive(clazz, addOpt(opt, opts1))
-            }
-        )(Go("", defaultOptions()));
-        match (command, opts.nonOptions) {
-            case (GetHelp, _) => Success(GetHelp)
-            case (GetVersion, _) => Success(GetVersion)
-            case (Go(_, opts1), clazz :: Nil) => Success(Go(clazz, opts1))
-            case (GoInteractive(_, opts1), clazz :: Nil) => Success(GoInteractive(clazz, opts1))
-            case _ => Failure(Nec.singleton("Exactly one class must be specified."))
+        let commandOptsVal = forA (
+            opts <- getOpt(Permute, options(), args)
+        ) yield {
+            let command = opts.options |> List.foldLeft(
+                (acc, opt0) -> match (acc, opt0) {
+                    case (GetHelp, _) => GetHelp
+                    case (GetVersion, _) => GetVersion
+                    case (_, Help) => GetHelp
+                    case (_, Version) => GetVersion
+                    case (Go(clazz, opts1), Interactive) => GoInteractive(clazz, opts1)
+                    case (GoInteractive(clazz, opts1), Interactive) => GoInteractive(clazz, opts1)
+                    case (Go(clazz, opts1), opt) => Go(clazz, addOpt(opt, opts1))
+                    case (GoInteractive(clazz, opts1), opt) => GoInteractive(clazz, addOpt(opt, opts1))
+                }
+            )(Go("", defaultOptions()));
+            (command, opts)
+        };
+        match commandOptsVal {
+            case Failure(f) => Failure(f)
+            case Success((command, opts)) =>
+                match (command, opts.nonOptions) {
+                    case (GetHelp, _) => Success(GetHelp)
+                    case (GetVersion, _) => Success(GetVersion)
+                    case (Go(_, opts1), clazz :: Nil) => Success(Go(clazz, opts1))
+                    case (GoInteractive(_, opts1), clazz :: Nil) => Success(GoInteractive(clazz, opts1))
+                    case _ => Failure(Nec.singleton("Exactly one class must be specified."))
+                }
         }
     }
 
