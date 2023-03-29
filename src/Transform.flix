@@ -59,21 +59,27 @@ namespace Transform {
     /// Transforms the Java class into a Flix namespace.
     pub def visitClass(o: Options, c: Class): Result[Exception, Namespace] = {
         use Result.flatMap;
-        let* methods = getMethodsFor(o, c);
-        let defs1 = methods
-            |> List.filter(isBlackMagicMethod >> Bool.not)
-            |> List.map(visitMethod(o, c));
-        let* fields = getFieldsFor(o, c);
-        let defs2 = fields
-            |> List.flatMap(visitField(o, c));
-        let* constructors = getConstructorsFor(o, c);
-        let defs3 = constructors
-            |> List.map(visitConstructor(o, c));
-        let Options(opts) = o;
-        let name = opts.namespace_ |> Option.getWithDefault(getSimpleName(c));
-        let defs = disambiguateDefs(defs1 ::: defs2 ::: defs3)
-            |> List.sort;
-        Namespace(name, defs) |> Ok
+        for (
+            methods <- getMethodsFor(o, c);
+            defs1 <- methods
+                |> List.filter(isBlackMagicMethod >> Bool.not)
+                |> List.map(visitMethod(o, c))
+                |> Ok;
+            fields <- getFieldsFor(o, c);
+            defs2 <- fields
+                |> List.flatMap(visitField(o, c))
+                |> Ok;
+            constructors <- getConstructorsFor(o, c);
+            defs3 <- constructors
+                |> List.map(visitConstructor(o, c))
+                |> Ok
+        ) yield {
+            let Options(opts) = o;
+            let name = opts.namespace_ |> Option.getWithDefault(getSimpleName(c));
+            let defs = disambiguateDefs(defs1 ::: defs2 ::: defs3)
+                |> List.sort;
+            Namespace(name, defs)
+        }
     }
 
     /// Modifies the names of definitions to disambiguate them.
@@ -103,12 +109,15 @@ namespace Transform {
         use Result.flatMap;
         let Options(opts) = o;
         let clazzName = getClassName(c);
-        let* methods = getMethods(c);
-        unchecked_cast(match opts.superLevel {
-            case SuperLevel.SuperNone => methods |> Array.toList |> List.filter(m -> getClassName(getMethodDeclaringClass(m)) == clazzName)
-            case SuperLevel.SuperButObject => methods |> Array.toList |> List.filter(m -> getClassName(getMethodDeclaringClass(m)) != "java.lang.Object")
-            case SuperLevel.SuperAll => methods |> Array.toList
-        } as _ \ {}) |> Ok
+        for (
+            methods <- getMethods(c)
+        ) yield {
+            unchecked_cast(match opts.superLevel {
+                case SuperLevel.SuperNone => methods |> Array.toList |> List.filter(m -> getClassName(getMethodDeclaringClass(m)) == clazzName)
+                case SuperLevel.SuperButObject => methods |> Array.toList |> List.filter(m -> getClassName(getMethodDeclaringClass(m)) != "java.lang.Object")
+                case SuperLevel.SuperAll => methods |> Array.toList
+            } as _ \ {})
+        }
     }
 
     /// Gets the fields relevant to the class.
@@ -116,12 +125,15 @@ namespace Transform {
         use Result.flatMap;
         let Options(opts) = o;
         let clazzName = getClassName(c);
-        let* fields = getFields(c);
-        unchecked_cast(match opts.superLevel {
-            case SuperLevel.SuperNone => fields |> Array.toList |> List.filter(m -> getClassName(getFieldDeclaringClass(m)) == clazzName)
-            case SuperLevel.SuperButObject => fields |> Array.toList |> List.filter(m -> getClassName(getFieldDeclaringClass(m)) != "java.lang.Object")
-            case SuperLevel.SuperAll => fields |> Array.toList
-        } as _ \ {}) |> Ok
+        for (
+            fields <- getFields(c)
+        ) yield {
+            unchecked_cast(match opts.superLevel {
+                case SuperLevel.SuperNone => fields |> Array.toList |> List.filter(m -> getClassName(getFieldDeclaringClass(m)) == clazzName)
+                case SuperLevel.SuperButObject => fields |> Array.toList |> List.filter(m -> getClassName(getFieldDeclaringClass(m)) != "java.lang.Object")
+                case SuperLevel.SuperAll => fields |> Array.toList
+            } as _ \ {})
+        }
     }
 
     def getConstructorsFor(_o: Options, c: Class): Result[Exception, List[Constructor]] = {

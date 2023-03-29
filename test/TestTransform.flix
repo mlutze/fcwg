@@ -161,8 +161,11 @@ namespace TestTransform {
         let Options(opts) = defaultOptions();
         let o = Options({ namespace_ = Some("MyString") | opts });
         {
-            let* Namespace(name, _) = visitClass(o, clazz);
-            Ok(name == "MyString")
+            for (
+                Namespace(name, _) <- visitClass(o, clazz)
+            ) yield {
+                name == "MyString"
+            }
         } |> Result.getWithDefault(false)
     }
 
@@ -170,8 +173,11 @@ namespace TestTransform {
     def testVisitClassIgnoreInherited(): Bool = {
         let clazz = forNameString("java.lang.String") |> unsafeGet;
         {
-            let* Namespace(_, defs) = visitClass(defaultOptions(), clazz);
-            Ok(List.count(match Def(name, _, _, _, _) -> name == "wait", defs) == 0)
+            for (
+                Namespace(_, defs) <- visitClass(defaultOptions(), clazz)
+            ) yield {
+                List.count(match Def(name, _, _, _, _) -> name == "wait", defs) == 0
+            }
         } |> Result.getWithDefault(false)
     }
 
@@ -181,8 +187,11 @@ namespace TestTransform {
         let Options(default) = defaultOptions();
         let opts = Options({ superLevel = SuperLevel.SuperButObject | default });
         {
-            let* Namespace(_, defs) = visitClass(opts, clazz);
-            Ok(List.count(match Def(name, _, _, _, _) -> name == "getMessage", defs) > 0)
+            for (
+                Namespace(_, defs) <- visitClass(opts, clazz)
+            ) yield {
+                List.count(match Def(name, _, _, _, _) -> name == "getMessage", defs) > 0
+            }
         } |> Result.getWithDefault(false)
     }
 

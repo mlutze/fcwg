@@ -16,8 +16,12 @@ def main(): Unit & Impure =
     match parse(args) {
         case Success(Command.Go(name, options)) =>
             match {
-                let* clazz = forNameString(name);
-                visitClass(options, clazz)
+                for (
+                    clazz <- forNameString(name);
+                    res <- visitClass(options, clazz)
+                ) yield {
+                    res
+                }
             } {
                 case Ok(ns) =>
                     println(ns)
