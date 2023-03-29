@@ -138,8 +138,11 @@ namespace Transform {
 
     def getConstructorsFor(_o: Options, c: Class): Result[Exception, List[Constructor]] = {
         use Result.flatMap;
-        let* csts = getConstructors(c);
-        unchecked_cast({ csts |> Array.toList } as _ \ {}) |> Ok
+        for (
+            csts <- getConstructors(c)
+        ) yield {
+            unchecked_cast({ csts |> Array.toList } as _ \ {})
+        }
     }
 
     def getMethodContext(m: Method): Context = if (isStaticMethod(m)) Context.Static else Context.Instance
