@@ -102,11 +102,6 @@ namespace Options {
     
     def namespace_(x: String): Option[Flag] = Some(Namespace(x)) // MATT validate namespace
 
-    def flatMap(f: t1 -> Validation[e, t2] & f, v: Validation[e, t1]): Validation[e, t2] & f = match v {
-        case Success(x) => f(x)
-        case Failure(e) => Failure(e)
-    }
-
     /// Parses the command line arguments
     pub def parse(args: List[String]): Validation[String, Command] = {
         let commandOptsVal = forA (
