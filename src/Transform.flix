@@ -1,4 +1,4 @@
-namespace Transform {
+mod Transform {
 
     use Ast.Arg
     use Ast.Body

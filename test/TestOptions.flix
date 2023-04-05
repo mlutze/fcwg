@@ -1,4 +1,4 @@
-namespace TestOptions {
+mod TestOptions {
     use Options.Command
     use Options.OptionLevel
     use Options.Options.Options

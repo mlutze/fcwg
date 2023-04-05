@@ -1,4 +1,4 @@
-namespace TestTransform {
+mod TestTransform {
     
     use Ast.Arg
     use Ast.Body

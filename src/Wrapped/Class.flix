@@ -1,4 +1,4 @@
-namespace Wrapped/Class {
+mod Wrapped/Class {
     pub def arrayType(x0: ##java.lang.Class): ##java.lang.Class & Pure = {
         import java.lang.Class.arrayType(): ##java.lang.Class & Pure as arrayType;
         arrayType(x0)

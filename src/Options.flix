@@ -1,4 +1,4 @@
-namespace Options {
+mod Options {
     use GetOpt.ArgDescr.{NoArg, ReqArg}
     use GetOpt.ArgOrder.Permute
     use GetOpt.OptionDescr

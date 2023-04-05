@@ -1,4 +1,4 @@
-namespace TestVersion {
+mod TestVersion {
     use Version.SemanticVersion
     use Version.SemanticVersion.SemanticVersion
     use Version.version

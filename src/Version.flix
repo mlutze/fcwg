@@ -1,4 +1,4 @@
-namespace Version {
+mod Version {
     use SemanticVersion.SemanticVersion
 
     pub enum SemanticVersion(Int32, Int32, Int32) with Eq
