@@ -1,4 +1,4 @@
-namespace Ast {
+mod Ast {
     use Arg.{Cast, NoCast}
     use Body.{NoTry, TryCatch}
     use Call.Call
@@ -87,7 +87,7 @@ namespace Ast {
                 |> List.map(ToString.toString)
                 |> String.intercalate("\n\n")
                 |> String.indent(4);
-            "namespace ${name} {\n" +
+            "mod ${name} {\n" +
             "${contents}" +
             "}"
     }
