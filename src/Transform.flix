@@ -23,32 +23,32 @@ mod Transform {
     use Options.ResultLevel
     use Options.SuperLevel
 
-    use Wrapped/Class.getComponentType
-    use Wrapped/Class.getConstructors
-    use Wrapped/Class.getFields
-    use Wrapped/Class.getMethods
-    use Wrapped/Class.getSimpleName
-    use Wrapped/Class.isArray
-    use Wrapped/Class.isPrimitive
-    use Wrapped/Class.{getName => getClassName}
+    use Wrapped.Class.getComponentType
+    use Wrapped.Class.getConstructors
+    use Wrapped.Class.getFields
+    use Wrapped.Class.getMethods
+    use Wrapped.Class.getSimpleName
+    use Wrapped.Class.isArray
+    use Wrapped.Class.isPrimitive
+    use Wrapped.Class.{getName => getClassName}
 
-    use Wrapped/Constructor.{getExceptionTypes => getConstructorExceptionTypes}
-    use Wrapped/Constructor.{getParameterTypes => getConstructorParameterTypes}
+    use Wrapped.Constructor.{getExceptionTypes => getConstructorExceptionTypes}
+    use Wrapped.Constructor.{getParameterTypes => getConstructorParameterTypes}
 
-    use Wrapped/Field.getType
-    use Wrapped/Field.{getDeclaringClass => getFieldDeclaringClass}
-    use Wrapped/Field.{getModifiers => getFieldModifiers}
-    use Wrapped/Field.{getName => getFieldName}
+    use Wrapped.Field.getType
+    use Wrapped.Field.{getDeclaringClass => getFieldDeclaringClass}
+    use Wrapped.Field.{getModifiers => getFieldModifiers}
+    use Wrapped.Field.{getName => getFieldName}
 
-    use Wrapped/Method.{getExceptionTypes => getMethodExceptionTypes}
-    use Wrapped/Method.{getParameterTypes => getMethodParameterTypes}
-    use Wrapped/Method.getReturnType
-    use Wrapped/Method.{getDeclaringClass => getMethodDeclaringClass}
-    use Wrapped/Method.{getModifiers => getMethodModifiers}
-    use Wrapped/Method.{getName => getMethodName}
+    use Wrapped.Method.{getExceptionTypes => getMethodExceptionTypes}
+    use Wrapped.Method.{getParameterTypes => getMethodParameterTypes}
+    use Wrapped.Method.getReturnType
+    use Wrapped.Method.{getDeclaringClass => getMethodDeclaringClass}
+    use Wrapped.Method.{getModifiers => getMethodModifiers}
+    use Wrapped.Method.{getName => getMethodName}
 
-    use Wrapped/Modifier.isStatic
-    use Wrapped/Modifier.isFinal
+    use Wrapped.Modifier.isStatic
+    use Wrapped.Modifier.isFinal
 
     type alias Class = ##java.lang.Class
     type alias Constructor = ##java.lang.reflect.Constructor

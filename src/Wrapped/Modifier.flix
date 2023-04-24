@@ -1,4 +1,4 @@
-mod Wrapped/Modifier {
+mod Wrapped.Modifier {
     pub def classModifiers(): Int32 & Pure = {
         import static java.lang.reflect.Modifier.classModifiers(): Int32 & Pure as classModifiers;
         classModifiers()

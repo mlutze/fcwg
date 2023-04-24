@@ -1,4 +1,4 @@
-mod Wrapped/Method {
+mod Wrapped.Method {
     pub def equals(x0: ##java.lang.reflect.Method, x1: ##java.lang.Object): Bool & Pure = {
         import java.lang.reflect.Method.equals(##java.lang.Object): Bool & Pure as equals;
         equals(x0, x1)

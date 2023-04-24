@@ -1,4 +1,4 @@
-mod Wrapped/Field {
+mod Wrapped.Field {
     pub def equals(x0: ##java.lang.reflect.Field, x1: ##java.lang.Object): Bool & Pure = {
         import java.lang.reflect.Field.equals(##java.lang.Object): Bool & Pure as equals;
         equals(x0, x1)

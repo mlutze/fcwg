@@ -5,9 +5,9 @@ use Transform.visitClass
 use Version.version
 use Validation.{Success, Failure}
 
-use Wrapped/Class.forNameString
-use Wrapped/Exception.getMessage
-use Wrapped/System.exit
+use Wrapped.Class.forNameString
+use Wrapped.Exception.getMessage
+use Wrapped.System.exit
 
 // The main entry point.
 def main(): Unit & Impure =
@@ -26,7 +26,7 @@ def main(): Unit & Impure =
                 case Ok(ns) =>
                     println(ns)
                 case Err(err) =>
-                    System/StdErr.println(getMessage(err));
+                    System.StdErr.println(getMessage(err));
                     exitProcessError()
             }
         case Success(Command.GetVersion) =>
@@ -34,11 +34,11 @@ def main(): Unit & Impure =
         case Success(Command.GetHelp) =>
             println(usage())
         case Success(_) =>
-            System/StdErr.println("Unsupported operation.");
+            System.StdErr.println("Unsupported operation.");
             exitUnsupported()
         case Failure(errs) =>
-            errs |> Nec.forEach(System/StdErr.print);
-            System/StdErr.print(usage());
+            errs |> Nec.forEach(System.StdErr.print);
+            System.StdErr.print(usage());
             exitParseError()
     }
 

@@ -1,4 +1,4 @@
-mod Wrapped/Exception {
+mod Wrapped.Exception {
     pub def addSuppressed(x0: ##java.lang.Exception, x1: ##java.lang.Throwable): Unit & Impure = {
         import java.lang.Throwable.addSuppressed(##java.lang.Throwable): Unit & Impure as addSuppressed;
         addSuppressed(unchecked_cast(x0 as ##java.lang.Throwable), x1)

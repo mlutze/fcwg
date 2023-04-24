@@ -1,4 +1,4 @@
-mod Wrapped/Constructor {
+mod Wrapped.Constructor {
     pub def equals(x0: ##java.lang.reflect.Constructor, x1: ##java.lang.Object): Bool & Pure = {
         import java.lang.reflect.Constructor.equals(##java.lang.Object): Bool & Pure as equals;
         equals(x0, x1)
