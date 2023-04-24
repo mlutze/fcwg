@@ -1,4 +1,4 @@
-mod Wrapped/System {
+mod Wrapped.System {
     pub def arraycopy(x0: ##java.lang.Object, x1: Int32, x2: ##java.lang.Object, x3: Int32, x4: Int32): Unit & Impure = {
         import static java.lang.System.arraycopy(##java.lang.Object, Int32, ##java.lang.Object, Int32, Int32): Unit & Impure as arraycopy;
         arraycopy(x0, x1, x2, x3, x4)

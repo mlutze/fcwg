@@ -31,10 +31,10 @@ mod TestTransform {
     use Transform.visitMethod
     use Transform.visitType
 
-    use Wrapped/Class.arrayType
-    use Wrapped/Class.forNameString
-    use Wrapped/Class.getField
-    use Wrapped/Class.getMethod
+    use Wrapped.Class.arrayType
+    use Wrapped.Class.forNameString
+    use Wrapped.Class.getField
+    use Wrapped.Class.getMethod
 
     type alias Class = ##java.lang.Class
     type alias Method = ##java.lang.reflect.Method
