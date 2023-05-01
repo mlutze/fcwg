@@ -412,7 +412,7 @@ mod Transform {
     /// A method with an undocumented modifier.
     /// Causes issues as it may have signature overlap.
     def isBlackMagicMethod(m: Method): Bool = {
-        (getMethodModifiers(m) &&& 4096) != 0
+        (getMethodModifiers(m) `Int32.bitwiseAnd` 4096) != 0
     }
 
     /// Creates a valid Flix getter name from the field name.
