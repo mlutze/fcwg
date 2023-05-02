@@ -96,15 +96,15 @@ mod Ast {
         pub def toString(d: Def): String =
             let Def(name, params, tpe, eff, impl) = d;
             let paramString = params |> List.map(match (n, t) -> "${n}: ${t}") |> String.intercalate(", ");
-            "pub def ${name}(${paramString}): ${tpe} & ${eff} = {\n" +
+            "pub def ${name}(${paramString}): ${tpe} \\ ${eff} = {\n" +
             "${impl}" |> String.indent(4) +
             "}\n"
     }
 
     instance ToString[Effect] {
         pub def toString(x: Effect): String = match x {
-            case Pure_ => "Pure"
-            case Impure_ => "Impure"
+            case Pure_ => "{}"
+            case Impure_ => "IO"
         }
     }
     
@@ -132,14 +132,14 @@ mod Ast {
         pub def toString(x: Import): String = match x {
             case Constructor(name, params, return, eff, alias_) =>
                 let paramString = params |> List.map(ToString.toString) |> String.intercalate(", ");
-                "import new ${name}(${paramString}): ${return} & ${eff} as ${alias_};\n"
+                "import new ${name}(${paramString}): ${return} \\ ${eff} as ${alias_};\n"
             case Method(context, name, params, return, eff, alias_) =>
                 let paramString = params |> List.map(ToString.toString) |> String.intercalate(", ");
-                "import ${context}${name}(${paramString}): ${return} & ${eff} as ${alias_};\n"
+                "import ${context}${name}(${paramString}): ${return} \\ ${eff} as ${alias_};\n"
             case GetField(context, name, return, eff, func) =>
-                "import ${context} get ${name}: ${return} & ${eff} as ${func};\n"
+                "import ${context} get ${name}: ${return} \\ ${eff} as ${func};\n"
             case SetField(context, name, return, eff, func) =>
-                "import ${context} set ${name}: ${return} & ${eff} as ${func};\n"
+                "import ${context} set ${name}: ${return} \\ ${eff} as ${func};\n"
         }
     }
 
