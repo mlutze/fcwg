@@ -324,6 +324,7 @@ mod Transform {
                 case hd :: tl => Arg.Cast(hd, visitType(importClazz)) :: List.map(Arg.NoCast, tl)
                 case Nil => bug!("unexpected empty parameter list")
             }
+            case Context.Instance => List.map(Arg.NoCast, paramNames)
         };
         let params = List.zip(paramNames, paramTypes);
         let funcName = getterName(name);
@@ -363,6 +364,7 @@ mod Transform {
                 case hd :: tl => Arg.Cast(hd, visitType(importClazz)) :: List.map(Arg.NoCast, tl)
                 case Nil => bug!("unexpected empty parameter list")
             }
+            case Context.Instance => List.map(Arg.NoCast, paramNames)
         };
         let params = List.zip(paramNames, paramTypes);
         let funcName = setterName(name);
