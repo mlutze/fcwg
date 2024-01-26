@@ -10,7 +10,7 @@ use Wrapped.Exception.getMessage
 use Wrapped.System.exit
 
 // The main entry point.
-def main(): Unit \ Impure =
+def main(): Unit \ IO =
     use Result.flatMap;
     let args = Environment.getArgs();
     match parse(args) {
@@ -42,8 +42,8 @@ def main(): Unit \ Impure =
             exitParseError()
     }
 
-def exitProcessError(): Unit \ Impure = exit(1)
+def exitProcessError(): Unit \ IO = exit(1)
 
-def exitParseError(): Unit \ Impure = exit(2)
+def exitParseError(): Unit \ IO = exit(2)
 
-def exitUnsupported(): Unit \ Impure = exit(3)
+def exitUnsupported(): Unit \ IO = exit(3)

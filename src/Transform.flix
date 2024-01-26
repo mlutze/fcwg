@@ -158,7 +158,7 @@ mod Transform {
     def mkEffect(o: Options, tpe: Type_): Effect = match o {
         case Options(opts) if opts.pureLevel >= PureLevel.PureButUnit and tpe != Type_.Unit_ => Effect.Pure_
         case Options(opts) if opts.pureLevel >= PureLevel.PureAll => Effect.Pure_
-        case _ => Effect.Impure_
+        case _ => Effect.IO_
     }
 
     /// Creates a list of [n] standard parameter names (x0, x1, ..., xn)
@@ -306,7 +306,7 @@ mod Transform {
         let eff = match (o, isFinalField(f)) {
             case (Options(opts), true) if opts.pureLevel >= PureLevel.PureFinal => Effect.Pure_
             case (Options(opts), _) if opts.pureLevel >= PureLevel.PureButUnit => Effect.Pure_
-            case _ => Effect.Impure_
+            case _ => Effect.IO_
         };
         let name = getFieldName(f);
         let importClazz = getFieldDeclaringClass(f);
@@ -346,7 +346,7 @@ mod Transform {
         let context = if (isStaticField(f)) Context.Static else Context.Instance;
         let eff = match o {
             case Options(opts) if opts.pureLevel >= PureLevel.PureAll => Effect.Pure_
-            case _ => Effect.Impure_
+            case _ => Effect.IO_
         };
         let name = getFieldName(f);
         let importClazz = getFieldDeclaringClass(f);
@@ -481,7 +481,7 @@ mod Transform {
 
     def flixKeywords(): Set[String] = Set#{
         "!=", "$DEFAULT$", "&&&", "*", "**", "+", "-", "..", "/", ":", "::", ":::", ":=", "<", "<+>", "<-", "<<<", "<=",
-        "<=>", "==", "=>", ">", ">=", ">>>", "???", "@", "Absent", "Bool", "Impure", "Nil", "Predicate", "Present", "Pure",
+        "<=>", "==", "=>", ">", ">=", ">>>", "???", "@", "Absent", "Bool", "IO", "Nil", "Predicate", "Present", "Pure",
         "RecordRow", "SchemaRow", "Type", "^^^", "alias", "case", "catch", "chan",
         "class", "def", "deref", "else", "enum", "false", "fix", "force", "if", "import",
         "inline", "instance", "into", "lat", "law", "lawless", "lazy", "let", "let*", "match", "mut", "namespace",

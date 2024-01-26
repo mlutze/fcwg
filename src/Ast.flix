@@ -3,7 +3,7 @@ mod Ast {
     use Body.{NoTry, TryCatch}
     use Call.Call
     use Def.Def;
-    use Effect.{Pure_, Impure_}
+    use Effect.{Pure_, IO_}
     use Impl.Impl;
     use Import.{Constructor, Method, GetField, SetField}
     use Namespace.Namespace;
@@ -77,7 +77,7 @@ mod Ast {
 
     pub enum Effect with Eq, Order {
         case Pure_
-        case Impure_
+        case IO_
     }
 
     instance ToString[Namespace] {
@@ -104,7 +104,7 @@ mod Ast {
     instance ToString[Effect] {
         pub def toString(x: Effect): String = match x {
             case Pure_ => "{}"
-            case Impure_ => "IO"
+            case IO_ => "IO"
         }
     }
     

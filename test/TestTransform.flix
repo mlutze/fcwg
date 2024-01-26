@@ -64,12 +64,12 @@ mod TestTransform {
     def testVisitMethod(): Bool = {
         let string = forNameString("java.lang.String") |> unsafeGet;
         let method = getMethod(string, "concat", unchecked_cast(Array#{string} @ Static as _ \ {})) |> unsafeGet;
-        let imp = Import.Method(Context.Instance, "java.lang.String.concat", Type_.String_ :: Nil, Type_.String_, Effect.Impure_, "concat");
+        let imp = Import.Method(Context.Instance, "java.lang.String.concat", Type_.String_ :: Nil, Type_.String_, Effect.IO_, "concat");
         let call = Call("concat", mkArgs("x0" :: "x1" :: Nil));
         let wrap = Wrap.NoWrap(call);
         let body = Body.NoTry(wrap);
         let impl = Impl(imp, body);
-        visitMethod(defaultOptions(), string, method) == Def("concat", ("x0", Type_.String_) :: ("x1", Type_.String_) :: Nil, Type_.String_, Effect.Impure_, impl)
+        visitMethod(defaultOptions(), string, method) == Def("concat", ("x0", Type_.String_) :: ("x1", Type_.String_) :: Nil, Type_.String_, Effect.IO_, impl)
     }
 
     @test
@@ -77,12 +77,12 @@ mod TestTransform {
         let clazz = forNameString("java.lang.Class") |> unsafeGet;
         let string = forNameString("java.lang.String") |> unsafeGet;
         let method = getMethod(clazz, "forName", unchecked_cast(Array#{string} @ Static as _ \ {})) |> unsafeGet;
-        let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Type_.Ref_("java.lang.Class"), Effect.Impure_, "forName");
+        let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Type_.Ref_("java.lang.Class"), Effect.IO_, "forName");
         let call = Call("forName", mkArgs("x0" :: Nil));
         let wrap = Wrap.NoWrap(call);
         let body = Body.NoTry(wrap);
         let impl = Impl(imp, body);
-        visitMethod(defaultOptions(), string, method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Ref_("java.lang.Class"), Effect.Impure_, impl)
+        visitMethod(defaultOptions(), string, method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Ref_("java.lang.Class"), Effect.IO_, impl)
     }
 
     @test
@@ -90,14 +90,14 @@ mod TestTransform {
         let clazz = forNameString("java.lang.Class") |> unsafeGet;
         let string = forNameString("java.lang.String") |> unsafeGet;
         let method = getMethod(clazz, "forName", unchecked_cast(Array#{string} @ Static as _ \ {})) |> unsafeGet;
-        let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Type_.Ref_("java.lang.Class"), Effect.Impure_, "forName");
+        let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Type_.Ref_("java.lang.Class"), Effect.IO_, "forName");
         let call = Call("forName", mkArgs("x0" :: Nil));
         let wrap = Wrap.NoWrap(call);
         let body = Body.TryCatch(wrap);
         let impl = Impl(imp, body);
         let Options(opts) = defaultOptions();
         let o = Options({ resultLevel = ResultLevel.ResultChecked | opts });
-        visitMethod(o, clazz, method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Result_(Type_.Ref_("java.lang.Exception"), Type_.Ref_("java.lang.Class")), Effect.Impure_, impl)
+        visitMethod(o, clazz, method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Result_(Type_.Ref_("java.lang.Exception"), Type_.Ref_("java.lang.Class")), Effect.IO_, impl)
     }
 
     @test
@@ -105,40 +105,40 @@ mod TestTransform {
         let clazz = forNameString("java.lang.Class") |> unsafeGet;
         let string = forNameString("java.lang.String") |> unsafeGet;
         let method = getMethod(clazz, "forName", unchecked_cast(Array#{string} @ Static as _ \ {})) |> unsafeGet;
-        let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Type_.Ref_("java.lang.Class"), Effect.Impure_, "forName");
+        let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Type_.Ref_("java.lang.Class"), Effect.IO_, "forName");
         let call = Call("forName", mkArgs("x0" :: Nil));
         let wrap = Wrap.WrapOption(call);
         let body = Body.TryCatch(wrap);
         let impl = Impl(imp, body);
         let Options(opts) = defaultOptions();
         let o = Options({ resultLevel = ResultLevel.ResultChecked, optionLevel = OptionLevel.OptionRef | opts });
-        visitMethod(o, clazz, method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Result_(Type_.Option_(Type_.Ref_("java.lang.Class")), Type_.Ref_("java.lang.Exception")), Effect.Impure_, impl)
+        visitMethod(o, clazz, method) == Def("forName", ("x0", Type_.String_) :: Nil, Type_.Result_(Type_.Option_(Type_.Ref_("java.lang.Class")), Type_.Ref_("java.lang.Exception")), Effect.IO_, impl)
     }
 
     @test
     def testVisitMethodUnit(): Bool = {
         let throwable = forNameString("java.lang.Throwable") |> unsafeGet;
         let method = getMethod(throwable, "printStackTrace", unchecked_cast(Array#{} @ Static as _ \ {})) |> unsafeGet;
-        let imp = Import.Method(Context.Instance, "java.lang.Throwable.printStackTrace", Nil, Type_.Unit_, Effect.Impure_, "printStackTrace");
+        let imp = Import.Method(Context.Instance, "java.lang.Throwable.printStackTrace", Nil, Type_.Unit_, Effect.IO_, "printStackTrace");
         let call = Call("printStackTrace", mkArgs("x0" :: Nil));
         let wrap = Wrap.NoWrap(call);
         let body = Body.NoTry(wrap);
         let impl = Impl(imp, body);
         let Options(default) = defaultOptions();
         let o = Options({ pureLevel = PureLevel.PureButUnit | default });
-        visitMethod(o, throwable, method) == Def("printStackTrace", ("x0", Type_.Ref_("java.lang.Throwable")) :: Nil, Type_.Unit_, Effect.Impure_, impl)
+        visitMethod(o, throwable, method) == Def("printStackTrace", ("x0", Type_.Ref_("java.lang.Throwable")) :: Nil, Type_.Unit_, Effect.IO_, impl)
     }
 
     @test
     def testVisitField(): Bool = {
         let string = forNameString("java.lang.String") |> unsafeGet;
         let field = getField(string, "CASE_INSENSITIVE_ORDER") |> unsafeGet;
-        let imp = Import.GetField(Context.Static, "java.lang.String.CASE_INSENSITIVE_ORDER", Type_.Ref_("java.util.Comparator"), Effect.Impure_, "getCASE_INSENSITIVE_ORDER");
+        let imp = Import.GetField(Context.Static, "java.lang.String.CASE_INSENSITIVE_ORDER", Type_.Ref_("java.util.Comparator"), Effect.IO_, "getCASE_INSENSITIVE_ORDER");
         let call = Call("getCASE_INSENSITIVE_ORDER", Nil);
         let wrap = Wrap.NoWrap(call);
         let body = Body.NoTry(wrap);
         let impl = Impl(imp, body);
-        visitField(defaultOptions(), string, field) == Def("getCASE_INSENSITIVE_ORDER", Nil, Type_.Ref_("java.util.Comparator"), Effect.Impure_, impl) :: Nil
+        visitField(defaultOptions(), string, field) == Def("getCASE_INSENSITIVE_ORDER", Nil, Type_.Ref_("java.util.Comparator"), Effect.IO_, impl) :: Nil
     }
 
     @test
@@ -200,7 +200,7 @@ mod TestTransform {
         let throwable = forNameString("java.lang.Throwable") |> unsafeGet;
         let exception = forNameString("java.lang.Exception") |> unsafeGet;
         let method = getMethod(throwable, "getMessage", unchecked_cast(Array#{} @ Static as _ \ {})) |> unsafeGet;
-        let imp = Import.Method(Context.Instance, "java.lang.Throwable.getMessage", Nil, Type_.String_, Effect.Impure_, "getMessage");
+        let imp = Import.Method(Context.Instance, "java.lang.Throwable.getMessage", Nil, Type_.String_, Effect.IO_, "getMessage");
         let call = Call("getMessage", Arg.Cast("x0", Type_.Ref_("java.lang.Throwable")) :: Nil);
         let wrap = Wrap.NoWrap(call);
         let body = Body.NoTry(wrap);
@@ -209,7 +209,7 @@ mod TestTransform {
         let Options(default) = defaultOptions();
         let opts = Options({ superLevel = SuperLevel.SuperButObject | default });
 
-        visitMethod(opts, exception, method) == Def("getMessage", ("x0", Type_.Ref_("java.lang.Exception")) :: Nil, Type_.String_, Effect.Impure_, impl) 
+        visitMethod(opts, exception, method) == Def("getMessage", ("x0", Type_.Ref_("java.lang.Exception")) :: Nil, Type_.String_, Effect.IO_, impl) 
     }
 
     @test
@@ -217,7 +217,7 @@ mod TestTransform {
         let field = forNameString("java.lang.reflect.Field") |> unsafeGet;
         let object = forNameString("java.lang.Object") |> unsafeGet;
         let method = getMethod(field, "set", unchecked_cast(Array#{object, object} @ Static as _ \ {})) |> unsafeGet;
-        let imp = Import.Method(Context.Instance, "java.lang.reflect.Field.set", Type_.Ref_("java.lang.Object") :: Type_.Ref_("java.lang.Object") :: Nil, Type_.Unit_, Effect.Impure_, "set_");
+        let imp = Import.Method(Context.Instance, "java.lang.reflect.Field.set", Type_.Ref_("java.lang.Object") :: Type_.Ref_("java.lang.Object") :: Nil, Type_.Unit_, Effect.IO_, "set_");
         let call = Call("set_", mkArgs("x0" :: "x1" :: "x2" :: Nil));
         let wrap = Wrap.NoWrap(call);
         let body = Body.NoTry(wrap);
@@ -228,7 +228,7 @@ mod TestTransform {
                 "set_",
                 ("x0", Type_.Ref_("java.lang.reflect.Field")) :: ("x1", Type_.Ref_("java.lang.Object")) :: ("x2", Type_.Ref_("java.lang.Object")) :: Nil,
                 Type_.Unit_,
-                Effect.Impure_,
+                Effect.IO_,
                 impl
             )
     }
@@ -237,12 +237,12 @@ mod TestTransform {
     def testReturnNestedClass(): Bool = {
         let character = forNameString("java.lang.Character$UnicodeBlock") |> unsafeGet;
         let field = getField(character, "CUNEIFORM") |> unsafeGet;
-        let imp = Import.GetField(Context.Static, "java.lang.Character$UnicodeBlock.CUNEIFORM", Type_.Ref_("java.lang.Character$UnicodeBlock"), Effect.Impure_, "getCUNEIFORM");
+        let imp = Import.GetField(Context.Static, "java.lang.Character$UnicodeBlock.CUNEIFORM", Type_.Ref_("java.lang.Character$UnicodeBlock"), Effect.IO_, "getCUNEIFORM");
         let call = Call("getCUNEIFORM", Nil);
         let wrap = Wrap.NoWrap(call);
         let body = Body.NoTry(wrap);
         let impl = Impl(imp, body);
 
-        visitField(defaultOptions(), character, field) == Def("getCUNEIFORM", Nil, Type_.Ref_("java.lang.Character$UnicodeBlock"), Effect.Impure_, impl) :: Nil
+        visitField(defaultOptions(), character, field) == Def("getCUNEIFORM", Nil, Type_.Ref_("java.lang.Character$UnicodeBlock"), Effect.IO_, impl) :: Nil
     }
 }
