@@ -62,7 +62,7 @@ mod Transform {
         for (
             methods <- getMethodsFor(o, c);
             defs1 <- methods
-                |> List.filter(isBlackMagicMethod >> Bool.not)
+                |> List.filter(isBlackMagicMethod >> Utils.lnot)
                 |> List.map(visitMethod(o, c))
                 |> Ok;
             fields <- getFieldsFor(o, c);
@@ -166,7 +166,7 @@ mod Transform {
 
     /// Returns true iff the function should return a Result.
     def shouldResultMethod(o: Options, m: Method): Bool = {
-        let canFail = getMethodExceptionTypes(m) |> Array.isEmpty |> Bool.not;
+        let canFail = getMethodExceptionTypes(m) |> Array.isEmpty |> Utils.lnot;
         match (o, canFail) {
             case (Options(opts), true) if opts.resultLevel >= ResultLevel.ResultChecked => true
             case (Options(opts), _) if opts.resultLevel >= ResultLevel.ResultAll => true
@@ -175,7 +175,7 @@ mod Transform {
     }
 
     def shouldResultConstructor(o: Options, c: Constructor): Bool = {
-        let canFail = getConstructorExceptionTypes(c) |> Array.isEmpty |> Bool.not;
+        let canFail = getConstructorExceptionTypes(c) |> Array.isEmpty |> Utils.lnot;
         match (o, canFail) {
             case (Options(opts), true) if opts.resultLevel >= ResultLevel.ResultChecked => true
             case (Options(opts), _) if opts.resultLevel >= ResultLevel.ResultAll => true
