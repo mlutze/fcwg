@@ -479,7 +479,7 @@ mod Transform {
         case Type_.Option_(_) => "Option"
     }
 
-    def flixKeywords(): Set[String] = Set#{
+    def flixKeywords(): Set[String] = Vector#{
         "!=", "$DEFAULT$", "&&&", "*", "**", "+", "-", "..", "/", ":", "::", ":::", ":=", "<", "<+>", "<-", "<<<", "<=",
         "<=>", "==", "=>", ">", ">=", ">>>", "???", "@", "Absent", "Bool", "IO", "Nil", "Predicate", "Present", "Pure",
         "RecordRow", "SchemaRow", "Type", "^^^", "alias", "case", "catch", "chan",
@@ -488,5 +488,5 @@ mod Transform {
         "null", "opaque", "override", "pub", "ref", "reify", "reifyBool",
         "reifyEff", "reifyType", "rel", "rigid", "scoped", "sealed", "set", "spawn",
         "static", "true", "type", "unlawful", "use", "where", "with", "|||", "~~~"
-    }
+    } |> Vector.toSet
 }
