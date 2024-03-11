@@ -36,13 +36,13 @@ mod Wrapped.System {
     
     
     pub def getErr(): ##java.io.PrintStream \ {} = {
-        import static  get java.lang.System.err: ##java.io.PrintStream \ {} as getErr;
+        import static java_get_field java.lang.System.err: ##java.io.PrintStream \ {} as getErr;
         getErr()
     }
     
     
     pub def getIn(): ##java.io.InputStream \ {} = {
-        import static  get java.lang.System.in: ##java.io.InputStream \ {} as getIn;
+        import static java_get_field java.lang.System.in: ##java.io.InputStream \ {} as getIn;
         getIn()
     }
     
@@ -60,7 +60,7 @@ mod Wrapped.System {
     
     
     pub def getOut(): ##java.io.PrintStream \ {} = {
-        import static  get java.lang.System.out: ##java.io.PrintStream \ {} as getOut;
+        import static java_get_field java.lang.System.out: ##java.io.PrintStream \ {} as getOut;
         getOut()
     }
     

@@ -132,14 +132,14 @@ mod Ast {
         pub def toString(x: Import): String = match x {
             case Constructor(name, params, return, eff, alias_) =>
                 let paramString = params |> List.map(ToString.toString) |> String.intercalate(", ");
-                "import new ${name}(${paramString}): ${return} \\ ${eff} as ${alias_};\n"
+                "import java_new ${name}(${paramString}): ${return} \\ ${eff} as ${alias_};\n"
             case Method(context, name, params, return, eff, alias_) =>
                 let paramString = params |> List.map(ToString.toString) |> String.intercalate(", ");
                 "import ${context}${name}(${paramString}): ${return} \\ ${eff} as ${alias_};\n"
             case GetField(context, name, return, eff, func) =>
-                "import ${context} get ${name}: ${return} \\ ${eff} as ${func};\n"
+                "import ${context}java_get_field ${name}: ${return} \\ ${eff} as ${func};\n"
             case SetField(context, name, return, eff, func) =>
-                "import ${context} set ${name}: ${return} \\ ${eff} as ${func};\n"
+                "import ${context}java_set_field ${name}: ${return} \\ ${eff} as ${func};\n"
         }
     }
 

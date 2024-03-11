@@ -48,25 +48,25 @@ mod Wrapped.Exception {
     
     
     pub def newException(): ##java.lang.Exception \ {} = {
-        import new java.lang.Exception(): ##java.lang.Exception \ {} as newException;
+        import java_new java.lang.Exception(): ##java.lang.Exception \ {} as newException;
         newException()
     }
     
     
     pub def newExceptionString(x0: String): ##java.lang.Exception \ {} = {
-        import new java.lang.Exception(String): ##java.lang.Exception \ {} as newException;
+        import java_new java.lang.Exception(String): ##java.lang.Exception \ {} as newException;
         newException(x0)
     }
     
     
     pub def newExceptionStringThrowable(x0: String, x1: ##java.lang.Throwable): ##java.lang.Exception \ {} = {
-        import new java.lang.Exception(String, ##java.lang.Throwable): ##java.lang.Exception \ {} as newException;
+        import java_new java.lang.Exception(String, ##java.lang.Throwable): ##java.lang.Exception \ {} as newException;
         newException(x0, x1)
     }
     
     
     pub def newExceptionThrowable(x0: ##java.lang.Throwable): ##java.lang.Exception \ {} = {
-        import new java.lang.Exception(##java.lang.Throwable): ##java.lang.Exception \ {} as newException;
+        import java_new java.lang.Exception(##java.lang.Throwable): ##java.lang.Exception \ {} as newException;
         newException(x0)
     }
     
