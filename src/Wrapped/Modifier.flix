@@ -18,73 +18,73 @@ mod Wrapped.Modifier {
     
     
     pub def getABSTRACT(): Int32 \ {} = {
-        import static  get java.lang.reflect.Modifier.ABSTRACT: Int32 \ {} as getABSTRACT;
+        import static java_get_field java.lang.reflect.Modifier.ABSTRACT: Int32 \ {} as getABSTRACT;
         getABSTRACT()
     }
     
     
     pub def getFINAL(): Int32 \ {} = {
-        import static  get java.lang.reflect.Modifier.FINAL: Int32 \ {} as getFINAL;
+        import static java_get_field java.lang.reflect.Modifier.FINAL: Int32 \ {} as getFINAL;
         getFINAL()
     }
     
     
     pub def getINTERFACE(): Int32 \ {} = {
-        import static  get java.lang.reflect.Modifier.INTERFACE: Int32 \ {} as getINTERFACE;
+        import static java_get_field java.lang.reflect.Modifier.INTERFACE: Int32 \ {} as getINTERFACE;
         getINTERFACE()
     }
     
     
     pub def getNATIVE(): Int32 \ {} = {
-        import static  get java.lang.reflect.Modifier.NATIVE: Int32 \ {} as getNATIVE;
+        import static java_get_field java.lang.reflect.Modifier.NATIVE: Int32 \ {} as getNATIVE;
         getNATIVE()
     }
     
     
     pub def getPRIVATE(): Int32 \ {} = {
-        import static  get java.lang.reflect.Modifier.PRIVATE: Int32 \ {} as getPRIVATE;
+        import static java_get_field java.lang.reflect.Modifier.PRIVATE: Int32 \ {} as getPRIVATE;
         getPRIVATE()
     }
     
     
     pub def getPROTECTED(): Int32 \ {} = {
-        import static  get java.lang.reflect.Modifier.PROTECTED: Int32 \ {} as getPROTECTED;
+        import static java_get_field java.lang.reflect.Modifier.PROTECTED: Int32 \ {} as getPROTECTED;
         getPROTECTED()
     }
     
     
     pub def getPUBLIC(): Int32 \ {} = {
-        import static  get java.lang.reflect.Modifier.PUBLIC: Int32 \ {} as getPUBLIC;
+        import static java_get_field java.lang.reflect.Modifier.PUBLIC: Int32 \ {} as getPUBLIC;
         getPUBLIC()
     }
     
     
     pub def getSTATIC(): Int32 \ {} = {
-        import static  get java.lang.reflect.Modifier.STATIC: Int32 \ {} as getSTATIC;
+        import static java_get_field java.lang.reflect.Modifier.STATIC: Int32 \ {} as getSTATIC;
         getSTATIC()
     }
     
     
     pub def getSTRICT(): Int32 \ {} = {
-        import static  get java.lang.reflect.Modifier.STRICT: Int32 \ {} as getSTRICT;
+        import static java_get_field java.lang.reflect.Modifier.STRICT: Int32 \ {} as getSTRICT;
         getSTRICT()
     }
     
     
     pub def getSYNCHRONIZED(): Int32 \ {} = {
-        import static  get java.lang.reflect.Modifier.SYNCHRONIZED: Int32 \ {} as getSYNCHRONIZED;
+        import static java_get_field java.lang.reflect.Modifier.SYNCHRONIZED: Int32 \ {} as getSYNCHRONIZED;
         getSYNCHRONIZED()
     }
     
     
     pub def getTRANSIENT(): Int32 \ {} = {
-        import static  get java.lang.reflect.Modifier.TRANSIENT: Int32 \ {} as getTRANSIENT;
+        import static java_get_field java.lang.reflect.Modifier.TRANSIENT: Int32 \ {} as getTRANSIENT;
         getTRANSIENT()
     }
     
     
     pub def getVOLATILE(): Int32 \ {} = {
-        import static  get java.lang.reflect.Modifier.VOLATILE: Int32 \ {} as getVOLATILE;
+        import static java_get_field java.lang.reflect.Modifier.VOLATILE: Int32 \ {} as getVOLATILE;
         getVOLATILE()
     }
     

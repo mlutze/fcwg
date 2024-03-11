@@ -1,4 +1,10 @@
 mod Wrapped.Class {
+    pub def accessFlags(x0: ##java.lang.Class): ##java.util.Set \ {} = {
+        import java.lang.Class.accessFlags(): ##java.util.Set \ {} as accessFlags;
+        accessFlags(x0)
+    }
+    
+    
     pub def arrayType(x0: ##java.lang.Class): ##java.lang.Class \ {} = {
         import java.lang.Class.arrayType(): ##java.lang.Class \ {} as arrayType;
         arrayType(x0)
@@ -528,6 +534,12 @@ mod Wrapped.Class {
     pub def isSynthetic(x0: ##java.lang.Class): Bool \ {} = {
         import java.lang.Class.isSynthetic(): Bool \ {} as isSynthetic;
         isSynthetic(x0)
+    }
+    
+    
+    pub def isUnnamedClass(x0: ##java.lang.Class): Bool \ {} = {
+        import java.lang.Class.isUnnamedClass(): Bool \ {} as isUnnamedClass;
+        isUnnamedClass(x0)
     }
     
     

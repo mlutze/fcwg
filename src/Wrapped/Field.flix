@@ -1,4 +1,10 @@
 mod Wrapped.Field {
+    pub def accessFlags(x0: ##java.lang.reflect.Field): ##java.util.Set \ {} = {
+        import java.lang.reflect.Field.accessFlags(): ##java.util.Set \ {} as accessFlags;
+        accessFlags(x0)
+    }
+    
+    
     pub def equals(x0: ##java.lang.reflect.Field, x1: ##java.lang.Object): Bool \ {} = {
         import java.lang.reflect.Field.equals(##java.lang.Object): Bool \ {} as equals;
         equals(x0, x1)
