@@ -9,7 +9,7 @@ mod Ast {
     use Namespace.Namespace;
     use Type_.{Int8_, Int16_, Int32_, Int64_, Float32_, Float64_, Bool_, Char_, String_, BigInt_, Unit_, Ref_, Array_, Result_, Option_}
     use Wrap.{NoWrap, WrapOption}
-    use Context.{Instance, Staticc}
+    use Context.{Instance, Static_}
 
     ///  Def(name, params, return type, effect, impl)
     pub enum Def(String, List[(String, Type_)], Type_, Effect, Impl) with Eq, Order
@@ -71,7 +71,7 @@ mod Ast {
     }
 
     pub enum Context with Eq, Order {
-        case Staticc
+        case Static_
         case Instance
     }
 
@@ -94,9 +94,9 @@ mod Ast {
 
     instance ToString[Def] {
         pub def toString(d: Def): String =
-            let Def(name, params, tpe, effct, impl) = d;
+            let Def(name, params, tpe, effect, impl) = d;
             let paramString = params |> List.map(match (n, t) -> "${n}: ${t}") |> String.intercalate(", ");
-            "pub def ${name}(${paramString}): ${tpe} \\ ${effct} = {\n" +
+            "pub def ${name}(${paramString}): ${tpe} \\ ${effect} = {\n" +
             "${impl}" |> String.indent(4) +
             "}\n"
     }
@@ -130,16 +130,16 @@ mod Ast {
 
     instance ToString[Import] {
         pub def toString(x: Import): String = match x {
-            case Constructor(name, params, return, effct, alias_) =>
+            case Constructor(name, params, return, effect, alias_) =>
                 let paramString = params |> List.map(ToString.toString) |> String.intercalate(", ");
-                "import java_new ${name}(${paramString}): ${return} \\ ${effct} as ${alias_};\n"
-            case Method(context, name, params, return, effct, alias_) =>
+                "import java_new ${name}(${paramString}): ${return} \\ ${effect} as ${alias_};\n"
+            case Method(context, name, params, return, effect, alias_) =>
                 let paramString = params |> List.map(ToString.toString) |> String.intercalate(", ");
-                "import ${context}${name}(${paramString}): ${return} \\ ${effct} as ${alias_};\n"
-            case GetField(context, name, return, effct, func) =>
-                "import ${context}java_get_field ${name}: ${return} \\ ${effct} as ${func};\n"
-            case SetField(context, name, return, effct, func) =>
-                "import ${context}java_set_field ${name}: ${return} \\ ${effct} as ${func};\n"
+                "import ${context}${name}(${paramString}): ${return} \\ ${effect} as ${alias_};\n"
+            case GetField(context, name, return, effect, func) =>
+                "import ${context}java_get_field ${name}: ${return} \\ ${effect} as ${func};\n"
+            case SetField(context, name, return, effect, func) =>
+                "import ${context}java_set_field ${name}: ${return} \\ ${effect} as ${func};\n"
         }
     }
 
@@ -168,7 +168,7 @@ mod Ast {
 
     instance ToString[Context] {
         pub def toString(x: Context): String = match x {
-            case Staticc => "static " // kind of hacky to put this in an instance
+            case Static_ => "static " // kind of hacky to put this in an instance
             case Instance => ""
         }
     }
