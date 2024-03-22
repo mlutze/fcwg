@@ -77,7 +77,7 @@ mod TestTransform {
         let clazz = forNameString("java.lang.Class") |> unsafeGet;
         let string = forNameString("java.lang.String") |> unsafeGet;
         let method = getMethod(clazz, "forName", unchecked_cast(Array#{string} @ Static as _ \ {})) |> unsafeGet;
-        let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Type_.Ref_("java.lang.Class"), Effect.IO_, "forName");
+        let imp = Import.Method(Context.Static_, "java.lang.Class.forName", Type_.String_ :: Nil, Type_.Ref_("java.lang.Class"), Effect.IO_, "forName");
         let call = Call("forName", mkArgs("x0" :: Nil));
         let wrap = Wrap.NoWrap(call);
         let body = Body.NoTry(wrap);
@@ -90,7 +90,7 @@ mod TestTransform {
         let clazz = forNameString("java.lang.Class") |> unsafeGet;
         let string = forNameString("java.lang.String") |> unsafeGet;
         let method = getMethod(clazz, "forName", unchecked_cast(Array#{string} @ Static as _ \ {})) |> unsafeGet;
-        let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Type_.Ref_("java.lang.Class"), Effect.IO_, "forName");
+        let imp = Import.Method(Context.Static_, "java.lang.Class.forName", Type_.String_ :: Nil, Type_.Ref_("java.lang.Class"), Effect.IO_, "forName");
         let call = Call("forName", mkArgs("x0" :: Nil));
         let wrap = Wrap.NoWrap(call);
         let body = Body.TryCatch(wrap);
@@ -105,7 +105,7 @@ mod TestTransform {
         let clazz = forNameString("java.lang.Class") |> unsafeGet;
         let string = forNameString("java.lang.String") |> unsafeGet;
         let method = getMethod(clazz, "forName", unchecked_cast(Array#{string} @ Static as _ \ {})) |> unsafeGet;
-        let imp = Import.Method(Context.Static, "java.lang.Class.forName", Type_.String_ :: Nil, Type_.Ref_("java.lang.Class"), Effect.IO_, "forName");
+        let imp = Import.Method(Context.Static_, "java.lang.Class.forName", Type_.String_ :: Nil, Type_.Ref_("java.lang.Class"), Effect.IO_, "forName");
         let call = Call("forName", mkArgs("x0" :: Nil));
         let wrap = Wrap.WrapOption(call);
         let body = Body.TryCatch(wrap);
@@ -133,7 +133,7 @@ mod TestTransform {
     def testVisitField(): Bool = {
         let string = forNameString("java.lang.String") |> unsafeGet;
         let field = getField(string, "CASE_INSENSITIVE_ORDER") |> unsafeGet;
-        let imp = Import.GetField(Context.Static, "java.lang.String.CASE_INSENSITIVE_ORDER", Type_.Ref_("java.util.Comparator"), Effect.IO_, "getCASE_INSENSITIVE_ORDER");
+        let imp = Import.GetField(Context.Static_, "java.lang.String.CASE_INSENSITIVE_ORDER", Type_.Ref_("java.util.Comparator"), Effect.IO_, "getCASE_INSENSITIVE_ORDER");
         let call = Call("getCASE_INSENSITIVE_ORDER", Nil);
         let wrap = Wrap.NoWrap(call);
         let body = Body.NoTry(wrap);
@@ -145,7 +145,7 @@ mod TestTransform {
     def testVisitFieldPure(): Bool = {
         let string = forNameString("java.lang.String") |> unsafeGet;
         let field = getField(string, "CASE_INSENSITIVE_ORDER") |> unsafeGet;
-        let imp = Import.GetField(Context.Static, "java.lang.String.CASE_INSENSITIVE_ORDER", Type_.Ref_("java.util.Comparator"), Effect.Pure_, "getCASE_INSENSITIVE_ORDER");
+        let imp = Import.GetField(Context.Static_, "java.lang.String.CASE_INSENSITIVE_ORDER", Type_.Ref_("java.util.Comparator"), Effect.Pure_, "getCASE_INSENSITIVE_ORDER");
         let call = Call("getCASE_INSENSITIVE_ORDER", Nil);
         let wrap = Wrap.NoWrap(call);
         let body = Body.NoTry(wrap);
@@ -237,7 +237,7 @@ mod TestTransform {
     def testReturnNestedClass(): Bool = {
         let character = forNameString("java.lang.Character$UnicodeBlock") |> unsafeGet;
         let field = getField(character, "CUNEIFORM") |> unsafeGet;
-        let imp = Import.GetField(Context.Static, "java.lang.Character$UnicodeBlock.CUNEIFORM", Type_.Ref_("java.lang.Character$UnicodeBlock"), Effect.IO_, "getCUNEIFORM");
+        let imp = Import.GetField(Context.Static_, "java.lang.Character$UnicodeBlock.CUNEIFORM", Type_.Ref_("java.lang.Character$UnicodeBlock"), Effect.IO_, "getCUNEIFORM");
         let call = Call("getCUNEIFORM", Nil);
         let wrap = Wrap.NoWrap(call);
         let body = Body.NoTry(wrap);

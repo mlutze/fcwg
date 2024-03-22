@@ -59,7 +59,7 @@ mod Transform {
     /// Transforms the Java class into a Flix namespace.
     pub def visitClass(o: Options, c: Class): Result[Exception, Namespace] = {
         use Result.flatMap;
-        for (
+        forM (
             methods <- getMethodsFor(o, c);
             defs1 <- methods
                 |> List.filter(isBlackMagicMethod >> Utils.lnot)
@@ -89,10 +89,10 @@ mod Transform {
                 group
             } else {
                 group |> List.map(
-                    match Def(name, params, ret, eff, impl) ->
+                    match Def(name, params, ret, effect, impl) ->
                         let tpes = params |> List.map(snd) |> List.map(typeToIdentifierString);
                         let newName = name ++ String.intercalate("", tpes);
-                        Def(newName, params, ret, eff, impl)
+                        Def(newName, params, ret, effect, impl)
                 )
             }
         };
@@ -109,7 +109,7 @@ mod Transform {
         use Result.flatMap;
         let Options(opts) = o;
         let clazzName = getClassName(c);
-        for (
+        forM (
             methods <- getMethods(c)
         ) yield {
             unchecked_cast(match opts.superLevel {
@@ -125,7 +125,7 @@ mod Transform {
         use Result.flatMap;
         let Options(opts) = o;
         let clazzName = getClassName(c);
-        for (
+        forM (
             fields <- getFields(c)
         ) yield {
             unchecked_cast(match opts.superLevel {
@@ -138,14 +138,14 @@ mod Transform {
 
     def getConstructorsFor(_o: Options, c: Class): Result[Exception, List[Constructor]] = {
         use Result.flatMap;
-        for (
+        forM (
             csts <- getConstructors(c)
         ) yield {
             unchecked_cast({ csts |> Array.toList } as _ \ {})
         }
     }
 
-    def getMethodContext(m: Method): Context = if (isStaticMethod(m)) Context.Static else Context.Instance
+    def getMethodContext(m: Method): Context = if (isStaticMethod(m)) Context.Static_ else Context.Instance
 
     def isInheritedMethod(c: Class, m: Method): Bool = {
         let importClazzName = getClassName(c);
@@ -215,7 +215,7 @@ mod Transform {
             case Context.Instance =>
                 let paramNames = mkParamNames(getMethodParameterTypes(m) |> Array.length + 1);
                 List.map(Arg.NoCast, paramNames)
-            case Context.Static =>
+            case Context.Static_ =>
                 let paramNames = mkParamNames(getMethodParameterTypes(m) |> Array.length);
                 List.map(Arg.NoCast, paramNames)
         }
@@ -228,7 +228,7 @@ mod Transform {
                 let paramNames = mkParamNames(getMethodParameterTypes(m) |> Array.length + 1);
                 let paramTypes = visitType(c) :: importParamTypes;
                 List.zip(paramNames, paramTypes)
-            case Context.Static =>
+            case Context.Static_ =>
                 let paramNames = mkParamNames(getMethodParameterTypes(m) |> Array.length + 1);
                 let paramTypes = importParamTypes;
                 List.zip(paramNames, paramTypes)
@@ -246,9 +246,9 @@ mod Transform {
         let importReturnType = getReturnType(m) |> visitType;
         let context = getMethodContext(m);
         let importParamTypes = unchecked_cast({ getMethodParameterTypes(m) |> Array.toList |> List.map(visitType) } as _ \ {});
-        let eff = mkEffect(o, importReturnType);
+        let effect = mkEffect(o, importReturnType);
         let importName = importClazzName + "." + methodName;
-        let import_ = Import.Method(context, importName, importParamTypes, importReturnType, eff, alias_);
+        let import_ = Import.Method(context, importName, importParamTypes, importReturnType, effect, alias_);
 
         // build the call expression
         let doResult = shouldResultMethod(o, m);
@@ -262,7 +262,7 @@ mod Transform {
 
         let outerReturnType = mkOuterReturnType(doResult = doResult, doOption = doOption, importReturnType);
         let outerParams = mkOuterParams(c, m, importParamTypes);
-        Def(alias_, outerParams, outerReturnType, eff, impl)
+        Def(alias_, outerParams, outerReturnType, effect, impl)
     }
 
     pub def visitConstructor(o: Options, c: Class, cst: Constructor): Ast.Def = {
@@ -271,9 +271,9 @@ mod Transform {
         // build the import statement
         let importParamTypes = unchecked_cast({ getConstructorParameterTypes(cst) |> Array.toList |> List.map(visitType) } as _ \ {});
         let importReturnType = c |> visitType;
-        let eff = mkEffect(o, importReturnType);
+        let effect = mkEffect(o, importReturnType);
         let importName = getClassName(c);
-        let import_ = Import.Constructor(importName, importParamTypes, importReturnType, eff, alias_);
+        let import_ = Import.Constructor(importName, importParamTypes, importReturnType, effect, alias_);
 
         // build the call expression
         let doResult = shouldResultConstructor(o, cst);
@@ -287,7 +287,7 @@ mod Transform {
         let impl = Impl(import_, body);
         let outerReturnType = mkOuterReturnType(doResult = doResult, doOption = false, importReturnType);
         let outerParams = List.zip(paramNames, importParamTypes);
-        Def(alias_, outerParams, outerReturnType, eff, impl)
+        Def(alias_, outerParams, outerReturnType, effect, impl)
     }
 
 
@@ -302,8 +302,8 @@ mod Transform {
 
     /// Creates a getter for the given field.
     def mkGetter(o: Options, c: Class, f: Field): Ast.Def = {
-        let context = if (isStaticField(f)) Context.Static else Context.Instance;
-        let eff = match (o, isFinalField(f)) {
+        let context = if (isStaticField(f)) Context.Static_ else Context.Instance;
+        let effect = match (o, isFinalField(f)) {
             case (Options(opts), true) if opts.pureLevel >= PureLevel.PureFinal => Effect.Pure_
             case (Options(opts), _) if opts.pureLevel >= PureLevel.PureButUnit => Effect.Pure_
             case _ => Effect.IO_
@@ -313,13 +313,13 @@ mod Transform {
         let importClazzName = getClassName(importClazz);
         let fieldType = visitType(getType(f));
         let paramTypes = match context {
-            case Context.Static => Nil
+            case Context.Static_ => Nil
             case Context.Instance => visitType(c) :: Nil
         };
         let paramNames = List.range(0, List.length(paramTypes)) |> List.map(i -> "x${i}");
         let isInherited = importClazzName != getClassName(c);
         let args = match context {
-            case Context.Static => List.map(Arg.NoCast, paramNames)
+            case Context.Static_ => List.map(Arg.NoCast, paramNames)
             case Context.Instance if isInherited => match paramNames {
                 case hd :: tl => Arg.Cast(hd, visitType(importClazz)) :: List.map(Arg.NoCast, tl)
                 case Nil => bug!("unexpected empty parameter list")
@@ -328,7 +328,7 @@ mod Transform {
         };
         let params = List.zip(paramNames, paramTypes);
         let funcName = getterName(name);
-        let imp = Import.GetField(context, importClazzName + "." + name, fieldType, eff, funcName);
+        let imp = Import.GetField(context, importClazzName + "." + name, fieldType, effect, funcName);
         let call = Call(funcName, args);
         let doWrap = match (o, isPrimitive(getType(f))) {
             case (Options(opts), false) if opts.optionLevel >= OptionLevel.OptionRef => true
@@ -338,13 +338,13 @@ mod Transform {
         let wrap = if (doWrap) Wrap.WrapOption(call) else Wrap.NoWrap(call);
         let body = Body.NoTry(wrap);
         let impl = Impl(imp, body);
-        Def(funcName, params, outerReturnType, eff, impl)
+        Def(funcName, params, outerReturnType, effect, impl)
     }
 
     /// Creates a setter for the given field.
     def mkSetter(o: Options, c: Class, f: Field): Ast.Def = {
-        let context = if (isStaticField(f)) Context.Static else Context.Instance;
-        let eff = match o {
+        let context = if (isStaticField(f)) Context.Static_ else Context.Instance;
+        let effect = match o {
             case Options(opts) if opts.pureLevel >= PureLevel.PureAll => Effect.Pure_
             case _ => Effect.IO_
         };
@@ -353,13 +353,13 @@ mod Transform {
         let importClazzName = getClassName(importClazz);
         let fieldType = visitType(getType(f));
         let paramTypes = match context {
-            case Context.Static => fieldType :: Nil
+            case Context.Static_ => fieldType :: Nil
             case Context.Instance => visitType(c) :: fieldType :: Nil
         };
         let paramNames = List.range(0, List.length(paramTypes)) |> List.map(i -> "x${i}");
         let isInherited = importClazzName != getClassName(c);
         let args = match context {
-            case Context.Static => List.map(Arg.NoCast, paramNames)
+            case Context.Static_ => List.map(Arg.NoCast, paramNames)
             case Context.Instance if isInherited => match paramNames {
                 case hd :: tl => Arg.Cast(hd, visitType(importClazz)) :: List.map(Arg.NoCast, tl)
                 case Nil => bug!("unexpected empty parameter list")
@@ -368,12 +368,12 @@ mod Transform {
         };
         let params = List.zip(paramNames, paramTypes);
         let funcName = setterName(name);
-        let imp = Import.SetField(context, importClazzName + "." + name, Type_.Unit_, eff, funcName);
+        let imp = Import.SetField(context, importClazzName + "." + name, Type_.Unit_, effect, funcName);
         let call = Call(funcName, args);
         let wrap = Wrap.NoWrap(call);
         let body = Body.NoTry(wrap);
         let impl = Impl(imp, body);
-        Def(funcName, params, fieldType, eff, impl)
+        Def(funcName, params, fieldType, effect, impl)
     }
 
     /// Converts the Java class into a Flix type.
