@@ -16,7 +16,7 @@ def main(): Unit \ IO =
     match parse(args) {
         case Success(Command.Go(name, options)) =>
             match {
-                for (
+                foreach (
                     clazz <- forNameString(name);
                     res <- visitClass(options, clazz)
                 ) yield {
