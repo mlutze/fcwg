@@ -45,5 +45,3 @@ def main(): Unit \ IO =
 def exitProcessError(): Unit \ IO = exit(1)
 
 def exitParseError(): Unit \ IO = exit(2)
-
-def exitUnsupported(): Unit \ IO = exit(3)
