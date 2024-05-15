@@ -80,9 +80,9 @@ mod Options {
 
 
     def options(): List[OptionDescr[Flag]] =
-        /// {optionIds = 'g' :: Nil, optionNames = "generic" :: Nil, argDescriptor = NoArg(Generic), explanation = "Wraps generic types in Generic"} ::
+        // {optionIds = 'g' :: Nil, optionNames = "generic" :: Nil, argDescriptor = NoArg(Generic), explanation = "Wraps generic types in Generic"} ::
         {optionIds = 'h' :: Nil, optionNames = "help" :: Nil, argDescriptor = NoArg(Help), explanation = "Prints this help information and exits."} ::
-        /// {optionIds = 'i' :: Nil, optionNames = "interactive" :: Nil, argDescriptor = NoArg(Interactive), explanation = "Launches interactive mode." } ::
+        // {optionIds = 'i' :: Nil, optionNames = "interactive" :: Nil, argDescriptor = NoArg(Interactive), explanation = "Launches interactive mode." } ::
         {optionIds = 'n' :: Nil, optionNames = "namespace" :: Nil, argDescriptor = ReqArg(namespace_, "<namespace>"), explanation = "Sets the namespace. Uses the class's namespace by default."} ::
         {optionIds = 'o' :: Nil, optionNames = "option" :: Nil, argDescriptor = NoArg(Option), explanation = "Returns Option for functions returning reference types."} ::
         {optionIds = 'p' :: Nil, optionNames = "pure" :: Nil, argDescriptor = NoArg(Pure_), explanation = "Once: Casts getters for final fields to Pure. Twice: Casts all functions but those returning Unit. Thrice: Casts all functions."} ::
