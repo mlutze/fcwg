@@ -1,5 +1,12 @@
 # Flix Class Wrapper Generator
 
+Flix interop has significantly improved since the creation of this tool.
+As such, it is no longer maintained.
+
+
+
+# Old README
+
 Imports in Flix are annoying.
 They mess up purity,
 require try-catches,
